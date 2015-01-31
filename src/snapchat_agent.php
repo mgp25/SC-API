@@ -21,7 +21,7 @@ abstract class SnapchatAgent {
 	 *   Make library capable of using different endpoints (some of the
 	 *   resource names are different, so they aren't interchangeable).
 	 */
-	const URL = 'https://feelinsonice-hrd.appspot.com/bq';
+	const URL = 'https://feelinsonice-hrd.appspot.com';
 
 	/*
 	 * The API secret. Used to create access tokens.
@@ -297,13 +297,18 @@ abstract class SnapchatAgent {
 			CURLOPT_POSTFIELDS => $data,
 			CURLOPT_URL => self::URL . $endpoint,
 			CURLOPT_HTTPHEADER => array(
-				'Accept-Language: en-GB;q=1, en;q=0.9',
-				'Accept-Locale: en'
+				'Accept-Language: es;q=1',
+				'Accept-Locale: es_ES',
+				'Content-Type: application/x-www-form-urlencoded; charset=utf-8',
+				'Accept-Encoding: gzip'
 			),
 		);
 		curl_setopt_array($ch, $options);
 
 		$result = curl_exec($ch);
+		$status = json_decode($result);
+		if($status->{'status'} = '-103')
+			echo $status->{'message'};
 
 		// If cURL doesn't have a bundle of root certificates handy, we provide
 		// ours (see http://curl.haxx.se/docs/sslcerts.html).

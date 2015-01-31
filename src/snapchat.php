@@ -93,7 +93,7 @@ class Snapchat extends SnapchatAgent {
 	public function login($username, $password) {
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'/login',
+			'/loq/login',
 			array(
 				'username' => $username,
 				'password' => $password,
@@ -878,7 +878,8 @@ class Snapchat extends SnapchatAgent {
 			$cfile = curl_file_create($temp, ($type == self::MEDIA_IMAGE ? 'image/jpeg' : 'video/quicktime'), 'snap');
 		}
 
-		$media_id = strtoupper($this->username) . '~' . time();
+		$uniId = md5(uniqid());
+		$media_id = strtoupper($this->username . '~' . sprintf('%08s-%04s-%04x-%04x-%12s', substr($uniId, 0, 8), substr($uniId, 8, 12), substr($uniId, 12, 16), substr($uniId, 16, 20), substr($uniId, 20, 32)));
 		$timestamp = parent::timestamp();
 		$result = parent::post(
 			'/upload',
@@ -945,7 +946,7 @@ class Snapchat extends SnapchatAgent {
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'/send',
+			'/loq/send',
 			array(
 				'media_id' => $media_id,
 				'recipient' => implode(',', $recipients),
