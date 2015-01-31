@@ -282,7 +282,7 @@ abstract class SnapchatAgent {
 	 *   The data returned from the API (decoded if JSON). Returns FALSE if
 	 *   the request failed.
 	 */
-	public function post($endpoint, $data, $params, $multipart = FALSE) {
+	public function post($endpoint, $data, $params, $multipart = FALSE, $debug = FALSE) {
 		$ch = curl_init();
 
 		$data['req_token'] = self::hash($params[0], $params[1]);
@@ -308,7 +308,12 @@ abstract class SnapchatAgent {
 		$result = curl_exec($ch);
 		$status = json_decode($result);
 		if($status->{'status'} = '-103')
-			echo $status->{'message'};
+			echo $status->{'message'}."\n";
+		if($debug)
+		{
+			echo "\nREQUEST TO: " .self::URL . $endpoint . "\n";
+			echo 'DATA: ' . $data;
+		}
 
 		// If cURL doesn't have a bundle of root certificates handy, we provide
 		// ours (see http://curl.haxx.se/docs/sslcerts.html).
