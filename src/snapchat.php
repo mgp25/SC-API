@@ -102,8 +102,8 @@ class Snapchat extends SnapchatAgent {
 				'ptoken' => '',
 				'height' => '1136',
 				'width' => '640',
-				'nt' => '1'
-				'timestamp' => $timestamp
+				'nt' => '1',
+				'timestamp' => $timestamp,
 			),
 			array(
 				parent::STATIC_TOKEN,
@@ -986,8 +986,6 @@ class Snapchat extends SnapchatAgent {
 				$timestamp
 			)
 		);
-
-		var_dump($result);
 	}
 
 	/**
