@@ -11,7 +11,7 @@ abstract class SnapchatAgent {
 	 * Before updating this value, confirm
 	 * that the library requests everything in the same way as the app.
 	 */
-	const VERSION = 'Snapchat/8.0.1.3';
+	const VERSION = 'Snapchat/9.0.2.0';
 
 	/*
 	 * The API URL. We're using the /bq endpoint, the one that the iPhone
@@ -53,7 +53,7 @@ abstract class SnapchatAgent {
 		CURLOPT_CONNECTTIMEOUT => 5,
 		CURLOPT_RETURNTRANSFER => TRUE,
 		CURLOPT_TIMEOUT => 10,
-		CURLOPT_USERAGENT => 'Snapchat/8.0.1.3 (Nexus 5; Android 21; gzip)',
+		CURLOPT_USERAGENT => 'Snapchat/9.0.2.0 (iPhone5,2; iOS 8.1.2; gzip)',
 		CURLOPT_HTTPHEADER => array('Accept-Language: en'),
 	);
 

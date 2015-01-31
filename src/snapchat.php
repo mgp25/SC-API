@@ -97,7 +97,13 @@ class Snapchat extends SnapchatAgent {
 			array(
 				'username' => $username,
 				'password' => $password,
-				'timestamp' => $timestamp,
+				'dsig' => '',
+				'dtoken1i' => '',
+				'ptoken' => '',
+				'height' => '1136',
+				'width' => '640',
+				'nt' => '1'
+				'timestamp' => $timestamp
 			),
 			array(
 				parent::STATIC_TOKEN,
