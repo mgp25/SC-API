@@ -286,7 +286,6 @@ abstract class SnapchatAgent {
 		$ch = curl_init();
 
 		$data['req_token'] = self::hash($params[0], $params[1]);
-		$data['version'] = self::VERSION;
 
 		if (!$multipart) {
 			$data = http_build_query($data);
@@ -298,21 +297,20 @@ abstract class SnapchatAgent {
 			CURLOPT_URL => self::URL . $endpoint,
 			CURLOPT_HTTPHEADER => array(
 				'Accept-Language: es;q=1',
-				'Accept-Locale: es_ES',
-				'Content-Type: application/x-www-form-urlencoded; charset=utf-8',
-				'Accept-Encoding: gzip'
+				'Accept-Locale: es_ES'
 			),
 		);
 		curl_setopt_array($ch, $options);
 
 		$result = curl_exec($ch);
 		$status = json_decode($result);
-		if($status->{'status'} = '-103')
+		if($status->{'status'} == '-103')
 			echo $status->{'message'}."\n";
 		if($debug)
 		{
 			echo "\nREQUEST TO: " .self::URL . $endpoint . "\n";
-			echo 'DATA: ' . $data;
+			echo 'DATA: ' . $data . "\n";
+			echo 'RESULT: ' . $result . "\n";
 		}
 
 		// If cURL doesn't have a bundle of root certificates handy, we provide

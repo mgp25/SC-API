@@ -52,6 +52,8 @@ class Snapchat extends SnapchatAgent {
 	const PRIVACY_EVERYONE = 0;
 	const PRIVACY_FRIENDS = 1;
 
+	protected $debug;
+
 	/**
 	 * Sets up some initial variables. If a username and password are passed in,
 	 * we attempt to log in. If a username and auth token are passed in, we'll
@@ -64,9 +66,10 @@ class Snapchat extends SnapchatAgent {
 	 * @param string $auth_token
 	 *   The auth token, if already logged in.
 	 */
-	public function __construct($username = NULL, $password = NULL, $auth_token = NULL) {
+	public function __construct($username = NULL, $password = NULL, $auth_token = NULL, $debug = FALSE) {
 		$this->auth_token = FALSE;
 		$this->username = FALSE;
+		$this->debug = $debug;
 
 		if (!empty($password)) {
 			$this->login($username, $password);
@@ -77,6 +80,82 @@ class Snapchat extends SnapchatAgent {
 			$this->username = $username;
 		}
 	}
+
+	public function getDeviceToken()
+	{
+			$timestamp = parent::timestamp();
+
+			$result = parent::post(
+					'/loq/device_id',
+					array(
+							'timestamp' => $timestamp,
+					),
+					array(
+							parent::STATIC_TOKEN,
+							$timestamp,
+					), $multipart,
+					$debug = $this->debug
+					);
+
+			return $result;
+	}
+
+	public function getAuthToken()
+	{
+		$ch = curl_init();
+
+		$postfields = array(
+				'device_country' => 'fr',
+				'operatorCountry' => 'fr',
+				'lang' => 'fr_FR',
+				'sdk_version' => '17',
+				'google_play_services_version' => '6599036',
+				'accountType' => 'HOSTED_OR_GOOGLE',
+				'Email' => 'google.play.associated.email@gmail.com',
+				'service' => 'audience:server:client_id:694893979329-l59f3phl42et9clpoo296d8raqoljl6p.apps.googleusercontent.com',
+				'source' => 'android',
+				'androidId' => '3730d21d8976a879',
+				'app' => 'com.snapchat.android',
+				'client_sig' => '49f6bgdb81d89a9e38d65de76f09355071bd67e7',
+				'callerPkg' => 'com.snapchat.android',
+				'callerSig' => '49f6bgdb81d89a9e38d65de76f09355071bd67e7',
+				'EncryptedPasswd' => 'oauth2rt_1/kJBxEteTjVjdB41EIWXZPtEHmWqHtMtPgm55rZNvXQA'
+		);
+
+		$headers = array(
+				'device: 3730d21d8976a879',
+				'app: com.snapchat.android',
+				'User-Agent: GoogleAuth/1.4 (mako JDQ39)',
+				'Accept-Encoding: gzip'
+		);
+
+		curl_setopt($ch, CURLOPT_URL, "https://android.clients.google.com/auth");
+		curl_setopt($ch, CURLOPT_POST, TRUE);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postfields));
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+		curl_setopt($ch, CURLOPT_ENCODING, "gzip");
+		curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+
+		$result = curl_exec($ch);
+
+		if(curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200) {
+				$return['error'] = 1;
+				$return['data'] = $result;
+				if($this->debug)
+					echo "Error (".$return['error'].") while getting auth token: ".$return['data']."\n\n";
+				return $result;
+		}
+
+		curl_close($ch);
+
+		$return['error'] = 0;
+		$return['auth'] = substr(explode("\n", $result)[1], 5);
+
+		return $return;
+	}
+
 
 	/**
 	 * Handles login.
@@ -91,24 +170,32 @@ class Snapchat extends SnapchatAgent {
 	 *   Generally, returns the same result as self::getUpdates().
 	 */
 	public function login($username, $password) {
+
+		$ptoken = $this->getAuthToken();
+
+		$dtoken = $this->getDeviceToken();
+
+		$dsig = hash_hmac('sha256', $username . "|" . $password . "|" . $timestamp . "|" . parent::STATIC_TOKEN, $dtoken->dtoken1v);
+		$dsig = substr($dsig, 0, 20);
+
 		$timestamp = parent::timestamp();
 		$result = parent::post(
 			'/loq/login',
 			array(
 				'username' => $username,
 				'password' => $password,
-				'dsig' => '',
-				'dtoken1i' => '',
-				'ptoken' => '',
+		  	'dsig' => $dig,
+		  	'dtoken1i' => $this->dtoken1i,
+	      'ptoken' => $this->ptoken,
 				'height' => '1136',
 				'width' => '640',
-				'nt' => '1',
 				'timestamp' => $timestamp,
 			),
 			array(
 				parent::STATIC_TOKEN,
 				$timestamp,
-			)
+			), $multipart,
+			$debug = $this->debug
 		);
 
 		// If the login is successful, set the username and auth_token.
@@ -148,7 +235,8 @@ class Snapchat extends SnapchatAgent {
 			array(
 				$this->auth_token,
 				$timestamp,
-			)
+			), $multipart,
+			$debug = $this->debug
 		);
 
 		// Clear out the cache in case the instance is recycled.
@@ -189,7 +277,8 @@ class Snapchat extends SnapchatAgent {
 			array(
 				parent::STATIC_TOKEN,
 				$timestamp,
-			)
+			), $multipart,
+			$debug = $this->debug
 		);
 
 		if (!isset($result->token)) {
@@ -207,7 +296,8 @@ class Snapchat extends SnapchatAgent {
 			array(
 				parent::STATIC_TOKEN,
 				$timestamp,
-			)
+			), $multipart,
+			$debug = $this->debug
 		);
 
 		// If registration is successful, set the username and auth_token.
@@ -258,7 +348,8 @@ class Snapchat extends SnapchatAgent {
 			array(
 				$this->auth_token,
 				$timestamp,
-			)
+			), $multipart,
+			$debug = $this->debug
 		);
 
 		if (!empty($result->updates_response)) {
@@ -341,7 +432,8 @@ class Snapchat extends SnapchatAgent {
 			array(
 				$this->auth_token,
 				$timestamp,
-			)
+			), $multipart,
+			$debug = $this->debug
 		);
 
 		if (!empty($result->stories_response)) {
@@ -398,7 +490,8 @@ class Snapchat extends SnapchatAgent {
 				array(
 					$this->auth_token,
 					$timestamp,
-				)
+				), $multipart,
+				$debug = $this->debug
 			);
 
 			if (isset($result->results)) {
@@ -468,7 +561,8 @@ class Snapchat extends SnapchatAgent {
 			array(
 				$this->auth_token,
 				$timestamp,
-			)
+			), $multipart,
+			$debug = $this->debug
 		);
 
 		// Sigh...
@@ -522,7 +616,8 @@ class Snapchat extends SnapchatAgent {
 			array(
 				$this->auth_token,
 				$timestamp,
-			)
+			), $multipart,
+			$debug = $this->debug
 		);
 
 		return !empty($result->message);
@@ -558,7 +653,8 @@ class Snapchat extends SnapchatAgent {
 			array(
 				$this->auth_token,
 				$timestamp,
-			)
+			), $multipart,
+			$debug = $this->debug
 		);
 
 		return !empty($result->message);
@@ -594,7 +690,8 @@ class Snapchat extends SnapchatAgent {
 			array(
 				$this->auth_token,
 				$timestamp,
-			)
+			), $multipart,
+			$debug = $this->debug
 		);
 
 		return !empty($result->message);
@@ -627,7 +724,8 @@ class Snapchat extends SnapchatAgent {
 			array(
 				$this->auth_token,
 				$timestamp,
-			)
+			),  $multipart,
+			$debug = $this->debug
 		);
 
 		return !empty($result->message);
@@ -660,7 +758,8 @@ class Snapchat extends SnapchatAgent {
 			array(
 				$this->auth_token,
 				$timestamp,
-			)
+			), $multipart,
+			$debug = $this->debug
 		);
 
 		return !empty($result->message);
@@ -698,7 +797,8 @@ class Snapchat extends SnapchatAgent {
 			array(
 				$this->auth_token,
 				$timestamp,
-			)
+			), $multipart,
+			$debug = $this->debug
 		);
 
 		if (parent::isMedia(substr($result, 0, 2))) {
@@ -757,7 +857,8 @@ class Snapchat extends SnapchatAgent {
 			array(
 				$this->auth_token,
 				$timestamp,
-			)
+			), $multipart,
+			$debug = $this->debug
 		);
 
 		return is_null($result);
@@ -894,7 +995,8 @@ class Snapchat extends SnapchatAgent {
 				$this->auth_token,
 				$timestamp,
 			),
-			TRUE
+			$multipart = TRUE,
+			$debug = $this->debug
 		);
 
 		unlink($temp);
@@ -951,13 +1053,14 @@ class Snapchat extends SnapchatAgent {
 				'media_id' => $media_id,
 				'recipient' => implode(',', $recipients),
 				'time' => $time,
-				'timestamp' => $timestamp,
 				'username' => $this->username,
+				'zipped' => '0'
 			),
 			array(
 				$this->auth_token,
 				$timestamp,
-			)
+			),  $multipart,
+			$debug = $this->debug
 		);
 
 		return is_null($result);
@@ -985,7 +1088,8 @@ class Snapchat extends SnapchatAgent {
 			array(
 				$this->auth_token,
 				$timestamp
-			)
+			), $multipart,
+			$debug = $this->debug
 		);
 	}
 
@@ -1039,7 +1143,8 @@ class Snapchat extends SnapchatAgent {
 			array(
 				$this->auth_token,
 				$timestamp,
-			)
+			), $multipart,
+			$debug = $this->debug
 		);
 
 		return is_null($result);
@@ -1060,7 +1165,8 @@ class Snapchat extends SnapchatAgent {
 			array(
 				$this->auth_token,
 				$timestamp,
-			)
+			), $multipart,
+			$debug = $this->debug
 		);
 
 		return is_null($result);
@@ -1159,7 +1265,8 @@ class Snapchat extends SnapchatAgent {
 			array(
 				$this->auth_token,
 				$timestamp,
-			)
+			), $multipart,
+			$debug = $this->debug
 		);
 
 		return is_null($result);
@@ -1195,7 +1302,8 @@ class Snapchat extends SnapchatAgent {
 			array(
 				$this->auth_token,
 				$timestamp,
-			)
+			), $multipart,
+			$debug = $this->debug
 		);
 
 		if (empty($result)) {
@@ -1232,7 +1340,8 @@ class Snapchat extends SnapchatAgent {
 			array(
 				$this->auth_token,
 				$timestamp,
-			)
+			), $multipart,
+			$debug = $this->debug
 		);
 
 		return is_null($result);
@@ -1274,7 +1383,8 @@ class Snapchat extends SnapchatAgent {
 			array(
 				$this->auth_token,
 				$timestamp,
-			)
+			), $multipart,
+			$debug = $this->debug
 		);
 
 		return isset($result->param) && $result->param == $setting;
@@ -1307,7 +1417,8 @@ class Snapchat extends SnapchatAgent {
 			array(
 				$this->auth_token,
 				$timestamp,
-			)
+			), $multipart,
+			$debug = $this->debug
 		);
 
 		return isset($result->param) && $result->param == $email;
