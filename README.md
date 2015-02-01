@@ -1,3 +1,8 @@
 # Snap API
 
-SnapChat API with all the features and documentation. Coming soon :)
+Interface to Snapchat
+
+Based on [JorgenPhi](https://github.com/JorgenPhi/php-snapchat) code.
+
+## License
+MIT
