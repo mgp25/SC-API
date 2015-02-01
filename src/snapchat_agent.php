@@ -53,8 +53,14 @@ abstract class SnapchatAgent {
 		CURLOPT_CONNECTTIMEOUT => 5,
 		CURLOPT_RETURNTRANSFER => TRUE,
 		CURLOPT_TIMEOUT => 10,
-		CURLOPT_USERAGENT => 'Snapchat/9.0.2.0 (iPhone5,2; iOS 8.1.2; gzip)',
+		CURLOPT_USERAGENT => 'Snapchat/9.0.2.0 (Nexus 5; Android 21; gzip)',
 		CURLOPT_HTTPHEADER => array('Accept-Language: en'),
+	);
+
+	public static $CURL_HEADERS = array(
+		'Accept-Language: en-GB;q=1, en;q=0.9',
+		'Accept-Encoding: gzip',
+		'Accept-Locale: en'
 	);
 
 	/**
@@ -64,7 +70,7 @@ abstract class SnapchatAgent {
 	 *   The current timestamp, expressed in milliseconds since epoch.
 	 */
 	public function timestamp() {
-		return intval(microtime(TRUE) * 1000);
+		return round(microtime(TRUE) * 1000);
 	}
 
 	/**
@@ -295,12 +301,17 @@ abstract class SnapchatAgent {
 			CURLOPT_POST => TRUE,
 			CURLOPT_POSTFIELDS => $data,
 			CURLOPT_URL => self::URL . $endpoint,
-			CURLOPT_HTTPHEADER => array(
-				'Accept-Language: es;q=1',
-				'Accept-Locale: es_ES'
-			),
 		);
 		curl_setopt_array($ch, $options);
+
+		if($endpoint == "/loq/login")
+		{
+				$headers = array_merge(self::$CURL_HEADERS, array("Authorization: Bearer {$params[2]}"));
+		} else {
+			$headers = self::$CURL_HEADERS;
+		}
+
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
 		$result = curl_exec($ch);
 		$status = json_decode($result);
@@ -322,22 +333,41 @@ abstract class SnapchatAgent {
 
 		// If the cURL request fails, return FALSE. Also check the status code
 		// since the API generally won't return friendly errors.
-		if ($result === FALSE || curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200) {
+		if ($result === FALSE)
+		{
 			curl_close($ch);
-			return FALSE;
+
+			return $result;
+		}
+
+		if(curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200)
+		{
+				$return['data'] = $result;
+				$return['test'] = 1;
+				$return['code'] = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+				curl_close($ch);
+
+				return $return;
 		}
 
 		curl_close($ch);
 
-		if ($endpoint == '/blob') {
-			return $result;
+		$return['error'] = 0;
+
+		if ($endpoint == '/blob' || $endpoint == "/bq/snaptag_download")
+		{
+				$return['data'] = $result;
+
+				return $result;
 		}
 
 		// Add support for foreign characters in the JSON response.
 		$result = iconv('UTF-8', 'UTF-8//IGNORE', utf8_encode($result));
 
-		$data = json_decode($result);
-		return json_last_error() == JSON_ERROR_NONE ? $data : FALSE;
+		$return['data'] = json_decode($result);
+
+		return $return;
 	}
 
 }

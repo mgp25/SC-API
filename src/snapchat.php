@@ -100,33 +100,53 @@ class Snapchat extends SnapchatAgent {
 			return $result;
 	}
 
-	public function getAuthToken()
+	public function device($device_token)
 	{
-		$ch = curl_init();
 
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/loq/all_updates',
+				array(
+					'device_token' => $device_token,
+					'type' => "android",
+					'timestamp' => $timestamp,
+					'username' => $this->username,
+				),
+				array(
+					$this->auth_token,
+					$timestamp,
+				)
+			);
+
+			return $result;
+	}
+
+	private function getAuthToken() {
+
+		$ch = curl_init();
 		$postfields = array(
-				'device_country' => 'fr',
-				'operatorCountry' => 'fr',
-				'lang' => 'fr_FR',
-				'sdk_version' => '17',
-				'google_play_services_version' => '6599036',
-				'accountType' => 'HOSTED_OR_GOOGLE',
-				'Email' => 'google.play.associated.email@gmail.com',
-				'service' => 'audience:server:client_id:694893979329-l59f3phl42et9clpoo296d8raqoljl6p.apps.googleusercontent.com',
-				'source' => 'android',
-				'androidId' => '3730d21d8976a879',
-				'app' => 'com.snapchat.android',
-				'client_sig' => '49f6bgdb81d89a9e38d65de76f09355071bd67e7',
-				'callerPkg' => 'com.snapchat.android',
-				'callerSig' => '49f6bgdb81d89a9e38d65de76f09355071bd67e7',
-				'EncryptedPasswd' => 'oauth2rt_1/kJBxEteTjVjdB41EIWXZPtEHmWqHtMtPgm55rZNvXQA'
+			'device_country' => 'gb',
+			'operatorCountry' => 'gb',
+			'lang' => 'en_GB',
+			'sdk_version' => '17',
+			'google_play_services_version' => '6599036',
+			'accountType' => 'HOSTED_OR_GOOGLE',
+			'Email' => 'GOOGLE_PLAY_ASSOCIATED_EMAIL',
+			'service' => 'audience:server:client_id:694893979329-l59f3phl42et9clpoo296d8raqoljl6p.apps.googleusercontent.com',
+			'source' => 'android',
+			'androidId' => 'YOUR_ANDROID_ID',
+			'app' => 'com.snapchat.android',
+			'client_sig' => 'YOUR_CLIENT_SIG',
+			'callerPkg' => 'com.snapchat.android',
+			'callerSig' => 'YOUR_CALLER_SIG',
+			'EncryptedPasswd' => 'YOUR_ENCRYPTED_PASSWORD'
 		);
 
 		$headers = array(
-				'device: 3730d21d8976a879',
-				'app: com.snapchat.android',
-				'User-Agent: GoogleAuth/1.4 (mako JDQ39)',
-				'Accept-Encoding: gzip'
+			'device: YOUR_DEVICE_ID',
+			'app: com.snapchat.android',
+			'User-Agent: GoogleAuth/1.4 (mako JDQ39)',
+			'Accept-Encoding: gzip'
 		);
 
 		curl_setopt($ch, CURLOPT_URL, "https://android.clients.google.com/auth");
@@ -140,18 +160,64 @@ class Snapchat extends SnapchatAgent {
 
 		$result = curl_exec($ch);
 
-		if(curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200) {
+		if(curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200)
+		{
 				$return['error'] = 1;
 				$return['data'] = $result;
-				if($this->debug)
-					echo "Error (".$return['error'].") while getting auth token: ".$return['data']."\n\n";
-				return $result;
+
+				return $return;
 		}
 
 		curl_close($ch);
 
 		$return['error'] = 0;
 		$return['auth'] = substr(explode("\n", $result)[1], 5);
+
+		return $return;
+	}
+
+	private function getGCMToken() {
+
+		$ch = curl_init();
+		$postfields = array(
+			'X-GOOG.USER_AID' => 'YOUR_GOOGLE_USER_AID',
+			'app' => 'com.snapchat.android',
+			'sender' => 'YOUR_SENDER_KEY',
+			'cert' => 'YOUR_CERT_KEY',
+			'device' => 'YOUR_DEVICE_ID',
+			'app_ver' => '508',
+			'info' => '',
+		);
+
+		$headers = array(
+			'app: com.snapchat.android',
+			'User-Agent: Android-GCM/1.4 (mako JDQ39)',
+			'Authorization: AidLogin YOUR_GOOGLE_USER_AID'
+		);
+
+		curl_setopt($ch, CURLOPT_URL, "https://android.clients.google.com/c2dm/register3");
+		curl_setopt($ch, CURLOPT_POST, TRUE);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postfields));
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+		curl_setopt($ch, CURLOPT_ENCODING, "gzip");
+		curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+
+		$result = curl_exec($ch);
+
+		if(curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200)
+		{
+				$return['error'] = 1;
+				$return['data'] = $result;
+
+				return $return;
+		}
+
+		curl_close($ch);
+
+		$return['error'] = 0;
+		$return['token'] = substr($result, 6);
 
 		return $return;
 	}
@@ -171,46 +237,68 @@ class Snapchat extends SnapchatAgent {
 	 */
 	public function login($username, $password) {
 
-		$ptoken = $this->getAuthToken();
-
 		$dtoken = $this->getDeviceToken();
 
-		$dsig = hash_hmac('sha256', $username . "|" . $password . "|" . $timestamp . "|" . parent::STATIC_TOKEN, $dtoken->dtoken1v);
-		$dsig = substr($dsig, 0, 20);
+		if($dtoken['error'] == 1)
+		{
+				$return['message'] = "Failed to get new Device token set.";
+				return $return;
+		}
+
+		$ptoken = $this->getGCMToken();
+
+		if($ptoken['error'] == 1)
+		{
+				$return['message'] = "Failed to get GCM token.";
+				return $return;
+		}
 
 		$timestamp = parent::timestamp();
+		$req_token = parent::hash(parent::STATIC_TOKEN, $timestamp);
+		$string = $username . "|" . $password . "|" . $timestamp . "|" . $req_token;
+
+		$auth = $this->getAuthToken();
+
+		if($auth['error'] == 1)
+		{
+				return $auth;
+		}
+
 		$result = parent::post(
-			'/loq/login',
-			array(
-				'username' => $username,
-				'password' => $password,
-		  	'dsig' => $dig,
-		  	'dtoken1i' => $this->dtoken1i,
-	      'ptoken' => $this->ptoken,
-				'height' => '1136',
-				'width' => '640',
-				'timestamp' => $timestamp,
-			),
-			array(
-				parent::STATIC_TOKEN,
-				$timestamp,
-			), $multipart,
-			$debug = $this->debug
-		);
+				'/loq/login',
+						array(
+							'username' => $username,
+							'password' => $password,
+							'height' => 1280,
+							'width' => 720,
+							'max_video_height' => 640,
+							'max_video_width' => 480,
+							'dsig' => substr(hash_hmac('sha256', $string, $dtoken['data']->dtoken1v), 0, 20),
+							'dtoken1i' => $dtoken['data']->dtoken1i,
+							'ptoken' => $ptoken['token'],
+							'timestamp' => $timestamp,
+							'req_token' => $req_token,
+						),
+					array(
+						parent::STATIC_TOKEN,
+						$timestamp,
+						$auth['auth']
+					)
+				);
 
-		// If the login is successful, set the username and auth_token.
-		if (isset($result->logged) && $result->logged) {
-			$this->auth_token = $result->auth_token;
-			$this->username = $result->username;
+				if($result['error'] == 1)
+				{
+						return $result;
+				}
 
-			$this->cache = new SnapchatCache();
-			$this->cache->set('updates', $result);
+				if(isset($result['data']->updates_response->logged) && $result['data']->updates_response->logged)
+				{
+						$this->auth_token = $result['data']->updates_response->auth_token;
+						$this->username = $result['data']->updates_response->username;
+						$this->device($ptoken['token']);
+				}
 
-			return $result;
-		}
-		else {
-			return FALSE;
-		}
+				return $result;
 	}
 
 	/**
