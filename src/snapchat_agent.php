@@ -314,9 +314,6 @@ abstract class SnapchatAgent {
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
 		$result = curl_exec($ch);
-		$status = json_decode($result);
-		if($status->{'status'} == '-103')
-			echo $status->{'message'}."\n";
 		if($debug)
 		{
 			echo "\nREQUEST TO: " .self::URL . $endpoint . "\n";

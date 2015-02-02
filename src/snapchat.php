@@ -52,6 +52,8 @@ class Snapchat extends SnapchatAgent {
 	const PRIVACY_EVERYONE = 0;
 	const PRIVACY_FRIENDS = 1;
 
+	protected $auth_token;
+	protected $username;
 	protected $debug;
 
 	/**
@@ -66,19 +68,10 @@ class Snapchat extends SnapchatAgent {
 	 * @param string $auth_token
 	 *   The auth token, if already logged in.
 	 */
-	public function __construct($username = NULL, $password = NULL, $auth_token = NULL, $debug = FALSE) {
-		$this->auth_token = FALSE;
-		$this->username = FALSE;
+	public function __construct($username = NULL, $auth_token = NULL, $debug = FALSE) {
+		$this->auth_token = $auth_token;
+		$this->username = $username;
 		$this->debug = $debug;
-
-		if (!empty($password)) {
-			$this->login($username, $password);
-		}
-		elseif (!empty($auth_token)) {
-			$this->auth_token = $auth_token;
-			$this->cache = new SnapchatCache();
-			$this->username = $username;
-		}
 	}
 
 	public function getDeviceToken()
@@ -115,7 +108,8 @@ class Snapchat extends SnapchatAgent {
 				array(
 					$this->auth_token,
 					$timestamp,
-				)
+				), $multipart,
+				$debug = $this->debug
 			);
 
 			return $result;
@@ -159,6 +153,13 @@ class Snapchat extends SnapchatAgent {
 		curl_setopt($ch, CURLINFO_HEADER_OUT, true);
 
 		$result = curl_exec($ch);
+
+		if($this->debug)
+		{
+			echo "\nREQUEST TO: https://android.clients.google.com/auth\n";
+			echo 'DATA: ' . print_r($postfields) . "\n";
+			echo 'RESULT: ' . $result . "\n";
+		}
 
 		if(curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200)
 		{
@@ -205,6 +206,13 @@ class Snapchat extends SnapchatAgent {
 		curl_setopt($ch, CURLINFO_HEADER_OUT, true);
 
 		$result = curl_exec($ch);
+
+		if($this->debug)
+		{
+			echo "\nREQUEST TO: https://android.clients.google.com/c2dm/register3\n";
+			echo 'DATA: ' . print_r($postfields) . "\n";
+			echo 'RESULT: ' . $result . "\n";
+		}
 
 		if(curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200)
 		{
@@ -283,7 +291,8 @@ class Snapchat extends SnapchatAgent {
 						parent::STATIC_TOKEN,
 						$timestamp,
 						$auth['auth']
-					)
+					),$multipart,
+					$debug = $this->debug
 				);
 
 				if($result['error'] == 1)
