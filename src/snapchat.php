@@ -119,25 +119,25 @@ class Snapchat extends SnapchatAgent {
 
 		$ch = curl_init();
 		$postfields = array(
-			'device_country' => 'gb',
-			'operatorCountry' => 'gb',
-			'lang' => 'en_GB',
-			'sdk_version' => '17',
+			'device_country' => 'nl',
+			'operatorCountry' => 'nl',
+			'lang' => 'en_US',
+			'sdk_version' => '16',
 			'google_play_services_version' => '6599036',
 			'accountType' => 'HOSTED_OR_GOOGLE',
-			'Email' => 'GOOGLE_PLAY_ASSOCIATED_EMAIL',
+			'Email' => 'test@gmail.com',
 			'service' => 'audience:server:client_id:694893979329-l59f3phl42et9clpoo296d8raqoljl6p.apps.googleusercontent.com',
 			'source' => 'android',
-			'androidId' => 'YOUR_ANDROID_ID',
+			'androidId' => '378c184c6070c26c',
 			'app' => 'com.snapchat.android',
-			'client_sig' => 'YOUR_CLIENT_SIG',
+			'client_sig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
 			'callerPkg' => 'com.snapchat.android',
-			'callerSig' => 'YOUR_CALLER_SIG',
-			'EncryptedPasswd' => 'YOUR_ENCRYPTED_PASSWORD'
+			'callerSig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
+			'EncryptedPasswd' => 'oauth2rt_1/nYRuxRtMeGL5apSzWwV07Wq5WH5vXgv65py-eeID_CU'
 		);
 
 		$headers = array(
-			'device: YOUR_DEVICE_ID',
+			'device: 378c184c6070c26c',
 			'app: com.snapchat.android',
 			'User-Agent: GoogleAuth/1.4 (mako JDQ39)',
 			'Accept-Encoding: gzip'
@@ -181,11 +181,11 @@ class Snapchat extends SnapchatAgent {
 
 		$ch = curl_init();
 		$postfields = array(
-			'X-GOOG.USER_AID' => 'YOUR_GOOGLE_USER_AID',
+			'X-GOOG.USER_AID' => '4002600885140111980',
 			'app' => 'com.snapchat.android',
-			'sender' => 'YOUR_SENDER_KEY',
-			'cert' => 'YOUR_CERT_KEY',
-			'device' => 'YOUR_DEVICE_ID',
+			'sender' => '191410808405',
+			'cert' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
+			'device' => '4002600885140111980',
 			'app_ver' => '508',
 			'info' => '',
 		);
@@ -193,7 +193,7 @@ class Snapchat extends SnapchatAgent {
 		$headers = array(
 			'app: com.snapchat.android',
 			'User-Agent: Android-GCM/1.4 (mako JDQ39)',
-			'Authorization: AidLogin YOUR_GOOGLE_USER_AID'
+			'Authorization: AidLogin 4002600885140111980:7856388705669173275'
 		);
 
 		curl_setopt($ch, CURLOPT_URL, "https://android.clients.google.com/c2dm/register3");
@@ -1077,16 +1077,17 @@ class Snapchat extends SnapchatAgent {
 		}
 
 		$uniId = md5(uniqid());
-		$media_id = strtoupper($this->username . '~' . sprintf('%08s-%04s-%04x-%04x-%12s', substr($uniId, 0, 8), substr($uniId, 8, 12), substr($uniId, 12, 16), substr($uniId, 16, 20), substr($uniId, 20, 32)));
+		$media_id = strtoupper($this->username . '~' . sprintf('%08s-%04s-%04x-%04x-%12s', substr($uniId, 0, 8), substr($uniId, 8, 4), substr($uniId, 12, 4), substr($uniId, 16, 4), substr($uniId, 20, 12)));
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'/upload',
+			'/ph/upload',
 			array(
 				'media_id' => $media_id,
 				'type' => $type,
 				'data' => (version_compare(PHP_VERSION, '5.5.0', '>=') ? $cfile : '@' . $temp . ';filename=data'),
 				'timestamp' => $timestamp,
 				'username' => $this->username,
+				'zipped' => '0'
 			),
 			array(
 				$this->auth_token,
@@ -1098,7 +1099,8 @@ class Snapchat extends SnapchatAgent {
 
 		unlink($temp);
 
-		return is_null($result) ? $media_id : FALSE;
+		//TODO IF ERROR
+		return $media_id;
 	}
 
 	/**
@@ -1148,9 +1150,14 @@ class Snapchat extends SnapchatAgent {
 			'/loq/send',
 			array(
 				'media_id' => $media_id,
-				'recipient' => implode(',', $recipients),
+				'recipients' => implode(',', $recipients),
 				'time' => $time,
+				//'camera_front_facing' => '0',
+				//'country_code' => 'US',
 				'username' => $this->username,
+				//'type' => '0',
+				//'reply' => '0',
+				'features_map' => '{}',
 				'zipped' => '0'
 			),
 			array(
