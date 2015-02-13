@@ -53,13 +53,12 @@ abstract class SnapchatAgent {
 		CURLOPT_CONNECTTIMEOUT => 5,
 		CURLOPT_RETURNTRANSFER => TRUE,
 		CURLOPT_TIMEOUT => 10,
-		CURLOPT_USERAGENT => 'Snapchat/9.0.2.0 (Nexus 5; Android 21; gzip)',
-		CURLOPT_HTTPHEADER => array('Accept-Language: en'),
+		CURLOPT_USERAGENT => 'Snapchat/9.1.0.0 (GT-S7710; Android 4.1.2#S7710XXAMB6#16; gzip)',
+		CURLOPT_HTTPHEADER => array('Accept-Language: en', 'Accept-Locale: en_US'),
 	);
 
 	public static $CURL_HEADERS = array(
 		'Accept-Language: en-GB;q=1, en;q=0.9',
-		'Accept-Encoding: gzip',
 		'Accept-Locale: en'
 	);
 
@@ -317,8 +316,17 @@ abstract class SnapchatAgent {
 		if($debug)
 		{
 			echo "\nREQUEST TO: " .self::URL . $endpoint . "\n";
-			echo 'DATA: ' . $data . "\n";
-			echo 'RESULT: ' . $result . "\n";
+			if(is_array($data))
+				echo 'DATA: ' . print_r($data) . "\n";
+			else
+				echo 'DATA: ' . $data . "\n";
+			if ($endpoint == "/loq/login" || $endpoint == "/all_updates")
+			{
+				$jsonResult = json_decode($result);
+				echo 'RESULT: ' . print_r($jsonResult) . "\n";
+			}
+			else
+				echo 'RESULT: ' . $result . "\n";
 		}
 
 		// If cURL doesn't have a bundle of root certificates handy, we provide
