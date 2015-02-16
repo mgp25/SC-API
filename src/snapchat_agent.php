@@ -58,7 +58,7 @@ abstract class SnapchatAgent {
 	);
 
 	public static $CURL_HEADERS = array(
-		'Accept-Language: en-GB;q=1, en;q=0.9',
+		'Accept-Language: en;q=1',
 		'Accept-Locale: en'
 	);
 
@@ -239,12 +239,13 @@ abstract class SnapchatAgent {
 					$result[$filename] = zip_entry_read($zip_entry, zip_entry_filesize($zip_entry));
 					zip_entry_close($zip_entry);
 				} else {
+				    unlink("./temp");
 					return FALSE;
 				}
 			}
 			zip_close($resource);
 		}
-
+        unlink("./temp");
 		return $result;
 	}
 
@@ -291,11 +292,21 @@ abstract class SnapchatAgent {
 		$ch = curl_init();
 
 		$data['req_token'] = self::hash($params[0], $params[1]);
-
+        $boundary = "Boundary+0xAbCdEfGbOuNdArY";//md5(time());
 		if (!$multipart) {
 			$data = http_build_query($data);
+		}else{
+            $datas = "--".$boundary."\r\n" . 'Content-Disposition: form-data; name="req_token"' . "\r\n\r\n" . self::hash($params[0], $params[1]) . "\r\n";
+            foreach ($data as $key => $value){
+                if($key == "req_token") continue;
+                if($key != 'data'){
+                    $datas .= "--".$boundary."\r\n" . 'Content-Disposition: form-data; name="' . $key . '"' . "\r\n\r\n" . $value . "\r\n";
+                }else{
+                    $datas .= "--".$boundary."\r\n" . 'Content-Disposition: form-data; name="data"; filename="data"'."\r\n" . 'Content-Type: application/octet-stream'."\r\n\r\n" . $value . "\r\n";
+                }
+            }
+            $data = $datas . "--".$boundary."--";
 		}
-
 		$options = self::$CURL_OPTIONS + array(
 			CURLOPT_POST => TRUE,
 			CURLOPT_POSTFIELDS => $data,
@@ -309,7 +320,12 @@ abstract class SnapchatAgent {
 		} else {
 			$headers = self::$CURL_HEADERS;
 		}
-
+		if ($multipart) {
+            $headers = array_merge($headers, array("X-Timestamp: 0","Content-Type: multipart/form-data; boundary=$boundary"));
+		}
+		if ($endpoint == '/ph/blob' || $endpoint == '/bq/blob' || $endpoint == '/bq/chat_media'){
+		    $headers = array_merge($headers, array("X-Timestamp: " . $params[1]));
+		}
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
 		$result = curl_exec($ch);
@@ -336,6 +352,7 @@ abstract class SnapchatAgent {
 			$result = curl_exec($ch);
 		}
 
+		$gi = curl_getinfo($ch);
 		// If the cURL request fails, return FALSE. Also check the status code
 		// since the API generally won't return friendly errors.
 		if ($result === FALSE)
@@ -360,7 +377,7 @@ abstract class SnapchatAgent {
 
 		$return['error'] = 0;
 
-		if ($endpoint == '/blob' || $endpoint == "/bq/snaptag_download")
+		if ($endpoint == '/ph/blob' || $endpoint == '/bq/blob' || $endpoint == "/bq/snaptag_download" || $endpoint == '/bq/chat_media')
 		{
 				$return['data'] = $result;
 
