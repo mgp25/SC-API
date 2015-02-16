@@ -1115,7 +1115,7 @@ class Snapchat extends SnapchatAgent {
 	 *
 	 * @return bool
 	 *   TRUE if successful, FALSE otherwise.
-	 */
+	 *
 	public function send($media, $recipients, $time = 3, $media_id = null) {
 		// Make sure we're logged in and have a valid access token.
 
@@ -1168,6 +1168,42 @@ class Snapchat extends SnapchatAgent {
 		);
 
 		return is_null($result);
+	}
+	*/
+
+	public function send($media, $recipients, $type = 0, $time = 3) {
+		// Make sure we're logged in and have a valid access token.
+		if (!$this->auth_token || !$this->username) {
+			return FALSE;
+		}
+
+		$uniId = md5(uniqid());
+		$media_id = strtoupper($this->username . '~' . sprintf('%08s-%04s-%04x-%04x-%12s', substr($uniId, 0, 8), substr($uniId, 8, 4), substr($uniId, 12, 4), substr($uniId, 16, 4), substr($uniId, 20, 12)));
+
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/loq/retry',
+			array(
+				'camera_front_facing' => rand(0,1),
+				'country_code' => 'US',
+				'media_id' => $media_id,
+				'recipients' => "[\"" . $recipients . "\"]",
+				'reply' => '0',
+				'time' => $time,
+				'timestamp' => $timestamp,
+				'type' => $type,
+				'username' => $this->username,
+				'zipped' => '0',
+				'data' => file_get_contents($media)
+			),
+			array(
+				$this->auth_token,
+				$timestamp,
+			),  $multipart = true,
+					$debug = $this->debug
+		);
+
+		return $result;
 	}
 
 	// NEED TO FINISH
