@@ -1246,48 +1246,44 @@ class Snapchat extends SnapchatAgent {
 	 * @return bool
 	 *   TRUE if successful, FALSE otherwise.
 	 */
-	public function setStory($media, $time = 3) {
+	public function setStory($type, $media, $time = 10, $caption="") {
 		// Make sure we're logged in and have a valid access token.
 		if (!$this->auth_token || !$this->username) {
 			return FALSE;
 		}
-
-		$mime = mime_content_type($media);
-		if(strstr($mime, "video/"))
-		{
-			$media_id = $this->upload(
-			Snapchat::MEDIA_VIDEO,
-			file_get_contents($media)
-			);
-			$media_type = Snapchat::MEDIA_VIDEO;
-		}else if(strstr($mime, "image/"))
-		{
-			$media_id = $this->upload(
-			Snapchat::MEDIA_IMAGE,
-			file_get_contents($media)
-			);
-			$media_type = Snapchat::MEDIA_IMAGE;
+		$temp = tempnam(sys_get_temp_dir(), 'Snap');
+		file_put_contents($temp, $media);
+		if (false && version_compare(PHP_VERSION, '5.5.0', '>=')) {
+			$cfile = curl_file_create($temp, ($type == self::MEDIA_IMAGE ? 'image/jpeg' : 'video/quicktime'), 'snap');
+		}else{
+				$cfile = file_get_contents($temp);
 		}
-
 		$timestamp = parent::timestamp();
+		$media_id = strtoupper($this->username) . '~' . $this->getRandomUUID();
 		$result = parent::post(
-			'/post_story',
+			'/bq/retry_post_story',
 			array(
-				'client_id' => $media_id,
+				'camera_front_facing' => rand(0,1),
+				'caption_text_display' => $caption,
+				'country_code' => 'US',
 				'media_id' => $media_id,
-				'time' => $time,
+				'client_id' => $media_id,
 				'timestamp' => $timestamp,
-				'type' => $media_type,
-				'username' => $this->username,
+				'story_timestamp' => ($timestamp - 1234),
+				'time' => $time,
+				'type' => $type,
+				'username' => strtolower($this->username),
+				'zipped' => '0',
+				'data' => $cfile
 			),
 			array(
 				$this->auth_token,
 				$timestamp,
-			), $multipart,
+			),
+			$multipart = true,
 			$debug = $this->debug
 		);
-
-		return is_null($result);
+		return ($result);
 	}
 
 	public function deleteStory($storyId) {
