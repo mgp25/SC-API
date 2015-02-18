@@ -1259,7 +1259,8 @@ class Snapchat extends SnapchatAgent {
 				$cfile = file_get_contents($temp);
 		}
 		$timestamp = parent::timestamp();
-		$media_id = strtoupper($this->username) . '~' . $this->getRandomUUID();
+		$uniId = md5(uniqid());
+		$media_id = strtoupper($this->username . '~' . sprintf('%08s-%04s-%04x-%04x-%12s', substr($uniId, 0, 8), substr($uniId, 8, 4), substr($uniId, 12, 4), substr($uniId, 16, 4), substr($uniId, 20, 12)));
 		$result = parent::post(
 			'/bq/retry_post_story',
 			array(
