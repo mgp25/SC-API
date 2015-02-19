@@ -1246,11 +1246,23 @@ class Snapchat extends SnapchatAgent {
 	 * @return bool
 	 *   TRUE if successful, FALSE otherwise.
 	 */
-	public function setStory($type, $media, $time = 10, $caption="") {
+	public function setStory($media, $time = 10, $caption="") {
 		// Make sure we're logged in and have a valid access token.
 		if (!$this->auth_token || !$this->username) {
 			return FALSE;
 		}
+
+			$mime = mime_content_type($media);
+			if(strstr($mime, "video/"))
+			{
+				$type = Snapchat::MEDIA_VIDEO;
+			}else if(strstr($mime, "image/"))
+			{
+				$type = Snapchat::MEDIA_IMAGE;
+			}
+
+		$media = file_get_contents($media);
+
 		$temp = tempnam(sys_get_temp_dir(), 'Snap');
 		file_put_contents($temp, $media);
 		if (false && version_compare(PHP_VERSION, '5.5.0', '>=')) {
