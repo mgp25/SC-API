@@ -364,7 +364,7 @@ class Snapchat extends SnapchatAgent {
 	public function register($username, $password, $email, $birthday) {
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'/register',
+			'loq/register',
 			array(
 				'birthday' => $birthday,
 				'password' => $password,
