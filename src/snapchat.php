@@ -2,6 +2,7 @@
 
 include_once dirname(__FILE__) . '/snapchat_agent.php';
 include_once dirname(__FILE__) . '/snapchat_cache.php';
+include_once dirname(__FILE__) . '/func.php';
 
 /**
  * @file
@@ -1171,10 +1172,21 @@ class Snapchat extends SnapchatAgent {
 	}
 	*/
 
-	public function send($media, $recipients, $type = 0, $time = 3) {
+	public function send($media, $recipients, $text = null, $type = 0, $time = 3) {
 		// Make sure we're logged in and have a valid access token.
 		if (!$this->auth_token || !$this->username) {
 			return FALSE;
+		}
+
+		if($text != null)
+		{
+			text($media, $text);
+			$media = file_get_contents(__DIR__ . '/cache/image.jpg');
+			unlink(__DIR__ . '/cache/image.jpg');
+		}
+		else
+		{
+			$media = file_get_contents($media);
 		}
 
 		$uniId = md5(uniqid());
@@ -1194,7 +1206,7 @@ class Snapchat extends SnapchatAgent {
 				'type' => $type,
 				'username' => $this->username,
 				'zipped' => '0',
-				'data' => file_get_contents($media)
+				'data' => $media
 			),
 			array(
 				$this->auth_token,
