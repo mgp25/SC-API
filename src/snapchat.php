@@ -1273,7 +1273,16 @@ class Snapchat extends SnapchatAgent {
 				$type = Snapchat::MEDIA_IMAGE;
 			}
 
-		$media = file_get_contents($media);
+		if(($caption != null) && ($type == Snapchat::MEDIA_IMAGE))
+		{
+			text($media, $caption);
+			$media = file_get_contents(__DIR__ . '/cache/image.jpg');
+			unlink(__DIR__ . '/cache/image.jpg');
+		}
+		else
+		{
+				$media = file_get_contents($media);
+		}
 
 		$temp = tempnam(sys_get_temp_dir(), 'Snap');
 		file_put_contents($temp, $media);
