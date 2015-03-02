@@ -1258,7 +1258,7 @@ class Snapchat extends SnapchatAgent {
 	 * @return bool
 	 *   TRUE if successful, FALSE otherwise.
 	 */
-	public function setStory($media, $time = 10, $caption="") {
+	public function setStory($media, $time = 10, $text = null) {
 		// Make sure we're logged in and have a valid access token.
 		if (!$this->auth_token || !$this->username) {
 			return FALSE;
@@ -1273,9 +1273,9 @@ class Snapchat extends SnapchatAgent {
 				$type = Snapchat::MEDIA_IMAGE;
 			}
 
-		if(($caption != null) && ($type == Snapchat::MEDIA_IMAGE))
+		if(($text != null) && ($type == Snapchat::MEDIA_IMAGE))
 		{
-			text($media, $caption);
+			text($media, $text);
 			$media = file_get_contents(__DIR__ . '/cache/image.jpg');
 			unlink(__DIR__ . '/cache/image.jpg');
 		}
@@ -1298,7 +1298,7 @@ class Snapchat extends SnapchatAgent {
 			'/bq/retry_post_story',
 			array(
 				'camera_front_facing' => rand(0,1),
-				'caption_text_display' => $caption,
+				'caption_text_display' => $text,
 				'country_code' => 'US',
 				'media_id' => $media_id,
 				'client_id' => $media_id,
