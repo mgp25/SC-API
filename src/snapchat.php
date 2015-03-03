@@ -525,7 +525,7 @@ class Snapchat extends SnapchatAgent {
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'/all_updates',
+			'loq/all_updates',
 			array(
 				'timestamp' => $timestamp,
 				'username' => $this->username,
@@ -889,7 +889,7 @@ class Snapchat extends SnapchatAgent {
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'/blob',
+			'bq/blob',
 			array(
 				'id' => $id,
 				'timestamp' => $timestamp,
