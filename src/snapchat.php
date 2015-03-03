@@ -423,7 +423,7 @@ class Snapchat extends SnapchatAgent {
 	 * @return mixed
 	 *   The data returned by the service or FALSE on failure.
 	 */
-	public function getUpdates($force = FALSE) {
+	public function getUpdates($force = TRUE) {
 			if (!$force) {
 				$result = $this->cache->get('updates');
 				if ($result) {
