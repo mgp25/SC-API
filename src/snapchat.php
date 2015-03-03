@@ -424,40 +424,38 @@ class Snapchat extends SnapchatAgent {
 	 *   The data returned by the service or FALSE on failure.
 	 */
 	public function getUpdates($force = FALSE) {
-		if (!$force) {
-			$result = $this->cache->get('updates');
-			if ($result) {
-				return $result;
+			if (!$force) {
+				$result = $this->cache->get('updates');
+				if ($result) {
+					return $result;
+				}
 			}
+
+			// Make sure we're logged in and have a valid access token.
+			if (!$this->auth_token || !$this->username) {
+				return FALSE;
+			}
+
+			$timestamp = parent::timestamp();
+			$result = parent::post(
+				'/loq/all_updates',
+				array(
+					'timestamp' => $timestamp,
+					'username' => $this->username,
+				),
+				array(
+					$this->auth_token,
+					$timestamp,
+				));
+
+			if (!empty($result->updates_response)) {
+				$this->auth_token = $result->updates_response->auth_token;
+				$this->cache->set('updates', $result->updates_response);
+				return $result->updates_response;
+			}
+
+			return $result;
 		}
-
-		// Make sure we're logged in and have a valid access token.
-		if (!$this->auth_token || !$this->username) {
-			return FALSE;
-		}
-
-		$timestamp = parent::timestamp();
-		$result = parent::post(
-			'/all_updates',
-			array(
-				'timestamp' => $timestamp,
-				'username' => $this->username,
-			),
-			array(
-				$this->auth_token,
-				$timestamp,
-			), $multipart,
-			$debug = $this->debug
-		);
-
-		if (!empty($result->updates_response)) {
-			$this->auth_token = $result->updates_response->auth_token;
-			$this->cache->set('updates', $result->updates_response);
-			return $result->updates_response;
-		}
-
-		return $result;
-	}
 
 	/**
 	 * Gets the user's snaps.
@@ -466,36 +464,41 @@ class Snapchat extends SnapchatAgent {
 	 *   An array of snaps or FALSE on failure.
 	 */
 	public function getSnaps() {
-		$updates = $this->getUpdates();
 
-		if (empty($updates)) {
-			return FALSE;
+			$updates = $this->getUpdates();
+			if (empty($updates)) {
+					return FALSE;
+			}
+
+			$snaps = array();
+		  $conversations = $updates['data']->conversations_response;
+	    		foreach ($conversations as &$conversation) {
+		      		$pending_received_snaps = $conversation->pending_received_snaps;
+		        	foreach ($pending_received_snaps as &$snap) {
+		          		$snaps[] = (object)
+											array(
+													'id' => $snap->id,
+													'media_id' => empty($snap->c_id) ? FALSE : $snap->c_id,
+													'media_type' => $snap->m,
+													'time' => empty($snap->t) ? FALSE : $snap->t,
+													'sender' => empty($snap->sn) ? $this->username : $snap->sn,
+													'recipient' => empty($snap->rp) ? $this->username : $snap->rp,
+													'status' => $snap->st,
+													'screenshot_count' => empty($snap->c) ? 0 : $snap->c,
+													'sent' => $snap->sts,
+													'opened' => $snap->ts,
+													'broadcast' => empty($snap->broadcast) ? FALSE : (object)
+															array(
+																	'url' => $snap->broadcast_url,
+																	'action_text' => $snap->broadcast_action_text,
+																	'hide_timer' => $snap->broadcast_hide_timer,
+															),
+											);
+		        }
+	       }
+
+	        return $snaps;
 		}
-
-		// We'll make these a little more readable.
-		$snaps = array();
-		foreach ($updates->snaps as $snap) {
-			$snaps[] = (object) array(
-				'id' => $snap->id,
-				'media_id' => empty($snap->c_id) ? FALSE : $snap->c_id,
-				'media_type' => $snap->m,
-				'time' => empty($snap->t) ? FALSE : $snap->t,
-				'sender' => empty($snap->sn) ? $this->username : $snap->sn,
-				'recipient' => empty($snap->rp) ? $this->username : $snap->rp,
-				'status' => $snap->st,
-				'screenshot_count' => empty($snap->c) ? 0 : $snap->c,
-				'sent' => $snap->sts,
-				'opened' => $snap->ts,
-				'broadcast' => empty($snap->broadcast) ? FALSE : (object) array(
-					'url' => $snap->broadcast_url,
-					'action_text' => $snap->broadcast_action_text,
-					'hide_timer' => $snap->broadcast_hide_timer,
-				),
-			);
-		}
-
-		return $snaps;
-	}
 
 	/**
 	 * Gets friends' stories.
