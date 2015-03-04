@@ -889,7 +889,7 @@ class Snapchat extends SnapchatAgent {
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'bq/blob',
+			'/bq/blob',
 			array(
 				'id' => $id,
 				'timestamp' => $timestamp,
