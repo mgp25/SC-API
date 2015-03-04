@@ -53,7 +53,7 @@ abstract class SnapchatAgent {
 		CURLOPT_CONNECTTIMEOUT => 5,
 		CURLOPT_RETURNTRANSFER => TRUE,
 		CURLOPT_TIMEOUT => 10,
-		CURLOPT_USERAGENT => 'Snapchat/9.1.0.0 (GT-S7710; Android 4.1.2#S7710XXAMB6#16; gzip)',
+		CURLOPT_USERAGENT => 'Snapchat/9.2.0.0 (A0001; Android 4.4.4#5229c4ef56#19; gzip)',
 		CURLOPT_HTTPHEADER => array('Accept-Language: en', 'Accept-Locale: en_US'),
 	);
 
@@ -288,50 +288,75 @@ abstract class SnapchatAgent {
 	 *   The data returned from the API (decoded if JSON). Returns FALSE if
 	 *   the request failed.
 	 */
-	public function post($endpoint, $data, $params, $multipart = FALSE, $debug = FALSE) {
+	public function post($endpoint, $data, $params, $multipart = FALSE, $debug = FALSE)
+	{
 		$ch = curl_init();
 
 		$data['req_token'] = self::hash($params[0], $params[1]);
         $boundary = "Boundary+0xAbCdEfGbOuNdArY";//md5(time());
-		if (!$multipart) {
+		if(!$multipart)
+		{
 			$data = http_build_query($data);
-		}else{
+		}
+		else
+		{
             $datas = "--".$boundary."\r\n" . 'Content-Disposition: form-data; name="req_token"' . "\r\n\r\n" . self::hash($params[0], $params[1]) . "\r\n";
-            foreach ($data as $key => $value){
+            foreach($data as $key => $value)
+            {
                 if($key == "req_token") continue;
-                if($key != 'data'){
+
+                if($key != 'data')
+                {
                     $datas .= "--".$boundary."\r\n" . 'Content-Disposition: form-data; name="' . $key . '"' . "\r\n\r\n" . $value . "\r\n";
-                }else{
+                }
+                else
+                {
                     $datas .= "--".$boundary."\r\n" . 'Content-Disposition: form-data; name="data"; filename="data"'."\r\n" . 'Content-Type: application/octet-stream'."\r\n\r\n" . $value . "\r\n";
                 }
             }
             $data = $datas . "--".$boundary."--";
 		}
-		$options = self::$CURL_OPTIONS + array(
-			CURLOPT_POST => TRUE,
-			CURLOPT_POSTFIELDS => $data,
-			CURLOPT_URL => self::URL . $endpoint,
-		);
-		curl_setopt_array($ch, $options);
+		$options = self::$CURL_OPTIONS;
 
 		if($endpoint == "/loq/login")
 		{
 				$headers = array_merge(self::$CURL_HEADERS, array("Authorization: Bearer {$params[2]}"));
-		} else {
+		}
+		else
+		{
 			$headers = self::$CURL_HEADERS;
 		}
-		if ($multipart) {
+
+		if($multipart)
+		{
             $headers = array_merge($headers, array("X-Timestamp: 0","Content-Type: multipart/form-data; boundary=$boundary"));
 		}
-		if ($endpoint == '/ph/blob' || $endpoint == '/bq/blob' || $endpoint == '/bq/chat_media'){
+
+		if($endpoint == '/ph/blob' || $endpoint == '/bq/blob' || $endpoint == '/bq/chat_media')
+		{
 		    $headers = array_merge($headers, array("X-Timestamp: " . $params[1]));
+			curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+			$options += array(
+				CURLOPT_URL => self::URL . $endpoint . "?{$data}"
+			);
 		}
+		else
+		{
+			$options += array(
+				CURLOPT_POST => TRUE,
+				CURLOPT_POSTFIELDS => $data,
+				CURLOPT_URL => self::URL . $endpoint
+			);
+		}
+		curl_setopt_array($ch, $options);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
 		$result = curl_exec($ch);
 		if($debug)
 		{
+			$info = curl_getinfo($ch);
 			echo "\nREQUEST TO: " .self::URL . $endpoint . "\n";
+			echo "\nSent Request info: " .print_r($info['request_header'], true). "\n";
 			if(is_array($data))
 				echo 'DATA: ' . print_r($data) . "\n";
 			else
@@ -380,7 +405,6 @@ abstract class SnapchatAgent {
 		if ($endpoint == '/ph/blob' || $endpoint == '/bq/blob' || $endpoint == "/bq/snaptag_download" || $endpoint == '/bq/chat_media')
 		{
 				$return['data'] = $result;
-
 				return $result;
 		}
 
