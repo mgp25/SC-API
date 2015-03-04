@@ -70,9 +70,9 @@ class Snapchat extends SnapchatAgent {
 	 *   The auth token, if already logged in.
 	 */
 	public function __construct($username = NULL, $auth_token = NULL, $debug = FALSE) {
-		$this->auth_token = $auth_token;
-		$this->username = $username;
-		$this->debug = $debug;
+			$this->auth_token = $auth_token;
+			$this->username = $username;
+			$this->debug = $debug;
 	}
 
 	public function getDeviceToken()
@@ -87,7 +87,8 @@ class Snapchat extends SnapchatAgent {
 					array(
 							parent::STATIC_TOKEN,
 							$timestamp,
-					), $multipart,
+					),
+					$multipart,
 					$debug = $this->debug
 					);
 
@@ -97,20 +98,21 @@ class Snapchat extends SnapchatAgent {
 	public function device($device_token)
 	{
 
-		$timestamp = parent::timestamp();
-		$result = parent::post(
-			'/loq/all_updates',
-				array(
-					'device_token' => $device_token,
-					'type' => "android",
-					'timestamp' => $timestamp,
-					'username' => $this->username,
-				),
-				array(
-					$this->auth_token,
-					$timestamp,
-				), $multipart,
-				$debug = $this->debug
+			$timestamp = parent::timestamp();
+			$result = parent::post(
+					'/loq/all_updates',
+							array(
+									'device_token' => $device_token,
+									'type' => "android",
+									'timestamp' => $timestamp,
+									'username' => $this->username,
+							),
+							array(
+									$this->auth_token,
+									$timestamp,
+							),
+							$multipart,
+							$debug = $this->debug
 			);
 
 			return $result;
@@ -118,117 +120,121 @@ class Snapchat extends SnapchatAgent {
 
 	private function getAuthToken() {
 
-		$ch = curl_init();
-		$postfields = array(
-			'device_country' => 'nl',
-			'operatorCountry' => 'nl',
-			'lang' => 'en_US',
-			'sdk_version' => '16',
-			'google_play_services_version' => '6599036',
-			'accountType' => 'HOSTED_OR_GOOGLE',
-			'Email' => 'test@gmail.com',
-			'service' => 'audience:server:client_id:694893979329-l59f3phl42et9clpoo296d8raqoljl6p.apps.googleusercontent.com',
-			'source' => 'android',
-			'androidId' => '378c184c6070c26c',
-			'app' => 'com.snapchat.android',
-			'client_sig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
-			'callerPkg' => 'com.snapchat.android',
-			'callerSig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
-			'EncryptedPasswd' => 'oauth2rt_1/nYRuxRtMeGL5apSzWwV07Wq5WH5vXgv65py-eeID_CU'
-		);
+			$ch = curl_init();
+			$postfields =
+					array(
+							'device_country' => 'nl',
+							'operatorCountry' => 'nl',
+							'lang' => 'en_US',
+							'sdk_version' => '16',
+							'google_play_services_version' => '6599036',
+							'accountType' => 'HOSTED_OR_GOOGLE',
+							'Email' => 'test@gmail.com',
+							'service' => 'audience:server:client_id:694893979329-l59f3phl42et9clpoo296d8raqoljl6p.apps.googleusercontent.com',
+							'source' => 'android',
+							'androidId' => '378c184c6070c26c',
+							'app' => 'com.snapchat.android',
+							'client_sig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
+							'callerPkg' => 'com.snapchat.android',
+							'callerSig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
+							'EncryptedPasswd' => 'oauth2rt_1/nYRuxRtMeGL5apSzWwV07Wq5WH5vXgv65py-eeID_CU'
+					);
 
-		$headers = array(
-			'device: 378c184c6070c26c',
-			'app: com.snapchat.android',
-			'User-Agent: GoogleAuth/1.4 (mako JDQ39)',
-			'Accept-Encoding: gzip'
-		);
+			$headers =
+					array(
+							'device: 378c184c6070c26c',
+							'app: com.snapchat.android',
+							'User-Agent: GoogleAuth/1.4 (mako JDQ39)',
+							'Accept-Encoding: gzip'
+					);
 
-		curl_setopt($ch, CURLOPT_URL, "https://android.clients.google.com/auth");
-		curl_setopt($ch, CURLOPT_POST, TRUE);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postfields));
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-		curl_setopt($ch, CURLOPT_ENCODING, "gzip");
-		curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+			curl_setopt($ch, CURLOPT_URL, "https://android.clients.google.com/auth");
+			curl_setopt($ch, CURLOPT_POST, TRUE);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postfields));
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+			curl_setopt($ch, CURLOPT_ENCODING, "gzip");
+			curl_setopt($ch, CURLINFO_HEADER_OUT, true);
 
-		$result = curl_exec($ch);
+			$result = curl_exec($ch);
 
-		if($this->debug)
-		{
-			echo "\nREQUEST TO: https://android.clients.google.com/auth\n";
-			echo 'DATA: ' . print_r($postfields) . "\n";
-			echo 'RESULT: ' . $result . "\n";
-		}
+			if ($this->debug)
+			{
+					echo "\nREQUEST TO: https://android.clients.google.com/auth\n";
+					echo 'DATA: ' . print_r($postfields) . "\n";
+					echo 'RESULT: ' . $result . "\n";
+			}
 
-		if(curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200)
-		{
-				$return['error'] = 1;
-				$return['data'] = $result;
+			if (curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200)
+			{
+					$return['error'] = 1;
+					$return['data'] = $result;
 
-				return $return;
-		}
+					return $return;
+			}
 
-		curl_close($ch);
+			curl_close($ch);
 
-		$return['error'] = 0;
-		$return['auth'] = substr(explode("\n", $result)[1], 5);
+			$return['error'] = 0;
+			$return['auth'] = substr(explode("\n", $result)[1], 5);
 
-		return $return;
+			return $return;
 	}
 
 	private function getGCMToken() {
 
-		$ch = curl_init();
-		$postfields = array(
-			'X-GOOG.USER_AID' => '4002600885140111980',
-			'app' => 'com.snapchat.android',
-			'sender' => '191410808405',
-			'cert' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
-			'device' => '4002600885140111980',
-			'app_ver' => '508',
-			'info' => '',
-		);
+			$ch = curl_init();
+			$postfields =
+					array(
+							'X-GOOG.USER_AID' => '4002600885140111980',
+							'app' => 'com.snapchat.android',
+							'sender' => '191410808405',
+							'cert' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
+							'device' => '4002600885140111980',
+							'app_ver' => '508',
+							'info' => '',
+					);
 
-		$headers = array(
-			'app: com.snapchat.android',
-			'User-Agent: Android-GCM/1.4 (mako JDQ39)',
-			'Authorization: AidLogin 4002600885140111980:7856388705669173275'
-		);
+			$headers =
+					array(
+							'app: com.snapchat.android',
+							'User-Agent: Android-GCM/1.4 (mako JDQ39)',
+							'Authorization: AidLogin 4002600885140111980:7856388705669173275'
+					);
 
-		curl_setopt($ch, CURLOPT_URL, "https://android.clients.google.com/c2dm/register3");
-		curl_setopt($ch, CURLOPT_POST, TRUE);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postfields));
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-		curl_setopt($ch, CURLOPT_ENCODING, "gzip");
-		curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+			curl_setopt($ch, CURLOPT_URL, "https://android.clients.google.com/c2dm/register3");
+			curl_setopt($ch, CURLOPT_POST, TRUE);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postfields));
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+			curl_setopt($ch, CURLOPT_ENCODING, "gzip");
+			curl_setopt($ch, CURLINFO_HEADER_OUT, true);
 
-		$result = curl_exec($ch);
+			$result = curl_exec($ch);
 
-		if($this->debug)
-		{
-			echo "\nREQUEST TO: https://android.clients.google.com/c2dm/register3\n";
-			echo 'DATA: ' . print_r($postfields) . "\n";
-			echo 'RESULT: ' . $result . "\n";
-		}
+			if ($this->debug)
+			{
+					echo "\nREQUEST TO: https://android.clients.google.com/c2dm/register3\n";
+					echo 'DATA: ' . print_r($postfields) . "\n";
+					echo 'RESULT: ' . $result . "\n";
+			}
 
-		if(curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200)
-		{
-				$return['error'] = 1;
-				$return['data'] = $result;
+			if (curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200)
+			{
+					$return['error'] = 1;
+					$return['data'] = $result;
 
-				return $return;
-		}
+					return $return;
+			}
 
-		curl_close($ch);
+			curl_close($ch);
 
-		$return['error'] = 0;
-		$return['token'] = substr($result, 6);
+			$return['error'] = 0;
+			$return['token'] = substr($result, 6);
 
-		return $return;
+			return $return;
 	}
 
 
@@ -246,62 +252,63 @@ class Snapchat extends SnapchatAgent {
 	 */
 	public function login($username, $password) {
 
-		$dtoken = $this->getDeviceToken();
+			$dtoken = $this->getDeviceToken();
 
-		if($dtoken['error'] == 1)
-		{
-				$return['message'] = "Failed to get new Device token set.";
-				return $return;
-		}
+			if ($dtoken['error'] == 1)
+			{
+					$return['message'] = "Failed to get new Device token set.";
+					return $return;
+			}
 
-		$ptoken = $this->getGCMToken();
+			$ptoken = $this->getGCMToken();
 
-		if($ptoken['error'] == 1)
-		{
-				$return['message'] = "Failed to get GCM token.";
-				return $return;
-		}
+			if ($ptoken['error'] == 1)
+			{
+					$return['message'] = "Failed to get GCM token.";
+					return $return;
+			}
 
-		$timestamp = parent::timestamp();
-		$req_token = parent::hash(parent::STATIC_TOKEN, $timestamp);
-		$string = $username . "|" . $password . "|" . $timestamp . "|" . $req_token;
+			$timestamp = parent::timestamp();
+			$req_token = parent::hash(parent::STATIC_TOKEN, $timestamp);
+			$string = $username . "|" . $password . "|" . $timestamp . "|" . $req_token;
 
-		$auth = $this->getAuthToken();
+			$auth = $this->getAuthToken();
 
-		if($auth['error'] == 1)
-		{
-				return $auth;
-		}
+			if ($auth['error'] == 1)
+			{
+					return $auth;
+			}
 
-		$result = parent::post(
-				'/loq/login',
-						array(
-							'username' => $username,
-							'password' => $password,
-							'height' => 1280,
-							'width' => 720,
-							'max_video_height' => 640,
-							'max_video_width' => 480,
-							'dsig' => substr(hash_hmac('sha256', $string, $dtoken['data']->dtoken1v), 0, 20),
-							'dtoken1i' => $dtoken['data']->dtoken1i,
-							'ptoken' => $ptoken['token'],
-							'timestamp' => $timestamp,
-							'req_token' => $req_token,
-						),
-					array(
-						parent::STATIC_TOKEN,
-						$timestamp,
-						$auth['auth']
-					),$multipart,
-					$debug = $this->debug
-				);
+			$result = parent::post(
+					'/loq/login',
+								array(
+										'username' => $username,
+										'password' => $password,
+										'height' => 1280,
+										'width' => 720,
+										'max_video_height' => 640,
+										'max_video_width' => 480,
+										'dsig' => substr(hash_hmac('sha256', $string, $dtoken['data']->dtoken1v), 0, 20),
+										'dtoken1i' => $dtoken['data']->dtoken1i,
+										'ptoken' => $ptoken['token'],
+										'timestamp' => $timestamp,
+										'req_token' => $req_token,
+								),
+							array(
+									parent::STATIC_TOKEN,
+									$timestamp,
+									$auth['auth']
+							),
+							$multipart,
+							$debug = $this->debug
+						);
 
-				if($result['error'] == 1)
+				if ($result['error'] == 1)
 				{
 						return $result;
 				}
 
-				if(isset($result['data']->updates_response->logged) && $result['data']->updates_response->logged)
+				if (isset($result['data']->updates_response->logged) && $result['data']->updates_response->logged)
 				{
 						$this->auth_token = $result['data']->updates_response->auth_token;
 						$this->username = $result['data']->updates_response->username;
@@ -319,28 +326,29 @@ class Snapchat extends SnapchatAgent {
 	 */
 	public function logout() {
 		// Make sure we're logged in and have a valid access token.
-		if (!$this->auth_token || !$this->username) {
-			return FALSE;
-		}
+			if (!$this->auth_token || !$this->username) {
+					return FALSE;
+			}
 
-		$timestamp = parent::timestamp();
-		$result = parent::post(
-			'/logout',
-			array(
-				'timestamp' => $timestamp,
-				'username' => $this->username,
-			),
-			array(
-				$this->auth_token,
-				$timestamp,
-			), $multipart,
-			$debug = $this->debug
-		);
+			$timestamp = parent::timestamp();
+			$result = parent::post(
+					'/logout',
+							array(
+									'timestamp' => $timestamp,
+									'username' => $this->username,
+							),
+							array(
+									$this->auth_token,
+									$timestamp,
+							),
+							$multipart,
+							$debug = $this->debug
+					);
 
 		// Clear out the cache in case the instance is recycled.
-		$this->cache = NULL;
+			$this->cache = NULL;
 
-		return is_null($result);
+			return is_null($result);
 	}
 
 	/**
@@ -363,54 +371,57 @@ class Snapchat extends SnapchatAgent {
 	 *   Generally, returns the same result as calling self::getUpdates().
 	 */
 	public function register($username, $password, $email, $birthday) {
-		$timestamp = parent::timestamp();
-		$result = parent::post(
-			'loq/register',
-			array(
-				'birthday' => $birthday,
-				'password' => $password,
-				'email' => $email,
-				'timestamp' => $timestamp,
-			),
-			array(
-				parent::STATIC_TOKEN,
-				$timestamp,
-			), $multipart,
-			$debug = $this->debug
-		);
 
-		if (!isset($result->token)) {
-			return FALSE;
-		}
+			$timestamp = parent::timestamp();
+			$result = parent::post(
+					'loq/register',
+							array(
+									'birthday' => $birthday,
+									'password' => $password,
+									'email' => $email,
+									'timestamp' => $timestamp,
+							),
+							array(
+									parent::STATIC_TOKEN,
+									$timestamp,
+							),
+							$multipart,
+							$debug = $this->debug
+					);
 
-		$timestamp = parent::timestamp();
-		$result = parent::post(
-			'/registeru',
-			array(
-				'email' => $email,
-				'username' => $username,
-				'timestamp' => $timestamp,
-			),
-			array(
-				parent::STATIC_TOKEN,
-				$timestamp,
-			), $multipart,
-			$debug = $this->debug
-		);
+			if (!isset($result->token)) {
+					return FALSE;
+			}
+
+			$timestamp = parent::timestamp();
+			$result = parent::post(
+					'/registeru',
+							array(
+									'email' => $email,
+									'username' => $username,
+									'timestamp' => $timestamp,
+							),
+							array(
+									parent::STATIC_TOKEN,
+									$timestamp,
+							),
+							$multipart,
+							$debug = $this->debug
+					);
 
 		// If registration is successful, set the username and auth_token.
-		if (isset($result->logged) && $result->logged) {
-			$this->auth_token = $result->auth_token;
-			$this->username = $result->username;
+			if (isset($result->logged) && $result->logged) {
+					$this->auth_token = $result->auth_token;
+					$this->username = $result->username;
 
-			$this->cache = new SnapchatCache();
-			$this->cache->set('updates', $result);
+					$this->cache = new SnapchatCache();
+					$this->cache->set('updates', $result);
 
-			return $result;
-		}
-		else {
-			return FALSE;
-		}
+					return $result;
+			}
+			else {
+					return FALSE;
+			}
 	}
 
 	/**
@@ -424,37 +435,40 @@ class Snapchat extends SnapchatAgent {
 	 *   The data returned by the service or FALSE on failure.
 	 */
 	public function getUpdates($force = TRUE) {
+
 			if (!$force) {
-				$result = $this->cache->get('updates');
-				if ($result) {
-					return $result;
-				}
+					$result = $this->cache->get('updates');
+					if ($result) {
+							return $result;
+					}
 			}
 
 			// Make sure we're logged in and have a valid access token.
 			if (!$this->auth_token || !$this->username) {
-				return FALSE;
+					return FALSE;
 			}
 
 			$timestamp = parent::timestamp();
 			$result = parent::post(
-				'/loq/all_updates',
-				array(
-					'timestamp' => $timestamp,
-					'username' => $this->username,
-				),
-				array(
-					$this->auth_token,
-					$timestamp,
-				));
+					'/loq/all_updates',
+							array(
+									'timestamp' => $timestamp,
+									'username' => $this->username,
+							),
+							array(
+									$this->auth_token,
+									$timestamp,
+							)
+						);
 
 			if (!empty($result->updates_response)) {
-				$this->auth_token = $result->updates_response->auth_token;
-				$this->cache->set('updates', $result->updates_response);
-				return $result->updates_response;
+					$this->auth_token = $result->updates_response->auth_token;
+					$this->cache->set('updates', $result->updates_response);
+					return $result->updates_response;
 			}
 
 			return $result;
+
 		}
 
 	/**
@@ -511,44 +525,46 @@ class Snapchat extends SnapchatAgent {
 	 *   An array of stories or FALSE on failure.
 	 */
 	function getFriendStories($force = FALSE) {
+
 		if (!$force) {
-			$result = $this->cache->get('stories');
-			if ($result) {
-				return $result;
-			}
+				$result = $this->cache->get('stories');
+				if ($result) {
+						return $result;
+				}
 		}
 
 		// Make sure we're logged in and have a valid access token.
 		if (!$this->auth_token || !$this->username) {
-			return FALSE;
+				return FALSE;
 		}
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
 			'loq/all_updates',
-			array(
-				'timestamp' => $timestamp,
-				'username' => $this->username,
-			),
-			array(
-				$this->auth_token,
-				$timestamp,
-			), $multipart,
-			$debug = $this->debug
-		);
+					array(
+							'timestamp' => $timestamp,
+							'username' => $this->username,
+					),
+					array(
+							$this->auth_token,
+							$timestamp,
+					),
+					$multipart,
+					$debug = $this->debug
+			);
 
 		if (!empty($result->stories_response)) {
-			$this->cache->set('stories', $result->stories_response);
+				$this->cache->set('stories', $result->stories_response);
 		}
 		else {
-			return FALSE;
+				return FALSE;
 		}
 
 		$stories = array();
 		foreach ($result->stories_response->friend_stories as $group) {
-			foreach ($group->stories as $story) {
-				$stories[] = $story->story;
-			}
+				foreach ($group->stories as $story) {
+						$stories[] = $story->story;
+				}
 		}
 
 		return $stories;
@@ -570,33 +586,35 @@ class Snapchat extends SnapchatAgent {
 	 *   An array of user objects or FALSE on failure.
 	 */
 	public function findFriends($numbers, $country = 'US') {
+
 		$batches = array_chunk(array_flip($numbers), 30, TRUE);
 
 		// Make sure we're logged in and have a valid access token.
 		if (!$this->auth_token || !$this->username) {
-			return FALSE;
+				return FALSE;
 		}
 
 		$results = array();
 		foreach ($batches as $batch) {
-			$timestamp = parent::timestamp();
-			$result = parent::post(
-				'/find_friends',
-				array(
-					'countryCode' => $country,
-					'numbers' => json_encode($batch),
-					'timestamp' => $timestamp,
-					'username' => $this->username,
-				),
-				array(
-					$this->auth_token,
-					$timestamp,
-				), $multipart,
-				$debug = $this->debug
-			);
+				$timestamp = parent::timestamp();
+				$result = parent::post(
+						'/find_friends',
+								array(
+										'countryCode' => $country,
+										'numbers' => json_encode($batch),
+										'timestamp' => $timestamp,
+										'username' => $this->username,
+								),
+								array(
+										$this->auth_token,
+										$timestamp,
+								),
+								$multipart,
+								$debug = $this->debug
+						);
 
 			if (isset($result->results)) {
-				$results = $results + $result->results;
+					$results = $results + $result->results;
 			}
 		}
 
@@ -610,13 +628,14 @@ class Snapchat extends SnapchatAgent {
 	 *   An array of friends or FALSE on failure.
 	 */
 	public function getFriends() {
-		$updates = $this->getUpdates();
 
-		if (empty($updates)) {
-			return FALSE;
-		}
+			$updates = $this->getUpdates();
 
-		return $updates->friends;
+			if (empty($updates)) {
+					return FALSE;
+			}
+
+			return $updates->friends;
 	}
 
 	/**
@@ -626,10 +645,11 @@ class Snapchat extends SnapchatAgent {
 	 *   An array of friends or FALSE on failure.
 	 */
 	public function getAddedFriends() {
+
 		$updates = $this->getUpdates();
 
 		if (empty($updates)) {
-			return FALSE;
+				return FALSE;
 		}
 
 		return $updates->added_friends;
@@ -646,32 +666,33 @@ class Snapchat extends SnapchatAgent {
 	 */
 	public function addFriend($username) {
 		// Make sure we're logged in and have a valid access token.
-		if (!$this->auth_token || !$this->username) {
-			return FALSE;
-		}
+			if (!$this->auth_token || !$this->username) {
+					return FALSE;
+			}
 
-		$timestamp = parent::timestamp();
-		$result = parent::post(
-			'/friend',
-			array(
-				'action' => 'add',
-				'friend' => $username,
-				'timestamp' => $timestamp,
-				'username' => $this->username,
-			),
-			array(
-				$this->auth_token,
-				$timestamp,
-			), $multipart,
-			$debug = $this->debug
-		);
+			$timestamp = parent::timestamp();
+			$result = parent::post(
+					'/friend',
+							array(
+									'action' => 'add',
+									'friend' => $username,
+									'timestamp' => $timestamp,
+									'username' => $this->username,
+							),
+							array(
+									$this->auth_token,
+									$timestamp,
+							),
+							$multipart,
+							$debug = $this->debug
+					);
 
-		// Sigh...
-		if (strpos($result->message, 'Sorry! Couldn\'t find') === 0) {
-			return FALSE;
-		}
+				// Sigh...
+			if (strpos($result->message, 'Sorry! Couldn\'t find') === 0) {
+					return FALSE;
+			}
 
-		return !empty($result->message);
+			return !empty($result->message);
 	}
 
 	/**
@@ -685,40 +706,43 @@ class Snapchat extends SnapchatAgent {
 	 */
 	public function addFriends($usernames) {
 		// Make sure we're logged in and have a valid access token.
-		if (!$this->auth_token || !$this->username) {
-			return FALSE;
-		}
+			if (!$this->auth_token || !$this->username) {
+					return FALSE;
+			}
 
-		if (!is_array($usernames)) {
-				$usernames = array($usernames);
-		}
+			if (!is_array($usernames)) {
+					$usernames = array($usernames);
+			}
 
-		$friends = array();
-		foreach ($usernames as $username) {
-			$friends[] = (object) array(
-				'display' => '',
-				'name' => $username,
-				'type' => self::FRIEND_UNCONFIRMED,
-			);
-		}
+			$friends = array();
+			foreach ($usernames as $username) {
+					$friends[] = (object)
+							array(
+									'display' => '',
+									'name' => $username,
+									'type' => self::FRIEND_UNCONFIRMED,
+							);
+			}
 
-		$timestamp = parent::timestamp();
-		$result = parent::post(
-			'/friend',
-			array(
-				'action' => 'multiadddelete',
-				'friend' => json_encode(array(
-					'friendsToAdd' => $friends,
-					'friendsToDelete' => array(),
-				)),
-				'timestamp' => $timestamp,
-				'username' => $this->username,
-			),
-			array(
-				$this->auth_token,
-				$timestamp,
-			), $multipart,
-			$debug = $this->debug
+			$timestamp = parent::timestamp();
+			$result = parent::post(
+					'/friend',
+							array(
+									'action' => 'multiadddelete',
+									'friend' => json_encode(
+											array(
+													'friendsToAdd' => $friends,
+													'friendsToDelete' => array(),
+											)),
+									'timestamp' => $timestamp,
+									'username' => $this->username,
+							),
+							array(
+									$this->auth_token,
+									$timestamp,
+							),
+							$multipart,
+							$debug = $this->debug
 		);
 
 		return !empty($result->message);
@@ -738,27 +762,28 @@ class Snapchat extends SnapchatAgent {
 	 */
 	public function deleteFriend($username) {
 		// Make sure we're logged in and have a valid access token.
-		if (!$this->auth_token || !$this->username) {
-			return FALSE;
-		}
+			if (!$this->auth_token || !$this->username) {
+					return FALSE;
+			}
 
-		$timestamp = parent::timestamp();
-		$result = parent::post(
-			'/friend',
-			array(
-				'action' => 'delete',
-				'friend' => $username,
-				'timestamp' => $timestamp,
-				'username' => $this->username,
-			),
-			array(
-				$this->auth_token,
-				$timestamp,
-			), $multipart,
-			$debug = $this->debug
-		);
+			$timestamp = parent::timestamp();
+			$result = parent::post(
+					'/friend',
+							array(
+									'action' => 'delete',
+									'friend' => $username,
+									'timestamp' => $timestamp,
+									'username' => $this->username,
+							),
+							array(
+									$this->auth_token,
+									$timestamp,
+							),
+							$multipart,
+							$debug = $this->debug
+					);
 
-		return !empty($result->message);
+			return !empty($result->message);
 	}
 
 	/**
@@ -774,28 +799,29 @@ class Snapchat extends SnapchatAgent {
 	 */
 	public function setDisplayName($username, $display) {
 		// Make sure we're logged in and have a valid access token.
-		if (!$this->auth_token || !$this->username) {
-			return FALSE;
-		}
+			if (!$this->auth_token || !$this->username) {
+					return FALSE;
+			}
 
-		$timestamp = parent::timestamp();
-		$result = parent::post(
-			'/friend',
-			array(
-				'action' => 'display',
-				'display' => $display,
-				'friend' => $username,
-				'timestamp' => $timestamp,
-				'username' => $this->username,
-			),
-			array(
-				$this->auth_token,
-				$timestamp,
-			), $multipart,
-			$debug = $this->debug
-		);
+			$timestamp = parent::timestamp();
+			$result = parent::post(
+					'/friend',
+							array(
+									'action' => 'display',
+									'display' => $display,
+									'friend' => $username,
+									'timestamp' => $timestamp,
+									'username' => $this->username,
+							),
+							array(
+									$this->auth_token,
+									$timestamp,
+							),
+							$multipart,
+							$debug = $this->debug
+					);
 
-		return !empty($result->message);
+			return !empty($result->message);
 	}
 
 	/**
@@ -809,27 +835,28 @@ class Snapchat extends SnapchatAgent {
 	 */
 	public function block($username) {
 		// Make sure we're logged in and have a valid access token.
-		if (!$this->auth_token || !$this->username) {
-			return FALSE;
-		}
+			if (!$this->auth_token || !$this->username) {
+					return FALSE;
+			}
 
-		$timestamp = parent::timestamp();
-		$result = parent::post(
-			'/friend',
-			array(
-				'action' => 'block',
-				'friend' => $username,
-				'timestamp' => $timestamp,
-				'username' => $this->username,
-			),
-			array(
-				$this->auth_token,
-				$timestamp,
-			),  $multipart,
-			$debug = $this->debug
-		);
+			$timestamp = parent::timestamp();
+			$result = parent::post(
+					'/friend',
+							array(
+									'action' => 'block',
+									'friend' => $username,
+									'timestamp' => $timestamp,
+									'username' => $this->username,
+							),
+							array(
+									$this->auth_token,
+									$timestamp,
+							),
+							$multipart,
+							$debug = $this->debug
+					);
 
-		return !empty($result->message);
+			return !empty($result->message);
 	}
 
 	/**
@@ -843,27 +870,28 @@ class Snapchat extends SnapchatAgent {
 	 */
 	public function unblock($username) {
 		// Make sure we're logged in and have a valid access token.
-		if (!$this->auth_token || !$this->username) {
-			return FALSE;
-		}
+			if (!$this->auth_token || !$this->username) {
+					return FALSE;
+			}
 
-		$timestamp = parent::timestamp();
-		$result = parent::post(
-			'/friend',
-			array(
-				'action' => 'unblock',
-				'friend' => $username,
-				'timestamp' => $timestamp,
-				'username' => $this->username,
-			),
-			array(
-				$this->auth_token,
-				$timestamp,
-			), $multipart,
-			$debug = $this->debug
-		);
+			$timestamp = parent::timestamp();
+			$result = parent::post(
+					'/friend',
+							array(
+								'action' => 'unblock',
+								'friend' => $username,
+								'timestamp' => $timestamp,
+								'username' => $this->username,
+							),
+							array(
+									$this->auth_token,
+									$timestamp,
+							),
+							$multipart,
+							$debug = $this->debug
+					);
 
-		return !empty($result->message);
+			return !empty($result->message);
 	}
 
 
@@ -883,49 +911,50 @@ class Snapchat extends SnapchatAgent {
 	 */
 	public function getMedia($id) {
 		// Make sure we're logged in and have a valid access token.
-		if (!$this->auth_token || !$this->username) {
-			return FALSE;
-		}
+			if (!$this->auth_token || !$this->username) {
+					return FALSE;
+			}
 
-		$timestamp = parent::timestamp();
-		$result = parent::post(
-			'/bq/blob',
-			array(
-				'id' => $id,
-				'timestamp' => $timestamp,
-				'username' => $this->username,
-			),
-			array(
-				$this->auth_token,
-				$timestamp,
-			), $multipart,
-			$debug = $this->debug
-		);
-
-		if (parent::isMedia(substr($result, 0, 2))) {
-			return $result;
-		}
-		else {
-			$result = parent::decryptECB($result);
+			$timestamp = parent::timestamp();
+			$result = parent::post(
+					'/bq/blob',
+							array(
+								'id' => $id,
+								'timestamp' => $timestamp,
+								'username' => $this->username,
+							),
+							array(
+									$this->auth_token,
+									$timestamp,
+							),
+							$multipart,
+							$debug = $this->debug
+					);
 
 			if (parent::isMedia(substr($result, 0, 2))) {
-				return $result;
-			}
+					return $result;
+				}
+			else {
+					$result = parent::decryptECB($result);
+
+					if (parent::isMedia(substr($result, 0, 2))) {
+							return $result;
+					}
 
 			//When a snapchat video is sent with "text" or overlay
 			//the overlay is a transparent PNG file Zipped together
 			//with the M4V file.
 			//First two bytes are "PK" x50x4B; thus the previous media check
 			//will fail and would've returned a FALSE on an available media.
-			if (parent::isCompressed(substr($result, 0, 2))) {
-				//Uncompress
-				$result = parent::unCompress($result);
-				//Return Media and Overlay
-				return $result;
+					if (parent::isCompressed(substr($result, 0, 2))) {
+							//Uncompress
+							$result = parent::unCompress($result);
+							//Return Media and Overlay
+							return $result;
+					}
 			}
-		}
 
-		return FALSE;
+			return FALSE;
 	}
 
 	/**
@@ -942,27 +971,28 @@ class Snapchat extends SnapchatAgent {
 	 */
 	public function sendEvents($events, $snap_info = array()) {
 		// Make sure we're logged in and have a valid access token.
-		if (!$this->auth_token || !$this->username) {
-			return FALSE;
-		}
+			if (!$this->auth_token || !$this->username) {
+					return FALSE;
+			}
 
-		$timestamp = parent::timestamp();
-		$result = parent::post(
-			'/update_snaps',
-			array(
-				'events' => json_encode($events),
-				'json' => json_encode($snap_info),
-				'timestamp' => $timestamp,
-				'username' => $this->username,
-			),
-			array(
-				$this->auth_token,
-				$timestamp,
-			), $multipart,
-			$debug = $this->debug
-		);
+			$timestamp = parent::timestamp();
+			$result = parent::post(
+					'/update_snaps',
+					array(
+							'events' => json_encode($events),
+							'json' => json_encode($snap_info),
+							'timestamp' => $timestamp,
+							'username' => $this->username,
+					),
+					array(
+							$this->auth_token,
+							$timestamp,
+					),
+					$multipart,
+					$debug = $this->debug
+			);
 
-		return is_null($result);
+			return is_null($result);
 	}
 
 	/**
@@ -984,32 +1014,34 @@ class Snapchat extends SnapchatAgent {
 	 *   TRUE if successful, FALSE otherwise.
 	 */
 	public function markSnapViewed($id, $time = 1) {
-		$snap_info = array(
-			$id => array(
-				// Here Snapchat saw fit to use time as a float instead of
-				// straight milliseconds.
-				't' => microtime(TRUE),
-				// We add a small variation here just to make it look more
-				// realistic.
-				'sv' => $time + (mt_rand() / mt_getrandmax() / 10),
-			),
-		);
+
+			$snap_info =
+					array(
+							$id => array(
+										// Here Snapchat saw fit to use time as a float instead of
+										// straight milliseconds.
+										't' => microtime(TRUE),
+										// We add a small variation here just to make it look more
+										// realistic.
+										'sv' => $time + (mt_rand() / mt_getrandmax() / 10),
+									),
+					);
 
 		$events = array(
-			array(
-				'eventName' => 'SNAP_VIEW',
-				'params' => array(
-					'id' => $id,
-					// There are others, but it wouldn't be worth the effort to
-					// put them in here since they likely don't matter.
-				),
-				'ts' => time() - $time,
+				array(
+						'eventName' => 'SNAP_VIEW',
+						'params' => array(
+								'id' => $id,
+								// There are others, but it wouldn't be worth the effort to
+								// put them in here since they likely don't matter.
+							),
+							'ts' => time() - $time,
 			),
 			array(
-				'eventName' => 'SNAP_EXPIRED',
-				'params' => array(
-					'id' => $id,
-				),
+					'eventName' => 'SNAP_EXPIRED',
+					'params' => array(
+							'id' => $id,
+					),
 				'ts' => time()
 			),
 		);
@@ -1029,23 +1061,25 @@ class Snapchat extends SnapchatAgent {
 	 *   TRUE if successful, FALSE otherwise.
 	 */
 	public function markSnapShot($id, $time = 1) {
-		$snap_info = array(
-			$id => array(
-				// We use the same time values as in markSnapViewed, but add in the
-				// screenshot status.
-				't' => microtime(TRUE),
-				'sv' => $time + (mt_rand() / mt_getrandmax() / 10),
-				'c' => self::STATUS_SCREENSHOT,
-			),
-		);
 
-		$events = array(
-			array(
-				'eventName' => 'SNAP_SCREENSHOT',
-				'params' => array(
-					'id' => $id,
-				),
-				'ts' => time() - $time,
+			$snap_info =
+					array(
+							$id => array(
+									// We use the same time values as in markSnapViewed, but add in the
+									// screenshot status.
+									't' => microtime(TRUE),
+									'sv' => $time + (mt_rand() / mt_getrandmax() / 10),
+									'c' => self::STATUS_SCREENSHOT,
+							),
+					);
+
+			$events = array(
+					array(
+							'eventName' => 'SNAP_SCREENSHOT',
+							'params' => array(
+									'id' => $id,
+							),
+					'ts' => time() - $time,
 			),
 		);
 
@@ -1067,44 +1101,44 @@ class Snapchat extends SnapchatAgent {
 	 *   The ID of the uploaded media or FALSE on failure.
 	 */
 	public function upload($type, $data) {
-		// Make sure we're logged in and have a valid access token.
-		if (!$this->auth_token || !$this->username) {
-			return FALSE;
-		}
+			// Make sure we're logged in and have a valid access token.
+			if (!$this->auth_token || !$this->username) {
+					return FALSE;
+			}
 
-		// To make cURL happy, we write the data to a file first.
-		$temp = tempnam(sys_get_temp_dir(), 'Snap');
-		file_put_contents($temp, parent::encryptECB($data));
+			// To make cURL happy, we write the data to a file first.
+			$temp = tempnam(sys_get_temp_dir(), 'Snap');
+			file_put_contents($temp, parent::encryptECB($data));
 
-		if (version_compare(PHP_VERSION, '5.5.0', '>=')) {
-			$cfile = curl_file_create($temp, ($type == self::MEDIA_IMAGE ? 'image/jpeg' : 'video/quicktime'), 'snap');
-		}
+			if (version_compare(PHP_VERSION, '5.5.0', '>=')) {
+					$cfile = curl_file_create($temp, ($type == self::MEDIA_IMAGE ? 'image/jpeg' : 'video/quicktime'), 'snap');
+			}
 
-		$uniId = md5(uniqid());
-		$media_id = strtoupper($this->username . '~' . sprintf('%08s-%04s-%04x-%04x-%12s', substr($uniId, 0, 8), substr($uniId, 8, 4), substr($uniId, 12, 4), substr($uniId, 16, 4), substr($uniId, 20, 12)));
-		$timestamp = parent::timestamp();
-		$result = parent::post(
-			'/ph/upload',
-			array(
-				'media_id' => $media_id,
-				'type' => $type,
-				'data' => (version_compare(PHP_VERSION, '5.5.0', '>=') ? $cfile : '@' . $temp . ';filename=data'),
-				'timestamp' => $timestamp,
-				'username' => $this->username,
-				'zipped' => '0'
-			),
-			array(
-				$this->auth_token,
-				$timestamp,
-			),
-			$multipart = TRUE,
-			$debug = $this->debug
-		);
+			$uniId = md5(uniqid());
+			$media_id = strtoupper($this->username . '~' . sprintf('%08s-%04s-%04x-%04x-%12s', substr($uniId, 0, 8), substr($uniId, 8, 4), substr($uniId, 12, 4), substr($uniId, 16, 4), substr($uniId, 20, 12)));
+			$timestamp = parent::timestamp();
+			$result = parent::post(
+					'/ph/upload',
+							array(
+									'media_id' => $media_id,
+									'type' => $type,
+									'data' => (version_compare(PHP_VERSION, '5.5.0', '>=') ? $cfile : '@' . $temp . ';filename=data'),
+									'timestamp' => $timestamp,
+									'username' => $this->username,
+									'zipped' => '0'
+							),
+							array(
+									$this->auth_token,
+									$timestamp,
+							),
+							$multipart = TRUE,
+							$debug = $this->debug
+					);
 
-		unlink($temp);
+			unlink($temp);
 
-		//TODO IF ERROR
-		return $media_id;
+			//TODO IF ERROR
+			return $media_id;
 	}
 
 	/**
@@ -1176,46 +1210,47 @@ class Snapchat extends SnapchatAgent {
 	*/
 
 	public function send($media, $recipients, $text = null, $type = 0, $time = 3) {
-		// Make sure we're logged in and have a valid access token.
-		if (!$this->auth_token || !$this->username) {
-			return FALSE;
-		}
+			// Make sure we're logged in and have a valid access token.
+			if (!$this->auth_token || !$this->username) {
+					return FALSE;
+			}
 
-		if($text != null)
-		{
-			text($media, $text);
-			$media = file_get_contents(__DIR__ . '/cache/image.jpg');
-			unlink(__DIR__ . '/cache/image.jpg');
-		}
-		else
-		{
-			$media = file_get_contents($media);
-		}
+			if ($text != null)
+			{
+					text($media, $text);
+					$media = file_get_contents(__DIR__ . '/cache/image.jpg');
+					unlink(__DIR__ . '/cache/image.jpg');
+			}
+			else
+			{
+					$media = file_get_contents($media);
+			}
 
-		$uniId = md5(uniqid());
-		$media_id = strtoupper($this->username . '~' . sprintf('%08s-%04s-%04x-%04x-%12s', substr($uniId, 0, 8), substr($uniId, 8, 4), substr($uniId, 12, 4), substr($uniId, 16, 4), substr($uniId, 20, 12)));
+			$uniId = md5(uniqid());
+			$media_id = strtoupper($this->username . '~' . sprintf('%08s-%04s-%04x-%04x-%12s', substr($uniId, 0, 8), substr($uniId, 8, 4), substr($uniId, 12, 4), substr($uniId, 16, 4), substr($uniId, 20, 12)));
 
-		$timestamp = parent::timestamp();
-		$result = parent::post(
-			'/loq/retry',
-			array(
-				'camera_front_facing' => rand(0,1),
-				'country_code' => 'US',
-				'media_id' => $media_id,
-				'recipients' => "[\"" . $recipients . "\"]",
-				'reply' => '0',
-				'time' => $time,
-				'timestamp' => $timestamp,
-				'type' => $type,
-				'username' => $this->username,
-				'zipped' => '0',
-				'data' => $media
-			),
-			array(
-				$this->auth_token,
-				$timestamp,
-			),  $multipart = true,
-					$debug = $this->debug
+			$timestamp = parent::timestamp();
+			$result = parent::post(
+					'/loq/retry',
+							array(
+									'camera_front_facing' => rand(0,1),
+									'country_code' => 'US',
+									'media_id' => $media_id,
+									'recipients' => "[\"" . $recipients . "\"]",
+									'reply' => '0',
+									'time' => $time,
+									'timestamp' => $timestamp,
+									'type' => $type,
+									'username' => $this->username,
+									'zipped' => '0',
+									'data' => $media
+							),
+							array(
+									$this->auth_token,
+									$timestamp,
+							),
+						$multipart = true,
+						$debug = $this->debug
 		);
 
 		return $result;
@@ -1224,28 +1259,29 @@ class Snapchat extends SnapchatAgent {
 	// NEED TO FINISH
 	public function sendTyping($recipients) {
 
-		if (!$this->auth_token || !$this->username) {
-			return FALSE;
-		}
+			if (!$this->auth_token || !$this->username) {
+					return FALSE;
+			}
 
-		if (!is_array($recipients)) {
-				$recipients = array($recipients);
-		}
+			if (!is_array($recipients)) {
+					$recipients = array($recipients);
+			}
 
-		$timestamp = parent::timestamp();
-		$result = parent::post(
-			'/chat_typing',
-			array(
-				'recipient_usernames' => $recipients,
-				'timestamp' => $timestamp,
-				'username' => $this->username
-			),
-			array(
-				$this->auth_token,
-				$timestamp
-			), $multipart,
-			$debug = $this->debug
-		);
+			$timestamp = parent::timestamp();
+			$result = parent::post(
+					'/chat_typing',
+							array(
+									'recipient_usernames' => $recipients,
+									'timestamp' => $timestamp,
+									'username' => $this->username
+							),
+							array(
+									$this->auth_token,
+									$timestamp
+							),
+					$multipart,
+					$debug = $this->debug
+			);
 	}
 
 	/**
@@ -1262,85 +1298,87 @@ class Snapchat extends SnapchatAgent {
 	 *   TRUE if successful, FALSE otherwise.
 	 */
 	public function setStory($media, $time = 10, $text = null) {
-		// Make sure we're logged in and have a valid access token.
-		if (!$this->auth_token || !$this->username) {
-			return FALSE;
-		}
-
-			$mime = mime_content_type($media);
-			if(strstr($mime, "video/"))
-			{
-				$type = Snapchat::MEDIA_VIDEO;
-			}else if(strstr($mime, "image/"))
-			{
-				$type = Snapchat::MEDIA_IMAGE;
+			// Make sure we're logged in and have a valid access token.
+			if (!$this->auth_token || !$this->username) {
+					return FALSE;
 			}
 
-		if(($text != null) && ($type == Snapchat::MEDIA_IMAGE))
-		{
-			text($media, $text);
-			$media = file_get_contents(__DIR__ . '/cache/image.jpg');
-			unlink(__DIR__ . '/cache/image.jpg');
-		}
-		else
-		{
-				$media = file_get_contents($media);
-		}
+			$mime = mime_content_type($media);
+			if (strstr($mime, "video/"))
+			{
+						$type = Snapchat::MEDIA_VIDEO;
+			} else if (strstr($mime, "image/"))
+			{
+					$type = Snapchat::MEDIA_IMAGE;
+			}
 
-		$temp = tempnam(sys_get_temp_dir(), 'Snap');
-		file_put_contents($temp, $media);
-		if (false && version_compare(PHP_VERSION, '5.5.0', '>=')) {
-			$cfile = curl_file_create($temp, ($type == self::MEDIA_IMAGE ? 'image/jpeg' : 'video/quicktime'), 'snap');
-		}else{
-				$cfile = file_get_contents($temp);
-		}
-		$timestamp = parent::timestamp();
-		$uniId = md5(uniqid());
-		$media_id = strtoupper($this->username . '~' . sprintf('%08s-%04s-%04x-%04x-%12s', substr($uniId, 0, 8), substr($uniId, 8, 4), substr($uniId, 12, 4), substr($uniId, 16, 4), substr($uniId, 20, 12)));
-		$result = parent::post(
-			'/bq/retry_post_story',
-			array(
-				'camera_front_facing' => rand(0,1),
-				'caption_text_display' => $text,
-				'country_code' => 'US',
-				'media_id' => $media_id,
-				'client_id' => $media_id,
-				'timestamp' => $timestamp,
-				'story_timestamp' => ($timestamp - 1234),
-				'time' => $time,
-				'type' => $type,
-				'username' => strtolower($this->username),
-				'zipped' => '0',
-				'data' => $cfile
-			),
-			array(
-				$this->auth_token,
-				$timestamp,
-			),
-			$multipart = true,
-			$debug = $this->debug
-		);
-		return ($result);
+			if (($text != null) && ($type == Snapchat::MEDIA_IMAGE))
+			{
+					text($media, $text);
+					$media = file_get_contents(__DIR__ . '/cache/image.jpg');
+					unlink(__DIR__ . '/cache/image.jpg');
+			}
+			else
+			{
+					$media = file_get_contents($media);
+			}
+
+			$temp = tempnam(sys_get_temp_dir(), 'Snap');
+			file_put_contents($temp, $media);
+			if (false && version_compare(PHP_VERSION, '5.5.0', '>=')) {
+					$cfile = curl_file_create($temp, ($type == self::MEDIA_IMAGE ? 'image/jpeg' : 'video/quicktime'), 'snap');
+			} else {
+					$cfile = file_get_contents($temp);
+			}
+
+			$timestamp = parent::timestamp();
+			$uniId = md5(uniqid());
+			$media_id = strtoupper($this->username . '~' . sprintf('%08s-%04s-%04x-%04x-%12s', substr($uniId, 0, 8), substr($uniId, 8, 4), substr($uniId, 12, 4), substr($uniId, 16, 4), substr($uniId, 20, 12)));
+			$result = parent::post(
+					'/bq/retry_post_story',
+							array(
+									'camera_front_facing' => rand(0,1),
+									'caption_text_display' => $text,
+									'country_code' => 'US',
+									'media_id' => $media_id,
+									'client_id' => $media_id,
+									'timestamp' => $timestamp,
+									'story_timestamp' => ($timestamp - 1234),
+									'time' => $time,
+									'type' => $type,
+									'username' => strtolower($this->username),
+									'zipped' => '0',
+									'data' => $cfile
+							),
+							array(
+									$this->auth_token,
+									$timestamp,
+							),
+					$multipart = true,
+					$debug = $this->debug
+			);
+			return ($result);
 	}
 
 	public function deleteStory($storyId) {
-		// Make sure we're logged in and have a valid access token.
-		if (!$this->auth_token || !$this->username) {
-			return FALSE;
-		}
+			// Make sure we're logged in and have a valid access token.
+			if (!$this->auth_token || !$this->username) {
+					return FALSE;
+			}
 
-		$timestamp = parent::timestamp();
-		$result = parent::post(
-			'/delete_story',
-			array(
-				'story_id' => $storyId,
-			),
-			array(
-				$this->auth_token,
-				$timestamp,
-			), $multipart,
-			$debug = $this->debug
-		);
+			$timestamp = parent::timestamp();
+			$result = parent::post(
+					'/delete_story',
+							array(
+									'story_id' => $storyId,
+							),
+							array(
+									$this->auth_token,
+									$timestamp,
+							),
+					$multipart,
+					$debug = $this->debug
+			);
 
 		return is_null($result);
 	}
@@ -1359,19 +1397,19 @@ class Snapchat extends SnapchatAgent {
 	 *   The story data or FALSE on failure.
 	 */
 	public function getStory($media_id, $key, $iv) {
-		// Make sure we're logged in and have a valid access token.
-		if (!$this->auth_token || !$this->username) {
+			// Make sure we're logged in and have a valid access token.
+			if (!$this->auth_token || !$this->username) {
+					return FALSE;
+			}
+
+			// Retrieve encrypted story and decrypt.
+			$blob = parent::get('/story_blob?story_id=' . $media_id);
+
+			if (!empty($blob)) {
+					return parent::decryptCBC($blob, $key, $iv);
+			}
+
 			return FALSE;
-		}
-
-		// Retrieve encrypted story and decrypt.
-		$blob = parent::get('/story_blob?story_id=' . $media_id);
-
-		if (!empty($blob)) {
-			return parent::decryptCBC($blob, $key, $iv);
-		}
-
-		return FALSE;
 	}
 
 	/**
@@ -1388,19 +1426,19 @@ class Snapchat extends SnapchatAgent {
 	 *   The thumbnail data or FALSE on failure.
 	 */
 	public function getStoryThumb($media_id, $key, $iv) {
-		// Make sure we're logged in and have a valid access token.
-		if (!$this->auth_token || !$this->username) {
+			// Make sure we're logged in and have a valid access token.
+			if (!$this->auth_token || !$this->username) {
+					return FALSE;
+			}
+
+			// Retrieve encrypted story and decrypt.
+			$blob = parent::get('/story_thumbnail?story_id=' . $media_id);
+
+			if (!empty($blob)) {
+					return parent::decryptCBC($blob, $key, $iv);
+			}
+
 			return FALSE;
-		}
-
-		// Retrieve encrypted story and decrypt.
-		$blob = parent::get('/story_thumbnail?story_id=' . $media_id);
-
-		if (!empty($blob)) {
-			return parent::decryptCBC($blob, $key, $iv);
-		}
-
-		return FALSE;
 	}
 
 	/**
@@ -1415,32 +1453,34 @@ class Snapchat extends SnapchatAgent {
 	 *   TRUE if successful, FALSE otherwise.
 	 */
 	public function markStoryViewed($id, $screenshot_count = 0) {
-		// Make sure we're logged in and have a valid access token.
-		if (!$this->auth_token || !$this->username) {
-			return FALSE;
-		}
+			// Make sure we're logged in and have a valid access token.
+			if (!$this->auth_token || !$this->username) {
+					return FALSE;
+			}
 
-		// Mark story as viewed.
-		$timestamp = parent::timestamp();
-		$result = parent::post(
-			'/update_stories',
-			array(
-				'friend_stories' => json_encode(array(
-					array(
-						'id' => $id,
-						'screenshot_count' => $screenshot_count,
-						'timestamp' => $timestamp,
-					),
-				)),
-				'timestamp' => $timestamp,
-				'username' => $this->username,
-			),
-			array(
-				$this->auth_token,
-				$timestamp,
-			), $multipart,
-			$debug = $this->debug
-		);
+			// Mark story as viewed.
+			$timestamp = parent::timestamp();
+			$result = parent::post(
+					'/update_stories',
+							array(
+									'friend_stories' => json_encode(
+											array(
+													array(
+															'id' => $id,
+															'screenshot_count' => $screenshot_count,
+															'timestamp' => $timestamp,
+													),
+												)),
+										'timestamp' => $timestamp,
+										'username' => $this->username,
+							),
+							array(
+									$this->auth_token,
+									$timestamp,
+							),
+					$multipart,
+					$debug = $this->debug
+			);
 
 		return is_null($result);
 	}
@@ -1455,40 +1495,41 @@ class Snapchat extends SnapchatAgent {
 	 *   An dictionary of friends by username or FALSE on failure.
 	 */
 	public function getBests($friends) {
-		// Make sure we're logged in and have a valid access token.
-		if (!$this->auth_token || !$this->username) {
-			return FALSE;
-		}
+			// Make sure we're logged in and have a valid access token.
+			if (!$this->auth_token || !$this->username) {
+					return FALSE;
+			}
 
-		if (!is_array($friends)) {
-				$friends = array($friends);
-		}
+			if (!is_array($friends)) {
+					$friends = array($friends);
+			}
 
-		$timestamp = parent::timestamp();
-		$result = parent::post(
-			'/bests',
-			array(
-				'friend_usernames' => json_encode($friends),
-				'timestamp' => $timestamp,
-				'username' => $this->username,
-			),
-			array(
-				$this->auth_token,
-				$timestamp,
-			), $multipart,
-			$debug = $this->debug
-		);
+			$timestamp = parent::timestamp();
+			$result = parent::post(
+					'/bests',
+							array(
+								'friend_usernames' => json_encode($friends),
+								'timestamp' => $timestamp,
+								'username' => $this->username,
+							),
+							array(
+									$this->auth_token,
+									$timestamp,
+							),
+					$multipart,
+					$debug = $this->debug
+			);
 
-		if (empty($result)) {
-			return FALSE;
-		}
+			if (empty($result)) {
+					return FALSE;
+			}
 
-		$friends = array();
-		foreach((array) $result as $friend => $bests) {
-			$friends[$friend] = (array) $bests;
-		}
+			$friends = array();
+			foreach ((array) $result as $friend => $bests) {
+					$friends[$friend] = (array) $bests;
+			}
 
-		return $friends;
+			return $friends;
 	}
 
 	/**
@@ -1498,26 +1539,27 @@ class Snapchat extends SnapchatAgent {
 	 *   TRUE if successful, FALSE otherwise.
 	 */
 	public function clearFeed() {
-		// Make sure we're logged in and have a valid access token.
-		if (!$this->auth_token || !$this->username) {
-			return FALSE;
-		}
+			// Make sure we're logged in and have a valid access token.
+			if (!$this->auth_token || !$this->username) {
+					return FALSE;
+			}
 
-		$timestamp = parent::timestamp();
-		$result = parent::post(
-			'/clear',
-			array(
-				'timestamp' => $timestamp,
-				'username' => $this->username,
-			),
-			array(
-				$this->auth_token,
-				$timestamp,
-			), $multipart,
-			$debug = $this->debug
-		);
+			$timestamp = parent::timestamp();
+			$result = parent::post(
+					'/clear',
+							array(
+									'timestamp' => $timestamp,
+									'username' => $this->username,
+							),
+							array(
+									$this->auth_token,
+									$timestamp,
+							),
+					$multipart,
+					$debug = $this->debug
+			);
 
-		return is_null($result);
+			return is_null($result);
 	}
 
 	/**
@@ -1530,34 +1572,35 @@ class Snapchat extends SnapchatAgent {
 	 *   TRUE if successful, FALSE otherwise.
 	 */
 	public function updatePrivacy($setting) {
-		// Make sure we're logged in and have a valid access token.
-		if (!$this->auth_token || !$this->username) {
-			return FALSE;
-		}
+			// Make sure we're logged in and have a valid access token.
+			if (!$this->auth_token || !$this->username) {
+					return FALSE;
+			}
 
-		if(strcasecmp($setting, 'all'))
+		if (strcasecmp($setting, 'all'))
 		{
 				$setting = Snapchat::PRIVACY_EVERYONE;
 		}
-		elseif(strcasecmp($setting, 'friends'))
+		elseif (strcasecmp($setting, 'friends'))
 		{
 				$setting = Snapchat::PRIVACY_FRIENDS;
 		}
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'/settings',
-			array(
-				'action' => 'updatePrivacy',
-				'privacySetting' => $setting,
-				'timestamp' => $timestamp,
-				'username' => $this->username,
-			),
-			array(
-				$this->auth_token,
-				$timestamp,
-			), $multipart,
-			$debug = $this->debug
+				'/settings',
+						array(
+								'action' => 'updatePrivacy',
+								'privacySetting' => $setting,
+								'timestamp' => $timestamp,
+								'username' => $this->username,
+						),
+						array(
+								$this->auth_token,
+								$timestamp,
+						),
+				$multipart,
+				$debug = $this->debug
 		);
 
 		return isset($result->param) && $result->param == $setting;
@@ -1573,28 +1616,29 @@ class Snapchat extends SnapchatAgent {
 	 *   TRUE if successful, FALSE otherwise.
 	 */
 	public function updateEmail($email) {
-		// Make sure we're logged in and have a valid access token.
-		if (!$this->auth_token || !$this->username) {
-			return FALSE;
-		}
+			// Make sure we're logged in and have a valid access token.
+			if (!$this->auth_token || !$this->username) {
+					return FALSE;
+			}
 
-		$timestamp = parent::timestamp();
-		$result = parent::post(
-			'/settings',
-			array(
-				'action' => 'updateEmail',
-				'email' => $email,
-				'timestamp' => $timestamp,
-				'username' => $this->username,
-			),
-			array(
-				$this->auth_token,
-				$timestamp,
-			), $multipart,
-			$debug = $this->debug
-		);
+			$timestamp = parent::timestamp();
+			$result = parent::post(
+					'/settings',
+							array(
+									'action' => 'updateEmail',
+									'email' => $email,
+									'timestamp' => $timestamp,
+									'username' => $this->username,
+							),
+							array(
+									$this->auth_token,
+									$timestamp,
+							),
+					$multipart,
+					$debug = $this->debug
+			);
 
-		return isset($result->param) && $result->param == $email;
+			return isset($result->param) && $result->param == $email;
 	}
 
 }
