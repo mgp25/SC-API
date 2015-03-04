@@ -90,7 +90,7 @@ class Snapchat extends SnapchatAgent {
 					),
 					$multipart,
 					$debug = $this->debug
-					);
+			);
 
 			return $result;
 	}
@@ -118,8 +118,8 @@ class Snapchat extends SnapchatAgent {
 			return $result;
 	}
 
-	private function getAuthToken() {
-
+	private function getAuthToken()
+	{
 			$ch = curl_init();
 			$postfields =
 					array(
@@ -187,20 +187,20 @@ class Snapchat extends SnapchatAgent {
 			$ch = curl_init();
 			$postfields =
 					array(
-							'X-GOOG.USER_AID' => '4002600885140111980',
+							'X-GOOG.USER_AID' => '3538080729494335741',
 							'app' => 'com.snapchat.android',
 							'sender' => '191410808405',
 							'cert' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
-							'device' => '4002600885140111980',
-							'app_ver' => '508',
+							'device' => '3538080729494335741',
+							'app_ver' => '545',
 							'info' => '',
 					);
 
 			$headers =
 					array(
 							'app: com.snapchat.android',
-							'User-Agent: Android-GCM/1.4 (mako JDQ39)',
-							'Authorization: AidLogin 4002600885140111980:7856388705669173275'
+							'User-Agent: Android-GCM/1.4 (A0001 KTU84Q)',
+							'Authorization: AidLogin 3538080729494335741:629201482958995543'
 					);
 
 			curl_setopt($ch, CURLOPT_URL, "https://android.clients.google.com/c2dm/register3");
@@ -254,7 +254,7 @@ class Snapchat extends SnapchatAgent {
 
 			$dtoken = $this->getDeviceToken();
 
-			if ($dtoken['error'] == 1)
+			if($dtoken['error'] == 1)
 			{
 					$return['message'] = "Failed to get new Device token set.";
 					return $return;
@@ -434,42 +434,44 @@ class Snapchat extends SnapchatAgent {
 	 * @return mixed
 	 *   The data returned by the service or FALSE on failure.
 	 */
-	public function getUpdates($force = TRUE) {
-
-			if (!$force) {
-					$result = $this->cache->get('updates');
-					if ($result) {
-							return $result;
-					}
-			}
-
-			// Make sure we're logged in and have a valid access token.
-			if (!$this->auth_token || !$this->username) {
-					return FALSE;
-			}
-
-			$timestamp = parent::timestamp();
-			$result = parent::post(
-					'/loq/all_updates',
-							array(
-									'timestamp' => $timestamp,
-									'username' => $this->username,
-							),
-							array(
-									$this->auth_token,
-									$timestamp,
-							)
-						);
-
-			if (!empty($result->updates_response)) {
-					$this->auth_token = $result->updates_response->auth_token;
-					$this->cache->set('updates', $result->updates_response);
-					return $result->updates_response;
-			}
-
-			return $result;
-
+	public function getUpdates($force = TRUE)
+	{
+		if(!$force)
+		{
+				$result = $this->cache->get('updates');
+				if ($result) {
+						return $result;
+				}
 		}
+
+		// Make sure we're logged in and have a valid access token.
+		if(!$this->auth_token || !$this->username)
+		{
+			return FALSE;
+		}
+
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/loq/all_updates',
+			array(
+				'timestamp' => $timestamp,
+				'username' => $this->username,
+			),
+			array(
+				$this->auth_token,
+				$timestamp,
+			)
+		);
+
+		if(!empty($result->updates_response))
+		{
+				$this->auth_token = $result->updates_response->auth_token;
+				$this->cache->set('updates', $result->updates_response);
+				return $result->updates_response;
+		}
+
+		return $result;
+	}
 
 	/**
 	 * Gets the user's snaps.
@@ -477,42 +479,44 @@ class Snapchat extends SnapchatAgent {
 	 * @return mixed
 	 *   An array of snaps or FALSE on failure.
 	 */
-	public function getSnaps() {
-
-			$updates = $this->getUpdates();
-			if (empty($updates)) {
-					return FALSE;
-			}
-
-			$snaps = array();
-		  $conversations = $updates['data']->conversations_response;
-	    		foreach ($conversations as &$conversation) {
-		      		$pending_received_snaps = $conversation->pending_received_snaps;
-		        	foreach ($pending_received_snaps as &$snap) {
-		          		$snaps[] = (object)
-											array(
-													'id' => $snap->id,
-													'media_id' => empty($snap->c_id) ? FALSE : $snap->c_id,
-													'media_type' => $snap->m,
-													'time' => empty($snap->t) ? FALSE : $snap->t,
-													'sender' => empty($snap->sn) ? $this->username : $snap->sn,
-													'recipient' => empty($snap->rp) ? $this->username : $snap->rp,
-													'status' => $snap->st,
-													'screenshot_count' => empty($snap->c) ? 0 : $snap->c,
-													'sent' => $snap->sts,
-													'opened' => $snap->ts,
-													'broadcast' => empty($snap->broadcast) ? FALSE : (object)
-															array(
-																	'url' => $snap->broadcast_url,
-																	'action_text' => $snap->broadcast_action_text,
-																	'hide_timer' => $snap->broadcast_hide_timer,
-															),
-											);
-		        }
-	       }
-
-	        return $snaps;
+	public function getSnaps()
+	{
+		$updates = $this->getUpdates();
+		if(empty($updates))
+		{
+			return FALSE;
 		}
+
+		$snaps = array();
+		$conversations = $updates['data']->conversations_response;
+	    foreach($conversations as &$conversation)
+	    {
+			$pending_received_snaps = $conversation->pending_received_snaps;
+			foreach($pending_received_snaps as &$snap)
+			{
+			    $snaps[] = (object) array(
+					'id' => $snap->id,
+					'media_id' => empty($snap->c_id) ? FALSE : $snap->c_id,
+					'media_type' => $snap->m,
+					'time' => empty($snap->t) ? FALSE : $snap->t,
+					'sender' => empty($snap->sn) ? $this->username : $snap->sn,
+					'recipient' => empty($snap->rp) ? $this->username : $snap->rp,
+					'status' => $snap->st,
+					'screenshot_count' => empty($snap->c) ? 0 : $snap->c,
+					'sent' => $snap->sts,
+					'opened' => $snap->ts,
+					'broadcast' => empty($snap->broadcast) ? FALSE : (object)
+					array(
+						'url' => $snap->broadcast_url,
+						'action_text' => $snap->broadcast_action_text,
+						'hide_timer' => $snap->broadcast_hide_timer,
+					),
+				);
+			}
+		}
+
+		return $snaps;
+	}
 
 	/**
 	 * Gets friends' stories.
@@ -909,49 +913,55 @@ class Snapchat extends SnapchatAgent {
 	 *		media~zip-CE6F660A-4A9F-4BD6-8183-245C9C75B8A0	    => m4v_file_data
 	 * 	)
 	 */
-	public function getMedia($id) {
-		// Make sure we're logged in and have a valid access token.
-			if (!$this->auth_token || !$this->username) {
-					return FALSE;
+	public function getMedia($id)
+	{
+			// Make sure we're logged in and have a valid access token.
+			if(!$this->auth_token || !$this->username)
+			{
+				return FALSE;
 			}
 
 			$timestamp = parent::timestamp();
-			$result = parent::post(
-					'/bq/blob',
-							array(
-								'id' => $id,
-								'timestamp' => $timestamp,
-								'username' => $this->username,
-							),
-							array(
-									$this->auth_token,
-									$timestamp,
-							),
-							$multipart,
-							$debug = $this->debug
-					);
 
-			if (parent::isMedia(substr($result, 0, 2))) {
+			$result = parent::post(
+				'/bq/blob',
+					array(
+						'id' => $id,
+						'timestamp' => $timestamp,
+						'username' => $this->username,
+					),
+					array(
+						$this->auth_token,
+						$timestamp,
+					),
+					$multipart,
+					$debug = $this->debug
+				);
+
+			if(parent::isMedia(substr($result, 0, 2)))
+			{
+				return $result;
+			}
+			else
+			{
+				$result = parent::decryptECB($result);
+				if(parent::isMedia(substr($result, 0, 2)))
+				{
 					return $result;
 				}
-			else {
-					$result = parent::decryptECB($result);
 
-					if (parent::isMedia(substr($result, 0, 2))) {
-							return $result;
-					}
-
-			//When a snapchat video is sent with "text" or overlay
-			//the overlay is a transparent PNG file Zipped together
-			//with the M4V file.
-			//First two bytes are "PK" x50x4B; thus the previous media check
-			//will fail and would've returned a FALSE on an available media.
-					if (parent::isCompressed(substr($result, 0, 2))) {
-							//Uncompress
-							$result = parent::unCompress($result);
-							//Return Media and Overlay
-							return $result;
-					}
+				//When a snapchat video is sent with "text" or overlay
+				//the overlay is a transparent PNG file Zipped together
+				//with the M4V file.
+				//First two bytes are "PK" x50x4B; thus the previous media check
+				//will fail and would've returned a FALSE on an available media.
+				if(parent::isCompressed(substr($result, 0, 2)))
+				{
+						//Uncompress
+						$result = parent::unCompress($result);
+						//Return Media and Overlay
+						return $result;
+				}
 			}
 
 			return FALSE;
