@@ -479,7 +479,7 @@ class Snapchat extends SnapchatAgent {
 	 * @return mixed
 	 *   An array of snaps or FALSE on failure.
 	 */
-	public function getSnaps()
+	public function getSnaps($save = FALSE)
 	{
 		$updates = $this->getUpdates();
 		if(empty($updates))
@@ -513,6 +513,18 @@ class Snapchat extends SnapchatAgent {
 					),
 				);
 			}
+		}
+
+		if($save)
+		{
+				foreach ($snaps as $snap)
+				{
+						$id = $snap->id;
+						$from = $snap->sender;
+						$time = $snap->sent;
+
+						$this->getMedia($id, $from, $time);
+				}
 		}
 
 		return $snaps;
@@ -913,7 +925,7 @@ class Snapchat extends SnapchatAgent {
 	 *		media~zip-CE6F660A-4A9F-4BD6-8183-245C9C75B8A0	    => m4v_file_data
 	 * 	)
 	 */
-	public function getMedia($id)
+	function getMedia($id, $from = null, $time = null)
 	{
 			// Make sure we're logged in and have a valid access token.
 			if(!$this->auth_token || !$this->username)
@@ -940,7 +952,40 @@ class Snapchat extends SnapchatAgent {
 
 			if(parent::isMedia(substr($result, 0, 2)))
 			{
-				return $result;
+					if($from != null && $time != null)
+					{
+							$path = __DIR__ . DIRECTORY_SEPARATOR . "snaps" . DIRECTORY_SEPARATOR .  $from;
+							if (!file_exists($path))
+							{
+									mkdir($path);
+							}
+							$file = $path . DIRECTORY_SEPARATOR . date("Y-m-d H-i", (int) ($time / 1000));
+							file_put_contents($file, $result);
+							$finfo = finfo_open(FILEINFO_MIME_TYPE);
+							$finfo = finfo_file($finfo, $file);
+							switch ($finfo)
+							{
+									case "image/jpeg":
+												$ext = ".jpg";
+												break;
+									case "image/png":
+												$ext = ".png";
+												break;
+									case "video/mp4";
+												$ext = ".mp4";
+												break;
+									default:
+												$ext = null;
+							}
+
+							if ($ext != null)
+							{
+									rename ($file, $file . $ext);
+							}
+
+					}
+
+					return $result;
 			}
 			else
 			{
