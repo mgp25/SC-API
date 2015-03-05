@@ -1264,17 +1264,27 @@ class Snapchat extends SnapchatAgent {
 	}
 	*/
 
-	public function send($media, $recipients, $text = null, $type = 0, $time = 3) {
+	public function send($media, $recipients, $text = null, $time = 3) {
 			// Make sure we're logged in and have a valid access token.
 			if (!$this->auth_token || !$this->username) {
 					return FALSE;
 			}
 
+			if (!is_array($recipients)) {
+					$recipients = array($recipients);
+			}
+
+			$mime = mime_content_type($media);
+			if(strstr($mime, "video/"))
+			{
+					$type = Snapchat::MEDIA_VIDEO;
+			}else if (strstr($mime, "image/")) {
+					$type = Snapchat::MEDIA_IMAGE;
+			}
+
 			if ($text != null)
 			{
-					text($media, $text);
-					$media = file_get_contents(__DIR__ . '/cache/image.jpg');
-					unlink(__DIR__ . '/cache/image.jpg');
+					$media = text($media, $text);
 			}
 			else
 			{
