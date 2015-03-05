@@ -15,7 +15,7 @@ function text($image, $text, $type="png")
   $x = (imagesx($image)/2 - 15*strlen($text));
   imagettftext($image, 50, 0, $x, 1675, $whiteText, $font, $text);
   $res = imagepng($image, __DIR__ . '/cache/image.png');
-  ob_start()
+  ob_start();
   if ($type == "png"){
     imagepng($image);
   }elseif($type == "gif"){
@@ -23,7 +23,7 @@ function text($image, $text, $type="png")
   }else{
     imagejpeg($image);
   }
-  $res = ob_get_contents()
+  $res = ob_get_contents();
   imagedestroy($image);
   return $res;
 }
