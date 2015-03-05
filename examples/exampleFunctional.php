@@ -16,11 +16,19 @@ $to = ''; // the username you want to send the media to
 
 $snapchat = new Snapchat($username, $auth_token, $debug);
 
+//Login to Snapchat with your username and password
 $snapchat->login($username, $password);
 
-$snapchat->send($path, $to); // This send the media with default time 3 seconds
+// This send a media with default time 3 seconds
+$snapchat->send($path, $to);
 
-// if you have a previously $media_id, you can use it directly in the function. 10 seconds media.
-$snapchat->send($path, $to, 10, $media_id);
+// Send snap adding text to your image and 10 seconds
+$snapchat->send($path, $to, 'This is a test :D', 10);
+
+// Set a story
+$snapchat->setStory($path);
+
+// Set a story adding text to the image and 5 seconds
+$snapchat->setStory($path, 5, 'This is my story');
 
 ?>
