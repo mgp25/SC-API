@@ -42,6 +42,4 @@ function text($image, $text)
     //return jpeg data
     return $fileData;
 }
-
-file_put_contents("text.jpg", text("../examples/Example.jpg", "pls work"));
 ?>
