@@ -12,8 +12,8 @@ function text($image, $text)
     $rightX = imagesx($image);
     //half the height of the image
     $leftY = imagesy($image) / 2;
-    //high with padding added for text height
-    $rightY = $leftY - 18;
+    //high with padding added for text height, scaled
+    $rightY = $leftY - (0.04 * imagesy($image));
 
     //create rgb(0, 0, 0) with 0.75 alpha for opacity for box background
     $black = imagecolorallocatealpha($image, 0, 0, 0, 75);
@@ -24,11 +24,11 @@ function text($image, $text)
     imagefilledrectangle($image, $leftX, $leftY, $rightX, $rightY, $black);
 
     //get bounding box for text
-    $boundingBox = imagettfbbox(14, 0, $font, $text);
+    $boundingBox = imagettfbbox((0.03 * imagesy($image)), 0, $font, $text);
     //calculate leftmost x position for text placement to be in center
     $x = ($rightX - ($boundingBox[0] + $boundingBox[2])) / 2;
     //add text to image in box
-    imagettftext($image, 14, 0, $x, $leftY - 2, $whiteText, $font, $text);
+    imagettftext($image, (0.03 * imagesy($image)), 0, $x, ($leftY - ($leftY * 0.015)), $whiteText, $font, $text);
     //save new image with text as jpeg
     imagejpeg($image, __DIR__ . "/cache/image.jpg");
 
@@ -42,4 +42,6 @@ function text($image, $text)
     //return jpeg data
     return $fileData;
 }
+
+file_put_contents("text.jpg", text("../examples/Example.jpg", "pls work"));
 ?>
