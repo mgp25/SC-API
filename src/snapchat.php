@@ -1250,7 +1250,7 @@ class Snapchat extends SnapchatAgent {
 		}
 		else
 		{
-			$recipientsString = "\"{$recipients}\"]";
+			$recipientsString .= "\"{$recipients}\"]";
 		}
 		$recipients = $recipientsString;
 
