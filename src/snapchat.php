@@ -1155,167 +1155,134 @@ class Snapchat extends SnapchatAgent {
 	 * @return mixed
 	 *   The ID of the uploaded media or FALSE on failure.
 	 */
-	public function upload($type, $data) {
-			// Make sure we're logged in and have a valid access token.
-			if (!$this->auth_token || !$this->username) {
-					return FALSE;
-			}
+	public function upload($data, $media)
+	{
+		// Make sure we're logged in and have a valid access token.
+		if(!$this->auth_token || !$this->username)
+		{
+			return FALSE;
+		}
 
-			// To make cURL happy, we write the data to a file first.
-			$temp = tempnam(sys_get_temp_dir(), 'Snap');
-			file_put_contents($temp, parent::encryptECB($data));
+		$mime = mime_content_type($media);
+		if(strstr($mime, "video/"))
+		{
+			$type = Snapchat::MEDIA_VIDEO;
+		}
+		else if(strstr($mime, "image/"))
+		{
+			$type = Snapchat::MEDIA_IMAGE;
+		}
+		else
+		{
+			return false;
+		}
 
-			if (version_compare(PHP_VERSION, '5.5.0', '>=')) {
-					$cfile = curl_file_create($temp, ($type == self::MEDIA_IMAGE ? 'image/jpeg' : 'video/quicktime'), 'snap');
-			}
+		/*
+		// To make cURL happy, we write the data to a file first.
+		$temp = tempnam(sys_get_temp_dir(), 'Snap');
+		file_put_contents($temp, parent::encryptECB($data));
 
-			$uniId = md5(uniqid());
-			$media_id = strtoupper($this->username . '~' . sprintf('%08s-%04s-%04x-%04x-%12s', substr($uniId, 0, 8), substr($uniId, 8, 4), substr($uniId, 12, 4), substr($uniId, 16, 4), substr($uniId, 20, 12)));
-			$timestamp = parent::timestamp();
-			$result = parent::post(
-					'/ph/upload',
-							array(
-									'media_id' => $media_id,
-									'type' => $type,
-									'data' => (version_compare(PHP_VERSION, '5.5.0', '>=') ? $cfile : '@' . $temp . ';filename=data'),
-									'timestamp' => $timestamp,
-									'username' => $this->username,
-									'zipped' => '0'
-							),
-							array(
-									$this->auth_token,
-									$timestamp,
-							),
-							$multipart = TRUE,
-							$debug = $this->debug
-					);
+		if(version_compare(PHP_VERSION, '5.5.0', '>='))
+		{
+			$cfile = curl_file_create($temp, ($type == self::MEDIA_IMAGE ? 'image/jpeg' : 'video/quicktime'), 'snap');
+		}
+		*/
 
-			unlink($temp);
+		$uniId = md5(uniqid());
+		$media_id = strtoupper($this->username . '~' . sprintf('%08s-%04s-%04x-%04x-%12s', substr($uniId, 0, 8), substr($uniId, 8, 4), substr($uniId, 12, 4), substr($uniId, 16, 4), substr($uniId, 20, 12)));
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/ph/upload',
+			array(
+				'media_id' => $media_id,
+				'type' => $type,
+				'data' => $data,
+				'timestamp' => $timestamp,
+				'username' => $this->username,
+				'zipped' => '0'
+			),
+			array(
+				$this->auth_token,
+				$timestamp,
+			),
+			$multipart = true,
+			$debug = $this->debug
+		);
 
-			//TODO IF ERROR
-			return $media_id;
+		//unlink($temp);
+
+		//TODO IF ERROR
+		return $media_id;
 	}
 
 	/**
 	 * Sends a snap.
 	 *
-	 * @param string $media_id
-	 *   The media ID of the snap to send.
+	 * @param string $media
+	 *   The path to the media to send.
 	 * @param array $recipients
 	 *   An array of recipient usernames.
+	 * @param string $text
+	 *   Text to add to image.
 	 * @param int $time
 	 *   The time in seconds the snap should be available (1-10). Defaults to 3.
 	 *
 	 * @return bool
 	 *   TRUE if successful, FALSE otherwise.
-	 *
-	public function send($media, $recipients, $time = 3, $media_id = null) {
+	 */
+	public function send($media, $recipients, $text = null, $time = 3)
+	{
 		// Make sure we're logged in and have a valid access token.
-
-		if (!$this->auth_token || !$this->username) {
+		if(!$this->auth_token || !$this->username)
+		{
 			return FALSE;
 		}
 
-		if (!is_array($recipients)) {
-				$recipients = array($recipients);
+		$recipientsString = "[";
+		if(is_array($recipients))
+		{
+			foreach($recipients as $user)
+			{
+				$recipientsString .= "\"{$user}\",";
+			}
+			$recipientsString = rtrim($recipientsString, ',');
+			$recipientsString .=  "]";
+		}
+		else
+		{
+			$recipientsString = "\"{$recipients}\"]";
+		}
+		$recipients = $recipientsString;
+
+		if(!is_null($text))
+		{
+			$mediaData = text($media, $text);
+		}
+		else
+		{
+			$mediaData = file_get_contents($media);
 		}
 
-		if($media_id == null)
-		{
-			$mime = mime_content_type($media);
-			if(strstr($mime, "video/"))
-			{
-				$media_id = $this->upload(
-				Snapchat::MEDIA_VIDEO,
-				file_get_contents($media)
-				);
-			}else if(strstr($mime, "image/"))
-			{
-				$media_id = $this->upload(
-				Snapchat::MEDIA_IMAGE,
-				file_get_contents($media)
-				);
-			}
-		}
+		$media_id = $this->upload($mediaData, $media);
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
 			'/loq/send',
 			array(
 				'media_id' => $media_id,
-				'recipients' => implode(',', $recipients),
-				'time' => $time,
-				//'camera_front_facing' => '0',
-				//'country_code' => 'US',
+				'zipped' => '0',
+				'recipients' => $recipients,
 				'username' => $this->username,
-				//'type' => '0',
-				//'reply' => '0',
-				'features_map' => '{}',
-				'zipped' => '0'
+				'time' => $time,
+				'timestamp' => $timestamp,
+				'features_map' => '{}'
 			),
 			array(
 				$this->auth_token,
-				$timestamp,
-			),  $multipart,
+				$timestamp
+			),
+			$multipart = false,
 			$debug = $this->debug
-		);
-
-		return is_null($result);
-	}
-	*/
-
-	public function send($media, $recipients, $text = null, $time = 3) {
-			// Make sure we're logged in and have a valid access token.
-			if (!$this->auth_token || !$this->username) {
-					return FALSE;
-			}
-
-			if (!is_array($recipients)) {
-					$recipients = array($recipients);
-			}
-
-			$mime = mime_content_type($media);
-			if(strstr($mime, "video/"))
-			{
-					$type = Snapchat::MEDIA_VIDEO;
-			}else if (strstr($mime, "image/")) {
-					$type = Snapchat::MEDIA_IMAGE;
-			}
-
-			if ($text != null)
-			{
-					$media = text($media, $text);
-			}
-			else
-			{
-					$media = file_get_contents($media);
-			}
-
-			$uniId = md5(uniqid());
-			$media_id = strtoupper($this->username . '~' . sprintf('%08s-%04s-%04x-%04x-%12s', substr($uniId, 0, 8), substr($uniId, 8, 4), substr($uniId, 12, 4), substr($uniId, 16, 4), substr($uniId, 20, 12)));
-
-			$timestamp = parent::timestamp();
-			$result = parent::post(
-					'/loq/retry',
-							array(
-									'camera_front_facing' => rand(0,1),
-									'country_code' => 'US',
-									'media_id' => $media_id,
-									'recipients' => "[\"" . $recipients . "\"]",
-									'reply' => '0',
-									'time' => $time,
-									'timestamp' => $timestamp,
-									'type' => $type,
-									'username' => $this->username,
-									'zipped' => '0',
-									'data' => $media
-							),
-							array(
-									$this->auth_token,
-									$timestamp,
-							),
-						$multipart = true,
-						$debug = $this->debug
 		);
 
 		return $result;
