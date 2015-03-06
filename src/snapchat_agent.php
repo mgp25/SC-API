@@ -68,7 +68,8 @@ abstract class SnapchatAgent {
 	 * @return int
 	 *   The current timestamp, expressed in milliseconds since epoch.
 	 */
-	public function timestamp() {
+	public function timestamp()
+	{
 		return round(microtime(TRUE) * 1000);
 	}
 
@@ -83,7 +84,8 @@ abstract class SnapchatAgent {
 	 * @return data
 	 *   The padded data.
 	 */
-	public function pad($data, $blocksize = 16) {
+	public function pad($data, $blocksize = 16)
+	{
 		$pad = $blocksize - (strlen($data) % $blocksize);
 		return $data . str_repeat(chr($pad), $pad);
 	}
@@ -97,7 +99,8 @@ abstract class SnapchatAgent {
 	 * @return data
 	 *   The decrypted data.
 	 */
-	public function decryptECB($data) {
+	public function decryptECB($data)
+	{
 		return mcrypt_decrypt(MCRYPT_RIJNDAEL_128, self::BLOB_ENCRYPTION_KEY, self::pad($data), MCRYPT_MODE_ECB);
 	}
 
@@ -110,7 +113,8 @@ abstract class SnapchatAgent {
 	 * @return data
 	 *   The encrypted data.
 	 */
-	public function encryptECB($data) {
+	public function encryptECB($data)
+	{
 		return mcrypt_encrypt(MCRYPT_RIJNDAEL_128, self::BLOB_ENCRYPTION_KEY, self::pad($data), MCRYPT_MODE_ECB);
 	}
 
@@ -127,7 +131,8 @@ abstract class SnapchatAgent {
 	 * @return data
 	 *   The decrypted data.
 	 */
-	public function decryptCBC($data, $key, $iv) {
+	public function decryptCBC($data, $key, $iv)
+	{
 		// Decode the key and IV.
 		$iv = base64_decode($iv);
 		$key = base64_decode($key);
@@ -150,7 +155,8 @@ abstract class SnapchatAgent {
 	 * @return string
 	 *   The generated hash.
 	 */
-	public function hash($first, $second) {
+	public function hash($first, $second)
+	{
 		// Append the secret to the values.
 		$first = self::SECRET . $first;
 		$second = $second . self::SECRET;
@@ -165,7 +171,8 @@ abstract class SnapchatAgent {
 
 		// Create a new hash with pieces of the two we just made.
 		$result = '';
-		for ($i = 0; $i < strlen(self::HASH_PATTERN); $i++) {
+		for($i = 0; $i < strlen(self::HASH_PATTERN); $i++)
+		{
 			$result .= substr(self::HASH_PATTERN, $i, 1) ? $hash2[$i] : $hash1[$i];
 		}
 
@@ -181,14 +188,17 @@ abstract class SnapchatAgent {
 	 * @return bool
 	 *   TRUE if the blob looks like a media file, FALSE otherwise.
 	 */
-	function isMedia($data) {
+	function isMedia($data)
+	{
 		// Check for a JPG header.
-		if ($data[0] == chr(0xFF) && $data[1] == chr(0xD8)) {
+		if($data[0] == chr(0xFF) && $data[1] == chr(0xD8))
+		{
 			return TRUE;
 		}
 
 		// Check for a MP4 header.
-		if ($data[0] == chr(0x00) && $data[1] == chr(0x00)) {
+		if($data[0] == chr(0x00) && $data[1] == chr(0x00))
+		{
 			return TRUE;
 		}
 
@@ -204,9 +214,11 @@ abstract class SnapchatAgent {
 	 * @return bool
 	 *   TRUE if the blob looks like a compressed file, FALSE otherwise.
 	 */
-	function isCompressed($data) {
+	function isCompressed($data)
+	{
 		// Check for a PK header.
-		if ($data[0] == chr(0x50) && $data[1] == chr(0x4B)) {
+		if($data[0] == chr(0x50) && $data[1] == chr(0x4B))
+		{
 			return TRUE;
 		}
 
@@ -226,19 +238,26 @@ abstract class SnapchatAgent {
 	 * @return array
 	 *   Array containing both file contents, or FALSE if couldn't extract.
 	 */
-	function unCompress($data) {
-		if (!file_put_contents("./temp", $data)) {
+	function unCompress($data)
+	{
+		if(!file_put_contents("./temp", $data))
+		{
 			exit('Should have write access to own folder');
 		}
 		$resource = zip_open("./temp");
 		$result = FALSE;
-		if (is_resource($resource)) {
-			while($zip_entry = zip_read($resource)) {
+		if(is_resource($resource))
+		{
+			while($zip_entry = zip_read($resource))
+			{
 				$filename = zip_entry_name($zip_entry);
-				if (zip_entry_open($resource, $zip_entry, "r")) {
+				if(zip_entry_open($resource, $zip_entry, "r"))
+				{
 					$result[$filename] = zip_entry_read($zip_entry, zip_entry_filesize($zip_entry));
 					zip_entry_close($zip_entry);
-				} else {
+				}
+				else
+				{
 				    unlink("./temp");
 					return FALSE;
 				}
@@ -262,7 +281,8 @@ abstract class SnapchatAgent {
 	 * @return data
 	 *   The retrieved data.
 	 */
-	public function get($endpoint) {
+	public function get($endpoint)
+	{
 		return file_get_contents(self::URL . $endpoint);
 	}
 
@@ -358,16 +378,23 @@ abstract class SnapchatAgent {
 			echo "\nREQUEST TO: " .self::URL . $endpoint . "\n";
 			echo "\nSent Request info: " .print_r($info['request_header'], true). "\n";
 			if(is_array($data))
+			{
 				echo 'DATA: ' . print_r($data) . "\n";
+			}
 			else
+			{
 				echo 'DATA: ' . $data . "\n";
-			if ($endpoint == "/loq/login" || $endpoint == "/all_updates")
+			}
+
+			if($endpoint == "/loq/login" || $endpoint == "/all_updates")
 			{
 				$jsonResult = json_decode($result);
 				echo 'RESULT: ' . print_r($jsonResult) . "\n";
 			}
 			else
+			{
 				echo 'RESULT: ' . $result . "\n";
+			}
 		}
 
 		// If cURL doesn't have a bundle of root certificates handy, we provide
@@ -380,7 +407,7 @@ abstract class SnapchatAgent {
 		$gi = curl_getinfo($ch);
 		// If the cURL request fails, return FALSE. Also check the status code
 		// since the API generally won't return friendly errors.
-		if ($result === FALSE)
+		if($result === FALSE)
 		{
 			curl_close($ch);
 
@@ -402,10 +429,10 @@ abstract class SnapchatAgent {
 
 		$return['error'] = 0;
 
-		if ($endpoint == '/ph/blob' || $endpoint == '/bq/blob' || $endpoint == "/bq/snaptag_download" || $endpoint == '/bq/chat_media')
+		if($endpoint == '/ph/blob' || $endpoint == '/bq/blob' || $endpoint == "/bq/snaptag_download" || $endpoint == '/bq/chat_media')
 		{
-				$return['data'] = $result;
-				return $result;
+			$return['data'] = $result;
+			return $result;
 		}
 
 		// Add support for foreign characters in the JSON response.
