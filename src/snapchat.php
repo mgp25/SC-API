@@ -544,7 +544,7 @@ class Snapchat extends SnapchatAgent {
 	 * @return mixed
 	 *   An array of stories or FALSE on failure.
 	 */
-	function getFriendStories($save = TRUE)
+	function getFriendStories($save = FALSE)
 	{
 		// Make sure we're logged in and have a valid access token.
 		if(!$this->auth_token || !$this->username)
@@ -571,8 +571,10 @@ class Snapchat extends SnapchatAgent {
 			{
 				$id = $story->media_id;
 				$from = $story->username;
+				$mediaKey = $story->media_key;
+				$mediaIV = $story->media_iv;
 
-				$this->getMedia($id, $from);
+				$this->getStory($id, $mediaKey, $mediaIV, $from, $save);
 			}
 		}
 
@@ -1452,7 +1454,7 @@ class Snapchat extends SnapchatAgent {
 	 * @return mixed
 	 *   The story data or FALSE on failure.
 	 */
-	public function getStory($media_id, $key, $iv)
+	public function getStory($media_id, $key, $iv, $from, $save = FALSE)
 	{
 		// Make sure we're logged in and have a valid access token.
 		if(!$this->auth_token || !$this->username)
@@ -1461,11 +1463,45 @@ class Snapchat extends SnapchatAgent {
 		}
 
 		// Retrieve encrypted story and decrypt.
-		$blob = parent::get('/story_blob?story_id=' . $media_id);
+		$blob = parent::get('/bq/story_blob?story_id=' . $media_id);
+
 
 		if(!empty($blob))
 		{
-			return parent::decryptCBC($blob, $key, $iv);
+
+				$result = parent::decryptCBC($blob, $key, $iv);
+				if($save)
+				{
+					$path = __DIR__ . DIRECTORY_SEPARATOR . "stories" . DIRECTORY_SEPARATOR .  $from;
+					if(!file_exists($path))
+					{
+						mkdir($path);
+					}
+					$file = $path . DIRECTORY_SEPARATOR . 'story';
+					file_put_contents($file, $result);
+					$finfo = finfo_open(FILEINFO_MIME_TYPE);
+					$finfo = finfo_file($finfo, $file);
+					switch($finfo)
+					{
+						case "image/jpeg":
+							$ext = ".jpg";
+							break;
+						case "image/png":
+							$ext = ".png";
+							break;
+						case "video/mp4";
+							$ext = ".mp4";
+							break;
+						default:
+							$ext = null;
+					}
+
+					if($ext != null)
+					{
+						rename($file, $file . $ext);
+					}
+				}
+				return $result;
 		}
 
 		return FALSE;
