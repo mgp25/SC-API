@@ -544,51 +544,36 @@ class Snapchat extends SnapchatAgent {
 	 * @return mixed
 	 *   An array of stories or FALSE on failure.
 	 */
-	function getFriendStories($force = FALSE)
+	function getFriendStories($save = TRUE)
 	{
-
-		if(!$force)
-		{
-			$result = $this->cache->get('stories');
-			if($result)
-			{
-				return $result;
-			}
-		}
-
 		// Make sure we're logged in and have a valid access token.
 		if(!$this->auth_token || !$this->username)
 		{
 			return FALSE;
 		}
 
-		$timestamp = parent::timestamp();
-		$result = parent::post(
-			'loq/all_updates',
-			array(
-				'timestamp' => $timestamp,
-				'username' => $this->username,
-			),
-			array(
-				$this->auth_token,
-				$timestamp,
-			),
-			$multipart,
-			$debug = $this->debug
-		);
-
-		if (!empty($result->stories_response)) {
-				$this->cache->set('stories', $result->stories_response);
-		}
-		else {
-				return FALSE;
+		$updates = $this->getUpdates();
+		if(empty($updates))
+		{
+			return FALSE;
 		}
 
 		$stories = array();
-		foreach ($result->stories_response->friend_stories as $group) {
+		foreach ($updates['data']->stories_response->friend_stories as $group) {
 				foreach ($group->stories as $story) {
 						$stories[] = $story->story;
 				}
+		}
+
+		if($save)
+		{
+			foreach($stories as $story)
+			{
+				$id = $story->media_id;
+				$from = $story->username;
+
+				$this->getMedia($id, $from);
+			}
 		}
 
 		return $stories;
