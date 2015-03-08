@@ -54,7 +54,7 @@ class Snapchat extends SnapchatAgent {
 	const PRIVACY_FRIENDS = 1;
 
 	protected $auth_token;
-	protected  $chat_auth_token;
+	protected $chat_auth_token;
 	protected $username;
 	protected $debug;
 
@@ -802,7 +802,7 @@ class Snapchat extends SnapchatAgent {
 		$result = parent::post(
 			'/bq/friend',
 			array(
-				'action' => 'remove',
+				'action' => 'delete',
 				'friend' => $username,
 				'timestamp' => $timestamp,
 				'username' => $this->username,
@@ -1470,6 +1470,12 @@ class Snapchat extends SnapchatAgent {
 		{
 
 				$result = parent::decryptCBC($blob, $key, $iv);
+
+				if(parent::isCompressed(substr($result, 0, 2)))
+				{
+					$result = parent::unCompress($result);
+				}
+
 				if($save)
 				{
 					$path = __DIR__ . DIRECTORY_SEPARATOR . "stories" . DIRECTORY_SEPARATOR .  $from;
@@ -1477,7 +1483,7 @@ class Snapchat extends SnapchatAgent {
 					{
 						mkdir($path);
 					}
-					$file = $path . DIRECTORY_SEPARATOR . 'story';
+					$file = $path . DIRECTORY_SEPARATOR . "part-" . time();
 					file_put_contents($file, $result);
 					$finfo = finfo_open(FILEINFO_MIME_TYPE);
 					$finfo = finfo_file($finfo, $file);
