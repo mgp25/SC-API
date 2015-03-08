@@ -651,7 +651,7 @@ class Snapchat extends SnapchatAgent {
 	 * Gets the user's friends.
 	 *
 	 * @return mixed
-	 *   An array of friends or FALSE on failure.
+	 *   An array of friends
 	 */
 	public function getFriends()
 	{
@@ -662,7 +662,16 @@ class Snapchat extends SnapchatAgent {
 			return FALSE;
 		}
 
-		return $updates->friends;
+		$friends = array();
+		$friends = $updates['data']->friends_response;
+		$friends = $friends->friends;
+
+		foreach($friends as $friend)
+		{
+				$friendList[] = $friend->name;
+		}
+
+		return $friendList;
 	}
 
 	/**
