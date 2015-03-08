@@ -90,7 +90,7 @@ class Snapchat extends SnapchatAgent {
 				parent::STATIC_TOKEN,
 				$timestamp,
 			),
-			$multipart,
+			$multipart = false,
 			$debug = $this->debug
 		);
 
@@ -112,7 +112,7 @@ class Snapchat extends SnapchatAgent {
 				$this->auth_token,
 				$timestamp,
 			),
-			$multipart,
+			$multipart = false,
 			$debug = $this->debug
 		);
 
@@ -296,7 +296,7 @@ class Snapchat extends SnapchatAgent {
 				$timestamp,
 				$auth['auth']
 			),
-			$multipart,
+			$multipart = false,
 			$debug = $this->debug
 		);
 
@@ -341,7 +341,7 @@ class Snapchat extends SnapchatAgent {
 				$this->auth_token,
 				$timestamp,
 			),
-			$multipart,
+			$multipart = false,
 			$debug = $this->debug
 		);
 
@@ -385,7 +385,7 @@ class Snapchat extends SnapchatAgent {
 				parent::STATIC_TOKEN,
 				$timestamp,
 			),
-			$multipart,
+			$multipart = false,
 			$debug = $this->debug
 		);
 
@@ -406,7 +406,7 @@ class Snapchat extends SnapchatAgent {
 				parent::STATIC_TOKEN,
 				$timestamp,
 			),
-			$multipart,
+			$multipart = false,
 			$debug = $this->debug
 		);
 
@@ -620,7 +620,7 @@ class Snapchat extends SnapchatAgent {
 					$this->auth_token,
 					$timestamp,
 				),
-				$multipart,
+				$multipart = false,
 				$debug = $this->debug
 			);
 
@@ -707,7 +707,7 @@ class Snapchat extends SnapchatAgent {
 				$this->auth_token,
 				$timestamp,
 			),
-			$multipart,
+			$multipart = false,
 			$debug = $this->debug
 		);
 
@@ -769,7 +769,7 @@ class Snapchat extends SnapchatAgent {
 				$this->auth_token,
 				$timestamp,
 			),
-			$multipart,
+			$multipart = false,
 			$debug = $this->debug
 		);
 
@@ -809,7 +809,7 @@ class Snapchat extends SnapchatAgent {
 				$this->auth_token,
 				$timestamp,
 			),
-			$multipart,
+			$multipart = false,
 			$debug = $this->debug
 		);
 
@@ -848,7 +848,7 @@ class Snapchat extends SnapchatAgent {
 				$this->auth_token,
 				$timestamp,
 			),
-			$multipart,
+			$multipart = false,
 			$debug = $this->debug
 		);
 
@@ -885,7 +885,7 @@ class Snapchat extends SnapchatAgent {
 				$this->auth_token,
 				$timestamp,
 			),
-			$multipart,
+			$multipart = false,
 			$debug = $this->debug
 		);
 
@@ -922,7 +922,7 @@ class Snapchat extends SnapchatAgent {
 				$this->auth_token,
 				$timestamp,
 			),
-			$multipart,
+			$multipart = false,
 			$debug = $this->debug
 		);
 
@@ -965,7 +965,7 @@ class Snapchat extends SnapchatAgent {
 					$this->auth_token,
 					$timestamp,
 				),
-				$multipart,
+				$multipart = false,
 				$debug = $this->debug
 			);
 
@@ -1063,7 +1063,7 @@ class Snapchat extends SnapchatAgent {
 				$this->auth_token,
 				$timestamp,
 			),
-			$multipart,
+			$multipart = false,
 			$debug = $this->debug
 		);
 
@@ -1326,7 +1326,7 @@ class Snapchat extends SnapchatAgent {
 				$this->auth_token,
 				$timestamp
 			),
-			$multipart,
+			$multipart = false,
 			$debug = $this->debug
 		);
 	}
@@ -1432,7 +1432,7 @@ class Snapchat extends SnapchatAgent {
 				$this->auth_token,
 				$timestamp,
 			),
-			$multipart,
+			$multipart = false,
 			$debug = $this->debug
 		);
 
@@ -1541,7 +1541,7 @@ class Snapchat extends SnapchatAgent {
 				$this->auth_token,
 				$timestamp,
 			),
-			$multipart,
+			$multipart = false,
 			$debug = $this->debug
 		);
 
@@ -1582,7 +1582,7 @@ class Snapchat extends SnapchatAgent {
 				$this->auth_token,
 				$timestamp,
 			),
-			$multipart,
+			$multipart = false,
 			$debug = $this->debug
 		);
 
@@ -1625,7 +1625,7 @@ class Snapchat extends SnapchatAgent {
 				$this->auth_token,
 				$timestamp,
 			),
-			$multipart,
+			$multipart = false,
 			$debug = $this->debug
 		);
 
@@ -1671,7 +1671,7 @@ class Snapchat extends SnapchatAgent {
 				$this->auth_token,
 				$timestamp,
 			),
-			$multipart,
+			$multipart = false,
 			$debug = $this->debug
 		);
 
@@ -1708,7 +1708,7 @@ class Snapchat extends SnapchatAgent {
 				$this->auth_token,
 				$timestamp,
 			),
-			$multipart,
+			$multipart = false,
 			$debug = $this->debug
 		);
 
