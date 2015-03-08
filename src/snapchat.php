@@ -798,7 +798,7 @@ class Snapchat extends SnapchatAgent {
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'/friend',
+			'/bq/friend',
 			array(
 				'action' => 'delete',
 				'friend' => $username,
