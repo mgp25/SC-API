@@ -609,7 +609,7 @@ class Snapchat extends SnapchatAgent {
 		{
 			$timestamp = parent::timestamp();
 			$result = parent::post(
-				'/find_friends',
+				'/bq/find_friends',
 				array(
 					'countryCode' => $country,
 					'numbers' => json_encode($batch),
