@@ -701,12 +701,13 @@ class Snapchat extends SnapchatAgent {
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'/friend',
+			'/bq/friend',
 			array(
 				'action' => 'add',
 				'friend' => $username,
 				'timestamp' => $timestamp,
 				'username' => $this->username,
+				'friend_source' => 'ADDED_BY_USERNAME'
 			),
 			array(
 				$this->auth_token,
