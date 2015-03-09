@@ -714,7 +714,7 @@ class Snapchat extends SnapchatAgent {
 		);
 
 		// Sigh...
-		if(strpos($result->message, 'Sorry! Couldn\'t find') === 0)
+		if(strpos($result["data"]->message, 'Sorry! Couldn\'t find') === 0)
 		{
 			return FALSE;
 		}
