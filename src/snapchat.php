@@ -373,7 +373,7 @@ class Snapchat extends SnapchatAgent {
 	{
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'loq/register',
+			'/loq/register',
 			array(
 				'birthday' => $birthday,
 				'password' => $password,
@@ -395,7 +395,7 @@ class Snapchat extends SnapchatAgent {
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'/registeru',
+			'/loq/register_username',
 			array(
 				'email' => $email,
 				'username' => $username,
@@ -1510,7 +1510,7 @@ class Snapchat extends SnapchatAgent {
 							}
 					}
 				}
-				
+
 				return $result;
 		}
 
