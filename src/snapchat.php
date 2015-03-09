@@ -309,7 +309,6 @@ class Snapchat extends SnapchatAgent {
 		{
 			$this->auth_token = $result['data']->updates_response->auth_token;
 			$this->username = $result['data']->updates_response->username;
-
 			$this->device($ptoken['token']);
 		}
 
@@ -1720,29 +1719,4 @@ class Snapchat extends SnapchatAgent {
 
 		return isset($result->param) && $result->param == $email;
 	}
-
-	/**
-	 * Sends a chat message.
-	 *
-	 * @param string $target
-	 *   Target to send the message to.
-	 *
-	 * @param string $message
-	 *   Message to send.
-	 *
-	 * @return bool
-	 *   TRUE if successful, FALSE otherwise.
-	 */
-	public function sendMessage()
-	{
-		// Make sure we're logged in and have a valid access token.
-		if(!$this->auth_token || !$this->username)
-		{
-			return FALSE;
-		}
-
-		$timestamp = parent::timestamp();
-
-	}
-
 }
