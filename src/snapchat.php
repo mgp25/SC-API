@@ -309,7 +309,6 @@ class Snapchat extends SnapchatAgent {
 		{
 			$this->auth_token = $result['data']->updates_response->auth_token;
 			$this->username = $result['data']->updates_response->username;
-
 			$this->device($ptoken['token']);
 		}
 
@@ -698,12 +697,13 @@ class Snapchat extends SnapchatAgent {
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'/friend',
+			'/bq/friend',
 			array(
 				'action' => 'add',
 				'friend' => $username,
 				'timestamp' => $timestamp,
 				'username' => $this->username,
+				'friend_source' => 'ADDED_BY_USERNAME'
 			),
 			array(
 				$this->auth_token,
@@ -714,7 +714,7 @@ class Snapchat extends SnapchatAgent {
 		);
 
 		// Sigh...
-		if(strpos($result->message, 'Sorry! Couldn\'t find') === 0)
+		if(strpos($result["data"]->message, 'Sorry! Couldn\'t find') === 0)
 		{
 			return FALSE;
 		}
@@ -1756,29 +1756,4 @@ class Snapchat extends SnapchatAgent {
 
 		return isset($result->param) && $result->param == $email;
 	}
-
-	/**
-	 * Sends a chat message.
-	 *
-	 * @param string $target
-	 *   Target to send the message to.
-	 *
-	 * @param string $message
-	 *   Message to send.
-	 *
-	 * @return bool
-	 *   TRUE if successful, FALSE otherwise.
-	 */
-	public function sendMessage()
-	{
-		// Make sure we're logged in and have a valid access token.
-		if(!$this->auth_token || !$this->username)
-		{
-			return FALSE;
-		}
-
-		$timestamp = parent::timestamp();
-
-	}
-
 }

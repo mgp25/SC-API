@@ -338,6 +338,11 @@ abstract class SnapchatAgent {
 		}
 		$options = self::$CURL_OPTIONS;
 
+		if($debug)
+		{
+			curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+		}
+
 		if($endpoint == "/loq/login")
 		{
 				$headers = array_merge(self::$CURL_HEADERS, array("Authorization: Bearer {$params[2]}"));
@@ -355,7 +360,6 @@ abstract class SnapchatAgent {
 		if($endpoint == '/ph/blob' || $endpoint == '/bq/blob' || $endpoint == '/bq/chat_media')
 		{
 		    $headers = array_merge($headers, array("X-Timestamp: " . $params[1]));
-			curl_setopt($ch, CURLINFO_HEADER_OUT, true);
 			$options += array(
 				CURLOPT_URL => self::URL . $endpoint . "?{$data}"
 			);
@@ -370,7 +374,6 @@ abstract class SnapchatAgent {
 		}
 		curl_setopt_array($ch, $options);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
 		$result = curl_exec($ch);
 		if($debug)
 		{
