@@ -1483,30 +1483,34 @@ class Snapchat extends SnapchatAgent {
 					{
 						mkdir($path);
 					}
-					$file = $path . DIRECTORY_SEPARATOR . "part-" . time();
-					file_put_contents($file, $result);
-					$finfo = finfo_open(FILEINFO_MIME_TYPE);
-					$finfo = finfo_file($finfo, $file);
-					switch($finfo)
+					$file = $path . DIRECTORY_SEPARATOR . "story-" . $media_id;
+					if(!file_exists($file))
 					{
-						case "image/jpeg":
-							$ext = ".jpg";
-							break;
-						case "image/png":
-							$ext = ".png";
-							break;
-						case "video/mp4";
-							$ext = ".mp4";
-							break;
-						default:
-							$ext = null;
-					}
+							file_put_contents($file, $result);
+							$finfo = finfo_open(FILEINFO_MIME_TYPE);
+							$finfo = finfo_file($finfo, $file);
+							switch($finfo)
+							{
+									case "image/jpeg":
+											$ext = ".jpg";
+											break;
+									case "image/png":
+											$ext = ".png";
+											break;
+									case "video/mp4";
+											$ext = ".mp4";
+											break;
+									default:
+											$ext = null;
+							}
 
-					if($ext != null)
-					{
-						rename($file, $file . $ext);
+							if($ext != null)
+							{
+									rename($file, $file . $ext);
+							}
 					}
 				}
+				
 				return $result;
 		}
 
