@@ -26,4 +26,13 @@ $snapchat->setStory($imagePath);
 // Set a story adding text to the image and 5 seconds
 $snapchat->setStory($imagePath, 5, "This is my story");
 
+// Get your friends in an array
+$friends = $snapchat->getFriends();
+
+// Get snaps data
+$snapchat->getSnaps();
+
+// Automatically downloads Snaps and store it in 'Snaps' folder
+$snapchat->getSnaps(true);
+
 ?>
