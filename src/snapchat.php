@@ -364,12 +364,16 @@ class Snapchat extends SnapchatAgent {
 	 *   The email address to associate with the account.
 	 * @param $birthday string
 	 *   The user's birthday (yyyy-mm-dd).
+	 * @param string $phone_verification
+	 *   Whether to use phone verification or not.
+	 * @param string $phone_number
+	 *   Phone number to use if using phone verification.
 	 *
 	 * @return mixed
 	 *   The data returned by the service or FALSE if registration failed.
 	 *   Generally, returns the same result as calling self::getUpdates().
 	 */
-	public function register($username, $password, $email, $birthday)
+	public function register($username, $password, $email, $birthday, $phone_verification = FALSE, $phone_number = NULL)
 	{
 		$timestamp = parent::timestamp();
 		$result = parent::post(
@@ -388,21 +392,22 @@ class Snapchat extends SnapchatAgent {
 			$debug = $this->debug
 		);
 
-		if(!isset($result->token))
+		if(!isset($result["data"]->auth_token))
 		{
 			return FALSE;
 		}
+		$this->auth_token = $result['data']->auth_token;
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
 			'/loq/register_username',
 			array(
-				'email' => $email,
-				'username' => $username,
+				'username' => $email,
+				'selected_username' => $username,
 				'timestamp' => $timestamp,
 			),
 			array(
-				parent::STATIC_TOKEN,
+				$this->auth_token,
 				$timestamp,
 			),
 			$multipart = false,
@@ -418,6 +423,21 @@ class Snapchat extends SnapchatAgent {
 			$this->cache = new SnapchatCache();
 			$this->cache->set('updates', $result);
 
+			if($phone_verification)
+			{
+				if(!is_null($phone_number))
+				{
+					$this->sendPhoneVerification($phone_number);
+					//TODO
+					//run /bq/phone_verify with proper parameters: req_token, timestamp, action = verifyPhoneNumber, username, code = verification code
+				}
+				else
+				{
+					echo "\nYou must provide a phone number to verify with.";
+					return FALSE;
+				}
+			}
+
 			return $result;
 		}
 		else
@@ -425,6 +445,57 @@ class Snapchat extends SnapchatAgent {
 			return FALSE;
 		}
 	}
+
+
+	/**
+	 * Sends SMS verification.
+	 *
+	 * @param string $phone_number
+	 *   Phone number to use if using phone verification.
+	 *
+	 * @return mixed
+	 *   The data returned by the service or FALSE if registration failed.
+	 *   Generally, returns the same result as calling self::getUpdates().
+	 */
+	public function sendPhoneVerification($phone_number)
+	{
+		$regex = "/\\+?(9[976]\\d|8[987530]\\d|6[987]\\d|5[90]\\d|42\\d|3[875]\\d|2[98654321]\\d|9[8543210]|8[6421]|6[6543210]|5[87654321]|4[987654310]|3[9643210]|2[70]|7|1)(\\d{1,14}$)/";
+		preg_match($regex, $phone_number, $matches);
+		$countryCode = $matches[1];
+
+		$url = "http://restcountries.eu/rest/v1/callingcode/{$countryCode}";
+		if(substr(get_headers($url)[0], 9, 3) == "200")
+		{
+			$countryCodeArray = json_decode(file_get_contents($url), true);
+			$countryAlpha2Code = $countryCodeArray[0]["alpha2Code"];
+			$phone_number = $matches[2];
+		}
+		else
+		{
+			echo "\nInvalid country code: {$countryCode}";
+			return FALSE;
+		}
+
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			"/bq/phone_verify",
+			array(
+				"timestamp" => $timestamp,
+				"username" => $this->username,
+				"phoneNumber" => $phone_number,
+				"action" => "updatePhoneNumber",
+				"countryCode" => $countryAlpha2Code,
+				"skipConfirmation" => true
+			),
+			array(
+				$this->auth_token,
+				$timestamp,
+			)
+		);
+
+		return is_null($result);
+	}
+
 
 	/**
 	 * Retrieves general user, friend, and snap updates.
