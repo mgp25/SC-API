@@ -1662,7 +1662,7 @@ class Snapchat extends SnapchatAgent {
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'/clear',
+			'/ph/clear',
 			array(
 				'timestamp' => $timestamp,
 				'username' => $this->username,
