@@ -1,0 +1,33 @@
+{
+    "name": "mgp25/snapapi",
+    "description": "The php Snapchat library ",
+    "license": "MIT",
+    "keywords": [
+        "Snapchat",
+        "SnapAPI"
+    ],
+    "authors": [
+        {
+            "role": "Contributors",
+            "name": "Snap API Contributing Team",
+            "homepage": "https://github.com/mgp25/Snap-API/graphs/contributors"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/mgp25/Snap-API/issues",
+        "wiki": "https://github.com/mgp25/Snap-API/wiki",
+        "source": "https://github.com/mgp25/Snap-API"
+    },
+    "autoload": {
+        "classmap": [
+            "src/"
+        ]
+    },
+    "require": {
+        "php": ">=5.3",
+        "ext-curl": "*",
+        "ext-gd" : "*",
+        "ext-zip" : "*",
+        "ext-mcrypt" : "*"
+    }
+}
