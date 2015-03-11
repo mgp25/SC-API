@@ -1128,7 +1128,7 @@ class Snapchat extends SnapchatAgent {
 				//Uncompress
 				$result = parent::unCompress($result);
 				//Return Media and Overlay
-				return $result;
+				return $result[1];
 			}
 		}
 
@@ -1577,6 +1577,7 @@ class Snapchat extends SnapchatAgent {
 				if(parent::isCompressed(substr($result, 0, 2)))
 				{
 					$result = parent::unCompress($result);
+					$result = $result[1];
 				}
 
 				if($save)
