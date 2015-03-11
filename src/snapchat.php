@@ -367,7 +367,7 @@ class Snapchat extends SnapchatAgent {
 	 * @param string $phone_verification
 	 *   Whether to use phone verification or not.
 	 * @param string $phone_number
-	 *   Phone number to use if using phone verification.
+	 *   Phone number to use if using phone verification. (country code and phone number. with or without +)
 	 *
 	 * @return mixed
 	 *   The data returned by the service or FALSE if registration failed.
@@ -399,7 +399,7 @@ class Snapchat extends SnapchatAgent {
 		$this->auth_token = $result['data']->auth_token;
 
 		$timestamp = parent::timestamp();
-		$result = parent::post(
+		parent::post(
 			'/loq/register_username',
 			array(
 				'username' => $email,
@@ -413,23 +413,19 @@ class Snapchat extends SnapchatAgent {
 			$multipart = false,
 			$debug = $this->debug
 		);
+		$result = $result["data"];
 
 		// If registration is successful, set the username and auth_token.
 		if(isset($result->logged) && $result->logged)
 		{
 			$this->auth_token = $result->auth_token;
-			$this->username = $result->username;
-
-			$this->cache = new SnapchatCache();
-			$this->cache->set('updates', $result);
+			$this->username = $username;
 
 			if($phone_verification)
 			{
 				if(!is_null($phone_number))
 				{
-					$this->sendPhoneVerification($phone_number);
-					//TODO
-					//run /bq/phone_verify with proper parameters: req_token, timestamp, action = verifyPhoneNumber, username, code = verification code
+					return $this->sendPhoneVerification($phone_number);
 				}
 				else
 				{
@@ -437,15 +433,18 @@ class Snapchat extends SnapchatAgent {
 					return FALSE;
 				}
 			}
-
-			return $result;
+			else
+			{
+				echo "\nGo to <insert verification site URL here> to finish the verification process.\nNOTE: Your new account will not be usable until you complete verification!";
+			}
 		}
 		else
 		{
 			return FALSE;
 		}
-	}
 
+		return $result;
+	}
 
 	/**
 	 * Sends SMS verification.
@@ -453,26 +452,29 @@ class Snapchat extends SnapchatAgent {
 	 * @param string $phone_number
 	 *   Phone number to use if using phone verification.
 	 *
-	 * @return mixed
-	 *   The data returned by the service or FALSE if registration failed.
-	 *   Generally, returns the same result as calling self::getUpdates().
 	 */
 	public function sendPhoneVerification($phone_number)
 	{
-		$regex = "/\\+?(9[976]\\d|8[987530]\\d|6[987]\\d|5[90]\\d|42\\d|3[875]\\d|2[98654321]\\d|9[8543210]|8[6421]|6[6543210]|5[87654321]|4[987654310]|3[9643210]|2[70]|7|1)(\\d{1,14}$)/";
-		preg_match($regex, $phone_number, $matches);
-		$countryCode = $matches[1];
+		$opts = array(
+			"http" => array(
+				"method" => "GET",
+				"header" => "X-Mashape-Key: wiwbql3AxwmshuZzEIxVNI9olPZlp1KsrBAjsnfJpLBkxzaEhq\r\n"
+			)
+		);
 
-		$url = "http://restcountries.eu/rest/v1/callingcode/{$countryCode}";
-		if(substr(get_headers($url)[0], 9, 3) == "200")
+		$context = stream_context_create($opts);
+
+		$result = file_get_contents("https://metropolis-api-phone.p.mashape.com/analysis?telephone={$phone_number}", false, $context);
+		$result = json_decode($result, true);
+
+		if($result["valid"])
 		{
-			$countryCodeArray = json_decode(file_get_contents($url), true);
-			$countryAlpha2Code = $countryCodeArray[0]["alpha2Code"];
-			$phone_number = $matches[2];
+			$phone_number = str_replace(" ", "", $result["formatted-number"]);
+			$countryCode = $result["iso-code"];
 		}
 		else
 		{
-			echo "\nInvalid country code: {$countryCode}";
+			echo "\nInvalid phone number.";
 			return FALSE;
 		}
 
@@ -484,7 +486,7 @@ class Snapchat extends SnapchatAgent {
 				"username" => $this->username,
 				"phoneNumber" => $phone_number,
 				"action" => "updatePhoneNumber",
-				"countryCode" => $countryAlpha2Code,
+				"countryCode" => $countryCode,
 				"skipConfirmation" => true
 			),
 			array(
@@ -493,7 +495,37 @@ class Snapchat extends SnapchatAgent {
 			)
 		);
 
-		return is_null($result);
+		return $result;
+	}
+
+	/**
+	 * Verifies phone number.
+	 *
+	 * @param string $code
+	 *   Code sent for verification by Snapchat.
+	 *
+	 */
+	public function verifyPhoneNumber($code)
+	{
+		$timestamp = parent::timestamp();
+		$req_token = parent::hash(parent::STATIC_TOKEN, $timestamp);
+		$result = parent::post(
+			"/bq/phone_verify",
+			array(
+				"timestamp" => $timestamp,
+				"action" => "verifyPhoneNumber",
+				"username" => $this->username,
+				"code" => $code
+			),
+			array(
+				$req_token,
+				$timestamp,
+			),
+			$multipart = false,
+			$debug = $this->debug
+		);
+		$result = $result["data"];
+		return (isset($result->logged) && $result->logged);
 	}
 
 
