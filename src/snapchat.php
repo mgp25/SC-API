@@ -176,7 +176,8 @@ class Snapchat extends SnapchatAgent {
 		curl_close($ch);
 
 		$return['error'] = 0;
-		$return['auth'] = substr(explode("\n", $result)[1], 5);
+		$exploded = explode("\n", $result);
+		$return['auth'] = substr($exploded[1], 5);
 
 		return $return;
 	}
