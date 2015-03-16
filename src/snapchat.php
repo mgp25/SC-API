@@ -137,7 +137,7 @@ class Snapchat extends SnapchatAgent {
 			'client_sig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
 			'callerPkg' => 'com.snapchat.android',
 			'callerSig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
-			'EncryptedPasswd' => 'oauth2rt_1/nYRuxRtMeGL5apSzWwV07Wq5WH5vXgv65py-eeID_CU'
+			'EncryptedPasswd' => 'oauth2rt_1/6YQ6444lgGwYt3zB5DbnCI6rqZq2wo6PszKF8RjGa74'
 		);
 
 		$headers = array(
@@ -1129,7 +1129,6 @@ class Snapchat extends SnapchatAgent {
 				//Uncompress
 				$result = parent::unCompress($result);
 				//Return Media and Overlay
-				return $result[1];
 			}
 		}
 
@@ -1578,7 +1577,6 @@ class Snapchat extends SnapchatAgent {
 				if(parent::isCompressed(substr($result, 0, 2)))
 				{
 					$result = parent::unCompress($result);
-					$result = $result[1];
 				}
 
 				if($save)
