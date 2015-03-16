@@ -529,6 +529,24 @@ class Snapchat extends SnapchatAgent {
 		return (isset($result->logged) && $result->logged);
 	}
 
+	public function getCaptcha()
+	{
+	  $timestamp = parent::timestamp();
+	  $result = parent::post(
+	    '/bq/get_captcha',
+	    array(
+	      'username' => $this->username,
+	      'timestamp' => $timestamp,
+	    ),
+	    array(
+				$this->auth_token,
+	      $timestamp,
+	    ),
+	    $multipart = false,
+	    $debug = $this->debug
+	  );
+	}
+
 
 	/**
 	 * Retrieves general user, friend, and snap updates.

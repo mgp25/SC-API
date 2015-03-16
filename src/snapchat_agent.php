@@ -398,6 +398,10 @@ abstract class SnapchatAgent {
 			{
 				echo 'RESULT: ' . $result . "\n";
 			}
+			if($endpoint == "/bq/get_captcha")
+			{
+				file_put_contents(__DIR__.'/captcha.zip', $result);
+			}
 		}
 
 		// If cURL doesn't have a bundle of root certificates handy, we provide
