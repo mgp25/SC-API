@@ -1175,7 +1175,7 @@ class Snapchat extends SnapchatAgent {
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'/update_snaps',
+			'/bq/update_snaps',
 			array(
 				'events' => json_encode($events),
 				'json' => json_encode($snap_info),
