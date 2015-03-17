@@ -436,7 +436,7 @@ class Snapchat extends SnapchatAgent {
 			}
 			else
 			{
-				echo "\nGo to <insert verification site URL here> to finish the verification process.\nNOTE: Your new account will not be usable until you complete verification!";
+				$this->getCaptcha();
 			}
 		}
 		else
