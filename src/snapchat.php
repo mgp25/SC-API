@@ -137,7 +137,7 @@ class Snapchat extends SnapchatAgent {
 			'client_sig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
 			'callerPkg' => 'com.snapchat.android',
 			'callerSig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
-			'EncryptedPasswd' => 'oauth2rt_1/6YQ6444lgGwYt3zB5DbnCI6rqZq2wo6PszKF8RjGa74'
+			'EncryptedPasswd' => 'oauth2rt_1/9pisZxSST6_J48gcbPxrzC17n4l91sRwI6sMMT3o4OM'
 		);
 
 		$headers = array(
