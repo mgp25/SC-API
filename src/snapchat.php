@@ -57,7 +57,7 @@ class Snapchat extends SnapchatAgent {
 	protected $chat_auth_token;
 	protected $username;
 	protected $debug;
-
+	
 	/**
 	 * Sets up some initial variables. If a username and password are passed in,
 	 * we attempt to log in. If a username and auth token are passed in, we'll
@@ -75,6 +75,13 @@ class Snapchat extends SnapchatAgent {
 		$this->auth_token = $auth_token;
 		$this->username = $username;
 		$this->debug = $debug;
+	}
+	
+	public function getSCAuth()
+	{
+		
+		return $this->auth_token;
+		
 	}
 
 	public function getDeviceToken()
@@ -137,7 +144,7 @@ class Snapchat extends SnapchatAgent {
 			'client_sig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
 			'callerPkg' => 'com.snapchat.android',
 			'callerSig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
-			'EncryptedPasswd' => 'oauth2rt_1/9pisZxSST6_J48gcbPxrzC17n4l91sRwI6sMMT3o4OM'
+			'EncryptedPasswd' => 'oauth2rt_1/evzrOtQ2qaGBrmz4VkJG-KMyIOsASmhluoocbXeDVhM'
 		);
 
 		$headers = array(
@@ -250,6 +257,33 @@ class Snapchat extends SnapchatAgent {
 	 */
 	public function login($username, $password)
 	{
+		
+		$cacheName = 'authtoken_' . $username . '.txt';
+		
+		$authCache = fopen($cacheName, "r"); // w+
+		$authCacheTxt = fread($authCache, filesize($cacheName));
+		
+		if(!is_null($authCacheTxt)) {
+
+			$this->auth_token = $authCacheTxt;
+			$this->username = $username;
+			
+			$checkData = $this->getUpdates();
+			fclose($authCache);
+			
+			if(@$checkData['code'] != '401') {
+				
+				return true;
+				
+			}
+			
+			/*if (@strpos($checkData['code'], '401') !== false) {
+				// Auth token working yes!
+				return;
+			}*/
+			
+		}
+		
 		$dtoken = $this->getDeviceToken();
 
 		if($dtoken['error'] == 1)
@@ -311,6 +345,12 @@ class Snapchat extends SnapchatAgent {
 			$this->auth_token = $result['data']->updates_response->auth_token;
 			$this->username = $result['data']->updates_response->username;
 			$this->device($ptoken['token']);
+			
+			// We just got new auth token, lets cache it
+			$writeCache = fopen($cacheName, "w"); // w+
+			fwrite($writeCache, $this->auth_token);
+			fclose($writeCache);
+
 		}
 
 		return $result;
@@ -436,7 +476,7 @@ class Snapchat extends SnapchatAgent {
 			}
 			else
 			{
-				$this->getCaptcha();
+				echo "\nGo to <insert verification site URL here> to finish the verification process.\nNOTE: Your new account will not be usable until you complete verification!";
 			}
 		}
 		else
@@ -527,24 +567,6 @@ class Snapchat extends SnapchatAgent {
 		);
 		$result = $result["data"];
 		return (isset($result->logged) && $result->logged);
-	}
-
-	public function getCaptcha()
-	{
-	  $timestamp = parent::timestamp();
-	  $result = parent::post(
-	    '/bq/get_captcha',
-	    array(
-	      'username' => $this->username,
-	      'timestamp' => $timestamp,
-	    ),
-	    array(
-				$this->auth_token,
-	      $timestamp,
-	    ),
-	    $multipart = false,
-	    $debug = $this->debug
-	  );
 	}
 
 
@@ -1147,6 +1169,7 @@ class Snapchat extends SnapchatAgent {
 				//Uncompress
 				$result = parent::unCompress($result);
 				//Return Media and Overlay
+				return $result[1];
 			}
 		}
 
@@ -1175,7 +1198,7 @@ class Snapchat extends SnapchatAgent {
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'/bq/update_snaps',
+			'/update_snaps',
 			array(
 				'events' => json_encode($events),
 				'json' => json_encode($snap_info),
@@ -1595,6 +1618,7 @@ class Snapchat extends SnapchatAgent {
 				if(parent::isCompressed(substr($result, 0, 2)))
 				{
 					$result = parent::unCompress($result);
+					$result = $result[1];
 				}
 
 				if($save)
