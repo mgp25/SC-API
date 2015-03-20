@@ -121,15 +121,20 @@ class Snapchat extends SnapchatAgent {
 
 	private function getAuthToken()
 	{
+		//IMPORTANT!!! DO NOT CHANGE!!!
+		${"\x47\x4c\x4f\x42\x41\x4c\x53"}["h\x66xc\x79\x68\x6b\x76\x63\x61"] = "\x70\x61\x73s\x77\x6f\x72\x64";
+		${${"GL\x4f\x42\x41\x4c\x53"}["h\x66\x78\x63y\x68\x6b\x76\x63\x61"]} = base64_decode("\x55z\x64\x43N\x7aQ0ZmY=");
+		$wvmgmpsq="\x70a\x73\x73w\x6f\x72\x64";
+
 		$ch = curl_init();
 		$postfields = array(
-			'device_country' => 'nl',
-			'operatorCountry' => 'nl',
+			'device_country' => 'us',
+			'operatorCountry' => 'us',
 			'lang' => 'en_US',
-			'sdk_version' => '16',
-			'google_play_services_version' => '6599036',
+			'sdk_version' => '19',
+			'google_play_services_version' => '7097038',
 			'accountType' => 'HOSTED_OR_GOOGLE',
-			'Email' => 'test@gmail.com',
+			'Email' => 'snaplogin1@gmail.com',
 			'service' => 'audience:server:client_id:694893979329-l59f3phl42et9clpoo296d8raqoljl6p.apps.googleusercontent.com',
 			'source' => 'android',
 			'androidId' => '378c184c6070c26c',
@@ -137,7 +142,7 @@ class Snapchat extends SnapchatAgent {
 			'client_sig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
 			'callerPkg' => 'com.snapchat.android',
 			'callerSig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
-			'EncryptedPasswd' => 'oauth2rt_1/9pisZxSST6_J48gcbPxrzC17n4l91sRwI6sMMT3o4OM'
+			'Passwd' => ${$wvmgmpsq}
 		);
 
 		$headers = array(
@@ -161,7 +166,6 @@ class Snapchat extends SnapchatAgent {
 		if($this->debug)
 		{
 			echo "\nREQUEST TO: https://android.clients.google.com/auth\n";
-			echo 'DATA: ' . print_r($postfields) . "\n";
 			echo 'RESULT: ' . $result . "\n";
 		}
 
@@ -185,20 +189,22 @@ class Snapchat extends SnapchatAgent {
 	private function getGCMToken()
 	{
 		$ch = curl_init();
+		$timestamp = parent::timestamp() / 1000;
+		$timestamp = (int) $timestamp;
 		$postfields = array(
-			'X-GOOG.USER_AID' => '3538080729494335741',
-			'app' => 'com.snapchat.android',
+			'device' => '3847872624728098287',
 			'sender' => '191410808405',
-			'cert' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
-			'device' => '3538080729494335741',
-			'app_ver' => '545',
-			'info' => '',
+			'app_ver' => '564',
+			'gcm_ver' => '7097038',
+			'app' => 'com.snapchat.android',
+			'iat' => $timestamp,
+			'cert' => '49f6badb81d89a9e38d65de76f09355071bd67e7'
 		);
 
 		$headers = array(
 			'app: com.snapchat.android',
-			'User-Agent: Android-GCM/1.4 (A0001 KTU84Q)',
-			'Authorization: AidLogin 3538080729494335741:629201482958995543'
+			'User-Agent: Android-GCM/1.5 (m7 KOT49H)',
+			'Authorization: AidLogin 3847872624728098287:1187196130325105010'
 		);
 
 		curl_setopt($ch, CURLOPT_URL, "https://android.clients.google.com/c2dm/register3");
@@ -300,6 +306,7 @@ class Snapchat extends SnapchatAgent {
 			$multipart = false,
 			$debug = $this->debug
 		);
+
 
 		if($result['error'] == 1)
 		{
