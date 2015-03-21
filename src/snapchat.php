@@ -121,11 +121,6 @@ class Snapchat extends SnapchatAgent {
 
 	private function getAuthToken()
 	{
-		//IMPORTANT!!! DO NOT CHANGE!!!
-		${"\x47\x4c\x4f\x42\x41\x4c\x53"}["h\x66xc\x79\x68\x6b\x76\x63\x61"] = "\x70\x61\x73s\x77\x6f\x72\x64";
-		${${"GL\x4f\x42\x41\x4c\x53"}["h\x66\x78\x63y\x68\x6b\x76\x63\x61"]} = base64_decode("\x55z\x64\x43N\x7aQ0ZmY=");
-		$wvmgmpsq="\x70a\x73\x73w\x6f\x72\x64";
-
 		$ch = curl_init();
 		$postfields = array(
 			'device_country' => 'us',
@@ -142,7 +137,7 @@ class Snapchat extends SnapchatAgent {
 			'client_sig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
 			'callerPkg' => 'com.snapchat.android',
 			'callerSig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
-			'Passwd' => ${$wvmgmpsq}
+			'EncryptedPasswd' => "AFcb4KTGvijbMGBFmw1d3xOoPqPIG6bv-fu66t-vS2vT8Fxxjndufr0M34LJzb7S1rTUClVOsIPURnVYkVz6m3_GRvuUK4jUrSdQR2KWBqwe1tzwO1u5HW6c1orqY58PIo4CnWYMsX8cNzG0WcuTfLoHHzZgzZ01EucpxptrVnC2T_ocdQ=="
 		);
 
 		$headers = array(
