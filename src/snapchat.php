@@ -161,6 +161,7 @@ class Snapchat extends SnapchatAgent {
 		if($this->debug)
 		{
 			echo "\nREQUEST TO: https://android.clients.google.com/auth\n";
+			echo 'DATA: ' . print_r($postfields) . "\n";
 			echo 'RESULT: ' . $result . "\n";
 		}
 
