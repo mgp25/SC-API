@@ -440,15 +440,13 @@ class Snapchat extends SnapchatAgent {
 			}
 			else
 			{
-				$this->getCaptcha();
+				return $this->getCaptcha();
 			}
 		}
 		else
 		{
 			return FALSE;
 		}
-
-		return $result;
 	}
 
 	/**
@@ -535,21 +533,43 @@ class Snapchat extends SnapchatAgent {
 
 	public function getCaptcha()
 	{
-	  $timestamp = parent::timestamp();
-	  $result = parent::post(
-	    '/bq/get_captcha',
-	    array(
-	      'username' => $this->username,
-	      'timestamp' => $timestamp,
-	    ),
-	    array(
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/bq/get_captcha',
+			array(
+			  'username' => $this->username,
+			  'timestamp' => $timestamp,
+			),
+			array(
 				$this->auth_token,
-	      $timestamp,
-	    ),
-	    $multipart = false,
-	    $debug = $this->debug
-	  );
+				$timestamp,
+			),
+			$multipart = false,
+			$debug = $this->debug
+		);
+		return $result;
 	}
+
+	public function sendCaptcha($result, $id)
+	{
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/bq/solve_captcha',
+			array(
+				'username' => $this->username,
+				'timestamp' => $timestamp,
+				'captcha_id' => substr($id, 0, strlen($id) - 4),
+				'captcha_solution' => $result
+			),
+			array(
+				$this->auth_token,
+				$timestamp,
+			),
+			$multipart = false,
+			$debug = $this->debug
+		);
+	}
+
 
 
 	/**

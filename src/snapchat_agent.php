@@ -374,6 +374,8 @@ abstract class SnapchatAgent {
 		}
 		curl_setopt_array($ch, $options);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+		$headerBuff = tmpfile();
+		curl_setopt($ch, CURLOPT_WRITEHEADER, $headerBuff);
 		$result = curl_exec($ch);
 		if($debug)
 		{
@@ -400,7 +402,17 @@ abstract class SnapchatAgent {
 			}
 			if($endpoint == "/bq/get_captcha")
 			{
-				file_put_contents(__DIR__.'/captcha.zip', $result);
+				file_put_contents(__DIR__."/captcha.zip", $result);
+				rewind($headerBuff);
+				$headers = stream_get_contents($headerBuff);
+				if(preg_match('/^Content-Disposition: .*?filename=(?<f>[^\s]+|\x22[^\x22]+\x22)\x3B?.*$/m', $headers, $matches))
+				{
+					$filename = trim($matches['f'],' ";');
+					rename(__DIR__."/captcha.zip", __DIR__."/{$filename}");
+					return $filename;
+				}
+				fclose($headerBuff);
+				return "captcha.zip";
 			}
 		}
 
