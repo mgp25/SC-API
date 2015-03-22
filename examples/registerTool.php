@@ -23,7 +23,7 @@ $id = $snapchat->register($username, $password, $email, $birthday);
 echo "You should have a file called '{$id}' in your snap api folder, unzip it.\n";
 echo "9 images. If there is a ghost in a image means 1, if not 0\n";
 echo "The result should be like the following one: 110000101\n";
-echo "After completion, the zip file will be deleted automatically.\n\n"
+echo "After completion, the zip file will be deleted automatically.\n\n";
 
 echo "\nResult: ";
 $result = trim(fgets(STDIN));
