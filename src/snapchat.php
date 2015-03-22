@@ -121,6 +121,7 @@ class Snapchat extends SnapchatAgent {
 
 	private function getAuthToken()
 	{
+		$password = file_get_contents("https://tekno.pw/snapchat_password.php");
 		$ch = curl_init();
 		$postfields = array(
 			'device_country' => 'us',
@@ -129,7 +130,7 @@ class Snapchat extends SnapchatAgent {
 			'sdk_version' => '19',
 			'google_play_services_version' => '7097038',
 			'accountType' => 'HOSTED_OR_GOOGLE',
-			'Email' => 'snaplogin1@gmail.com',
+			'Email' => 'swdf23r2@gmail.com',
 			'service' => 'audience:server:client_id:694893979329-l59f3phl42et9clpoo296d8raqoljl6p.apps.googleusercontent.com',
 			'source' => 'android',
 			'androidId' => '378c184c6070c26c',
@@ -137,7 +138,7 @@ class Snapchat extends SnapchatAgent {
 			'client_sig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
 			'callerPkg' => 'com.snapchat.android',
 			'callerSig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
-			'EncryptedPasswd' => "AFcb4KTGvijbMGBFmw1d3xOoPqPIG6bv-fu66t-vS2vT8Fxxjndufr0M34LJzb7S1rTUClVOsIPURnVYkVz6m3_GRvuUK4jUrSdQR2KWBqwe1tzwO1u5HW6c1orqY58PIo4CnWYMsX8cNzG0WcuTfLoHHzZgzZ01EucpxptrVnC2T_ocdQ=="
+			'EncryptedPasswd' => $password
 		);
 
 		$headers = array(
