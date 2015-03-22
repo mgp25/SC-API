@@ -20,7 +20,7 @@ $snapchat = new Snapchat($username, $auth_token, true);
 
 $id = $snapchat->register($username, $password, $email, $birthday);
 
-echo "You should have a file called '{$id}' in your snap api folder, unzip it.\n";
+echo "\nYou should have a file called '{$id}' in your snap api folder, unzip it.\n";
 echo "9 images. If there is a ghost in a image means 1, if not 0\n";
 echo "The result should be like the following one: 110000101\n";
 echo "After completion, the zip file will be deleted automatically.\n\n";
@@ -28,5 +28,16 @@ echo "After completion, the zip file will be deleted automatically.\n\n";
 echo "\nResult: ";
 $result = trim(fgets(STDIN));
 
-$snapchat->sendCaptcha($result, $id);
-unlink(__DIR__."/{$id}");
+$result = $snapchat->sendCaptcha($result, $id);
+unlink(__DIR__."{$id}");
+if ($result == null)
+{
+    echo "Account successfully created\n";
+    echo "\nUsername: $username\n";
+    echo "Password: $password\n";
+    echo "Email: $email\n";
+}
+else {
+    echo "There was an error registering your account\n";
+    echo "Error code: " . $result['code'];
+}

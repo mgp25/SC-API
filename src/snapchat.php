@@ -568,6 +568,8 @@ class Snapchat extends SnapchatAgent {
 			$multipart = false,
 			$debug = $this->debug
 		);
+
+		return $result;
 	}
 
 
