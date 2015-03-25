@@ -637,6 +637,26 @@ class Snapchat extends SnapchatAgent {
 		return $result;
 	}
 
+	public function getConversationAuth($to)
+	{
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/loq/conversation_auth_token',
+			array(
+				'username' => $this->username,
+				'timestamp' => $timestamp,
+				'conversation_id' => implode('~', array($this->username, $to))
+			),
+			array(
+				$this->auth_token,
+				$timestamp,
+			),
+			$multipart = false,
+			$debug = $this->debug
+		);
+
+		return $result;
+	}
 
 
 	/**
