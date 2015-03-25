@@ -1516,7 +1516,12 @@ class Snapchat extends SnapchatAgent {
 		return $result;
 	}
 
-	// NEED TO FINISH
+	/**
+	 * Send to recipients a typing status.
+	 *
+	 * @param array $recipients
+	 *   An array of recipient usernames.
+	 */
 	public function sendTyping($recipients)
 	{
 		if(!$this->auth_token || !$this->username)
@@ -1524,13 +1529,25 @@ class Snapchat extends SnapchatAgent {
 			return FALSE;
 		}
 
-		if (!is_array($recipients)) {
-				$recipients = array($recipients);
+		$recipientsString = "[";
+		if(is_array($recipients))
+		{
+			foreach($recipients as $user)
+			{
+				$recipientsString .= "\"{$user}\",";
+			}
+			$recipientsString = rtrim($recipientsString, ',');
+			$recipientsString .=  "]";
 		}
+		else
+		{
+			$recipientsString .= "\"{$recipients}\"]";
+		}
+		$recipients = $recipientsString;
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'/chat_typing',
+			'bq/chat_typing',
 			array(
 				'recipient_usernames' => $recipients,
 				'timestamp' => $timestamp,
