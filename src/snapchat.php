@@ -658,6 +658,28 @@ class Snapchat extends SnapchatAgent {
 		return $result;
 	}
 
+	public function getConversations($to)
+	{
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/loq/conversations',
+			array(
+				'username' => $this->username,
+				'timestamp' => $timestamp,
+				'checksum' => md5($this->username),
+				'offset' => implode('~', array($timestamp, $to, $this->username)),
+				'features_map' => '{}'
+			),
+			array(
+				$this->auth_token,
+				$timestamp,
+			),
+			$multipart = false,
+			$debug = $this->debug
+		);
+
+		return $result;
+	}
 
 	/**
 	 * Retrieves general user, friend, and snap updates.
@@ -1580,6 +1602,8 @@ class Snapchat extends SnapchatAgent {
 			$multipart = false,
 			$debug = $this->debug
 		);
+
+		return $result;
 	}
 
 	/**
