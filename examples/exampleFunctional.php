@@ -17,20 +17,24 @@ $snapchat = new Snapchat($username, $auth_token, $debug);
 //Login to Snapchat with your username and password
 $snapchat->login($username, $password);
 
+// Get your friends in an array
+$friends = $snapchat->getFriends();
+
+echo "My friends: ";
+print_r($friends);
+
 // Send snap adding text to your image and 10 seconds
 $snapchat->send($imagePath, $sendTo, "this is a test :D", 10);
 
 // Set a story
-$snapchat->setStory($imagePath);
+// $snapchat->setStory($imagePath);
 
 // Set a story adding text to the image and 5 seconds
 $snapchat->setStory($imagePath, 5, "This is my story");
 
-// Get your friends in an array
-$friends = $snapchat->getFriends();
 
-// Get snaps data
-$snapchat->getSnaps();
+// Get snaps data (Without storing them)
+//$snapchat->getSnaps();
 
 // Automatically downloads Snaps and store it in 'Snaps' folder
 $snapchat->getSnaps(true);
