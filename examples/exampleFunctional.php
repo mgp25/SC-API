@@ -35,4 +35,7 @@ $snapchat->getSnaps();
 // Automatically downloads Snaps and store it in 'Snaps' folder
 $snapchat->getSnaps(true);
 
+// Send chat message to "username"
+$snapchat->sendMessage("username", "hello from Snap-API!");
+
 ?>
