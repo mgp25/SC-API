@@ -1736,7 +1736,9 @@ class Snapchat extends SnapchatAgent {
 		if (!$this->auth_token || !$this->username) {
 			return FALSE;
 		}
-        	$media_id = strtoupper($this->username) . '~' . $this->getRandomUUID();
+		$uniId = md5(uniqid());
+		$media_id = strtoupper($this->username . '~' . sprintf('%08s-%04s-%04x-%04x-%12s', substr($uniId, 0, 8), substr($uniId, 8, 4), substr($uniId, 12, 4), substr($uniId, 16, 4), substr($uniId, 20, 12)));
+
 		$timestamp = parent::timestamp();
 		$result = parent::post(
 			'/loq/retry',
