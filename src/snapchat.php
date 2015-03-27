@@ -1067,6 +1067,32 @@ class Snapchat extends SnapchatAgent {
 		return $results;
 	}
 
+	public function searchFriend($friend)
+	{
+		if(!$this->auth_token || !$this->username)
+		{
+			return FALSE;
+		}
+
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/loq/friend_search',
+			array(
+				'query' => $friend,
+				'timestamp' => $timestamp,
+				'username' => $this->username,
+			),
+			array(
+				$this->auth_token,
+				$timestamp,
+			),
+			$multipart = false,
+			$debug = $this->debug
+		);
+
+		return $result;
+	}
+
 
 	public function userExists($user)
 	{
