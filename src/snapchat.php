@@ -1716,7 +1716,53 @@ class Snapchat extends SnapchatAgent {
 		//TODO IF ERROR
 		return $media_id;
 	}
+	/**
+	 * Sends a snap.
+	 *
+	 * @param string $media_id
+	 *   The media ID of the snap to send.
+	 * @param array $recipients
+	 *   An array of recipient usernames.
+	 * @param int $type
+	 *   The type of the media being sent.
+	 * @param int $time
+	 *   The time in seconds the snap should be available (1-10). Defaults to 3.
+	 *
+	 * @return bool
+	 *   TRUE if successful, FALSE otherwise.
+	 */
+	 public function send_retry($media, $recipients, $type = 0, $time = 10) {
+		// Make sure we're logged in and have a valid access token.
+		if (!$this->auth_token || !$this->username) {
+			return FALSE;
+		}
+		$uniId = md5(uniqid());
+		$media_id = strtoupper($this->username . '~' . sprintf('%08s-%04s-%04x-%04x-%12s', substr($uniId, 0, 8), substr($uniId, 8, 4), substr($uniId, 12, 4), substr($uniId, 16, 4), substr($uniId, 20, 12)));
 
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/loq/retry',
+			array(
+				'camera_front_facing' => rand(0,1),
+				'country_code' => 'US',
+				'media_id' => $media_id,
+				'recipients' => "[\"" . $recipients . "\"]",
+				'reply' => '0',
+				'time' => $time,
+				'timestamp' => $timestamp,
+				'type' => $type,
+				'username' => $this->username,
+				'zipped' => '0',
+				'data' => $media
+			),
+			array(
+				$this->auth_token,
+				$timestamp,
+			),  $multipart = true
+		);
+
+		return $result;
+	}
 	/**
 	 * Sends a snap.
 	 *
