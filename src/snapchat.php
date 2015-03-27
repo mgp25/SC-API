@@ -2232,7 +2232,7 @@ class Snapchat extends SnapchatAgent {
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'/settings',
+			'/bq/settings',
 			array(
 				'action' => 'updatePrivacy',
 				'privacySetting' => $setting,
@@ -2269,7 +2269,7 @@ class Snapchat extends SnapchatAgent {
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'/settings',
+			'/bq/settings',
 			array(
 				'action' => 'updateEmail',
 				'email' => $email,
@@ -2285,5 +2285,38 @@ class Snapchat extends SnapchatAgent {
 		);
 
 		return isset($result->param) && $result->param == $email;
+	}
+
+	public function updateSearchableByPhoneNumber($bool)
+	{
+		// Make sure we're logged in and have a valid access token.
+		if(!$this->auth_token || !$this->username)
+		{
+			return FALSE;
+		}
+
+		if($bool)
+				$bool = 1;
+		else
+				$bool = 0;
+
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/bq/settings',
+			array(
+				'action' => 'updateSearchableByPhoneNumber',
+				'searchable' => $bool,
+				'timestamp' => $timestamp,
+				'username' => $this->username,
+			),
+			array(
+				$this->auth_token,
+				$timestamp,
+			),
+			$multipart = false,
+			$debug = $this->debug
+		);
+
+		return isset($result->param) && $result->param == $bool;
 	}
 }
