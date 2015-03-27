@@ -1067,6 +1067,33 @@ class Snapchat extends SnapchatAgent {
 		return $results;
 	}
 
+
+	public function userExists($user)
+	{
+		if(!$this->auth_token || !$this->username)
+		{
+			return FALSE;
+		}
+
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/bq/user_exists',
+			array(
+				'request_username' => $user,
+				'timestamp' => $timestamp,
+				'username' => $this->username,
+			),
+			array(
+				$this->auth_token,
+				$timestamp,
+			),
+			$multipart = false,
+			$debug = $this->debug
+		);
+
+		return $result;
+	}
+
 	/**
 	 * Gets the user's friends.
 	 *
