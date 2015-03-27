@@ -2097,7 +2097,28 @@ class Snapchat extends SnapchatAgent {
 
 		return $friends;
 	}
+	public function clearConvo($id) {
+		// Make sure we're logged in and have a valid access token.
+		if (!$this->auth_token || !$this->username) {
+			return FALSE;
+		}
 
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/loq/clear_conversation',
+			array(
+			    'conversation_id' => $id,
+				'timestamp' => $timestamp,
+				'username' => $this->username,
+			),
+			array(
+				$this->auth_token,
+				$timestamp,
+			)
+		);
+
+		return is_null($result);
+	}
 	/**
 	 * Clears the current user's feed.
 	 *
