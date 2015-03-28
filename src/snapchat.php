@@ -655,7 +655,7 @@ class Snapchat extends SnapchatAgent {
 		$authInfo = $this->getConversationAuth($to);
 
 		//if user is even a friend
-		if(property_exists($authInfo["data"], "conversations") && array_key_exists("0", $authInfo["data"]->conversations))
+		if(property_exists($authInfo["data"], "messaging_auth"))
 		{
 			$payload = $authInfo["data"]->messaging_auth->payload;
 			$mac = $authInfo["data"]->messaging_auth->mac;
@@ -733,7 +733,7 @@ class Snapchat extends SnapchatAgent {
 		}
 		else
 		{
-			//simulate no response for error message to trigger
+			//simulate server response to trigger error message
 			$data = new stdClass();
 			$data->conversations = array();
 			$result = array(
@@ -748,6 +748,7 @@ class Snapchat extends SnapchatAgent {
 	public function sendMessage($to, $text)
 	{
 		$authInfo = $this->getConversationInfo($to);
+		print_r($authInfo);
 		if(!array_key_exists("0", $authInfo["data"]->conversations))
 		{
 			$authInfo = $this->getConversationAuth($to);
@@ -770,7 +771,8 @@ class Snapchat extends SnapchatAgent {
 			//conversation already exists
 			$payload = $authInfo["data"]->conversations[0]->conversation_messages->messaging_auth->payload;
 			$mac = $authInfo["data"]->conversations[0]->conversation_messages->messaging_auth->mac;
-			$seq_num = $authInfo["data"]->conversations[0]->conversation_messages->messages[0]->chat_message->seq_num;
+			$name = $this->username;
+			$seq_num = $authInfo["data"]->conversations[0]->conversation_state->user_sequences->$name;
 			$conv_id = $authInfo["data"]->conversations[0]->id;
 		}
 
@@ -1014,6 +1016,7 @@ class Snapchat extends SnapchatAgent {
 	 *
 	 * @param array $numbers
 	 *   An array of phone numbers.
+	 *   FORMATTING: array("name" => "number") !! VERY IMPORTANT !!
 	 * @param string $country
 	 *   The country code. Defaults to US.
 	 *
