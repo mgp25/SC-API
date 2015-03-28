@@ -400,6 +400,7 @@ abstract class SnapchatAgent {
 			{
 				echo 'RESULT: ' . $result . "\n";
 			}
+
 			if($endpoint == '/loq/register_username' || $endpoint == '/loq/register')
 			{
 				$jsonResult = json_decode($result);
@@ -409,10 +410,7 @@ abstract class SnapchatAgent {
 					exit();
 				}
 			}
-			else
-			{
-				echo 'RESULT: ' . $result . "\n";
-			}
+
 			if($endpoint == "/bq/get_captcha")
 			{
 				file_put_contents(__DIR__."/captcha.zip", $result);

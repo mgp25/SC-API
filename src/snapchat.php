@@ -97,13 +97,12 @@ class Snapchat extends SnapchatAgent {
 		return $result;
 	}
 
-	public function device($device_token)
+	public function device()
 	{
 		$timestamp = parent::timestamp();
 		$result = parent::post(
 			'/loq/all_updates',
 			array(
-				'device_token' => $device_token,
 				'type' => "android",
 				'timestamp' => $timestamp,
 				'username' => $this->username,
@@ -326,14 +325,6 @@ class Snapchat extends SnapchatAgent {
 			return $return;
 		}
 
-		$ptoken = $this->getGCMToken();
-
-		if($ptoken['error'] == 1)
-		{
-			$return['message'] = "Failed to get GCM token.";
-			return $return;
-		}
-
 		$timestamp = parent::timestamp();
 		$req_token = parent::hash(parent::STATIC_TOKEN, $timestamp);
 		$string = $username . "|" . $password . "|" . $timestamp . "|" . $req_token;
@@ -356,7 +347,7 @@ class Snapchat extends SnapchatAgent {
 				'max_video_width' => 480,
 				'dsig' => substr(hash_hmac('sha256', $string, $dtoken['data']->dtoken1v), 0, 20),
 				'dtoken1i' => $dtoken['data']->dtoken1i,
-				'ptoken' => $ptoken['token'],
+				'ptoken' => "ie",
 				'timestamp' => $timestamp,
 				'req_token' => $req_token,
 			),
@@ -379,7 +370,7 @@ class Snapchat extends SnapchatAgent {
 		{
 			$this->auth_token = $result['data']->updates_response->auth_token;
 			$this->username = $result['data']->updates_response->username;
-			$this->device($ptoken['token']);
+			$this->device();
 		}
 
 		return $result;
@@ -1029,8 +1020,8 @@ class Snapchat extends SnapchatAgent {
 	 * @return mixed
 	 *   An array of user objects or FALSE on failure.
 	 */
-	public function findFriends($numbers, $country = 'US') {
-
+	public function findFriends($numbers, $country = 'US')
+	{
 		$batches = array_chunk(array_flip($numbers), 30, TRUE);
 
 		// Make sure we're logged in and have a valid access token.
@@ -1044,10 +1035,10 @@ class Snapchat extends SnapchatAgent {
 		{
 			$timestamp = parent::timestamp();
 			$result = parent::post(
-				'/bq/find_friends',
+				'/ph/find_friends',
 				array(
 					'countryCode' => $country,
-					'numbers' => json_encode($batch),
+					'numbers' => json_encode($batch, JSON_FORCE_OBJECT),
 					'timestamp' => $timestamp,
 					'username' => $this->username,
 				),
