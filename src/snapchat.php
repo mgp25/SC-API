@@ -748,7 +748,6 @@ class Snapchat extends SnapchatAgent {
 	public function sendMessage($to, $text)
 	{
 		$authInfo = $this->getConversationInfo($to);
-		print_r($authInfo);
 		if(!array_key_exists("0", $authInfo["data"]->conversations))
 		{
 			$authInfo = $this->getConversationAuth($to);
