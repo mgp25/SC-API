@@ -2189,6 +2189,34 @@ class Snapchat extends SnapchatAgent {
 
 		return $friends;
 	}
+
+	public function setBestFriends($num)
+	{
+		if (!$this->auth_token || !$this->username) {
+			return FALSE;
+		}
+
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/bq/set_num_best_friends',
+			array(
+				'num_best_friends' => $num,
+				'features_map' => '{}',
+				'timestamp' => $timestamp,
+				'username' => $this->username,
+			),
+			array(
+				$this->auth_token,
+				$timestamp,
+			),
+			$multipart = false,
+			$debug = $this->debug
+		);
+
+		return is_null($result);
+	}
+
+
 	public function clearConvo($id) {
 		// Make sure we're logged in and have a valid access token.
 		if (!$this->auth_token || !$this->username) {
@@ -2206,7 +2234,9 @@ class Snapchat extends SnapchatAgent {
 			array(
 				$this->auth_token,
 				$timestamp,
-			)
+			),
+			$multipart = false,
+			$debug = $this->debug
 		);
 
 		return is_null($result);
@@ -2385,5 +2415,7 @@ class Snapchat extends SnapchatAgent {
 			$multipart = false,
 			$debug = $this->debug
 		);
+
+		return $result;
 	}
 }
