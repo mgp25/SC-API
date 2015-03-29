@@ -75,6 +75,11 @@ class Snapchat extends SnapchatAgent {
 		$this->auth_token = $auth_token;
 		$this->username = $username;
 		$this->debug = $debug;
+
+		if (file_exists(__DIR__ . "/auth.dat"))
+		{
+			$this->auth_token = file_get_contents(__DIR__ . '/auth.dat');
+		}
 	}
 
 	public function getDeviceToken()
@@ -315,65 +320,74 @@ class Snapchat extends SnapchatAgent {
 	 *   The data returned by the service or FALSE if the request failed.
 	 *   Generally, returns the same result as self::getUpdates().
 	 */
-	public function login($username, $password)
+	public function login($username, $password, $force = FALSE)
 	{
-		$dtoken = $this->getDeviceToken();
+		$do = ($force && file_exists(__DIR__ . "/auth.dat")) ? 1 : 0;
 
-		if($dtoken['error'] == 1)
+		if(($do == 1) || (!(file_exists(__DIR__ . "/auth.dat"))))
 		{
-			$return['message'] = "Failed to get new Device token set.";
-			return $return;
+				$dtoken = $this->getDeviceToken();
+
+				if($dtoken['error'] == 1)
+				{
+						$return['message'] = "Failed to get new Device token set.";
+						return $return;
+				}
+
+				$timestamp = parent::timestamp();
+				$req_token = parent::hash(parent::STATIC_TOKEN, $timestamp);
+				$string = $username . "|" . $password . "|" . $timestamp . "|" . $req_token;
+
+				$auth = $this->getAuthToken();
+
+				if($auth['error'] == 1)
+				{
+						return $auth;
+				}
+
+				$result = parent::post(
+					'/loq/login',
+					array(
+						'username' => $username,
+						'password' => $password,
+						'height' => 1280,
+						'width' => 720,
+						'max_video_height' => 640,
+						'max_video_width' => 480,
+						'dsig' => substr(hash_hmac('sha256', $string, $dtoken['data']->dtoken1v), 0, 20),
+						'dtoken1i' => $dtoken['data']->dtoken1i,
+						'ptoken' => "ie",
+						'timestamp' => $timestamp,
+						'req_token' => $req_token,
+					),
+					array(
+						parent::STATIC_TOKEN,
+						$timestamp,
+						$auth['auth']
+					),
+					$multipart = false,
+					$debug = $this->debug
+				);
+
+
+				if($result['error'] == 1)
+				{
+					return $result;
+				}
+
+				if(isset($result['data']->updates_response->logged) && $result['data']->updates_response->logged)
+				{
+					$this->auth_token = $result['data']->updates_response->auth_token;
+					$this->username = $result['data']->updates_response->username;
+					$this->device();
+
+					$authFile = fopen(__DIR__ . "/auth.dat", "w");
+					fwrite($authFile, $this->auth_token);
+					fclose($authFile);
+				}
+
+				return $result;
 		}
-
-		$timestamp = parent::timestamp();
-		$req_token = parent::hash(parent::STATIC_TOKEN, $timestamp);
-		$string = $username . "|" . $password . "|" . $timestamp . "|" . $req_token;
-
-		$auth = $this->getAuthToken();
-
-		if($auth['error'] == 1)
-		{
-			return $auth;
-		}
-
-		$result = parent::post(
-			'/loq/login',
-			array(
-				'username' => $username,
-				'password' => $password,
-				'height' => 1280,
-				'width' => 720,
-				'max_video_height' => 640,
-				'max_video_width' => 480,
-				'dsig' => substr(hash_hmac('sha256', $string, $dtoken['data']->dtoken1v), 0, 20),
-				'dtoken1i' => $dtoken['data']->dtoken1i,
-				'ptoken' => "ie",
-				'timestamp' => $timestamp,
-				'req_token' => $req_token,
-			),
-			array(
-				parent::STATIC_TOKEN,
-				$timestamp,
-				$auth['auth']
-			),
-			$multipart = false,
-			$debug = $this->debug
-		);
-
-
-		if($result['error'] == 1)
-		{
-			return $result;
-		}
-
-		if(isset($result['data']->updates_response->logged) && $result['data']->updates_response->logged)
-		{
-			$this->auth_token = $result['data']->updates_response->auth_token;
-			$this->username = $result['data']->updates_response->username;
-			$this->device();
-		}
-
-		return $result;
 	}
 
 	/**

@@ -6,3 +6,5 @@
 *.zip
 
 *.png
+
+src/auth.dat
