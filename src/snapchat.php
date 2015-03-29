@@ -392,7 +392,7 @@ class Snapchat extends SnapchatAgent {
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'/logout',
+			'/ph/logout',
 			array(
 				'timestamp' => $timestamp,
 				'username' => $this->username,
@@ -2162,7 +2162,7 @@ class Snapchat extends SnapchatAgent {
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'/bests',
+			'/bq/bests',
 			array(
 				'friend_usernames' => json_encode($friends),
 				'timestamp' => $timestamp,
@@ -2224,7 +2224,6 @@ class Snapchat extends SnapchatAgent {
 
 		return is_null($result);
 	}
-
 
 	public function clearConvo($id) {
 		// Make sure we're logged in and have a valid access token.
@@ -2381,11 +2380,6 @@ class Snapchat extends SnapchatAgent {
 		{
 			return FALSE;
 		}
-
-		if($searchable)
-				$searchable = 1;
-		else
-				$searchable = 0;
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
