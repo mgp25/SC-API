@@ -2358,4 +2358,32 @@ class Snapchat extends SnapchatAgent {
 
 		return isset($result->param) && $result->param == $bool;
 	}
+
+	public function getSnaptag()
+	{
+		$updates = $this->getUpdates();
+		if(empty($updates))
+		{
+			return FALSE;
+		}
+
+		$snaps = array();
+		$qr = $updates['data']->updates_response->qr_path;
+
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/bq/snaptag_download',
+			array(
+				'image' => $qr,
+				'timestamp' => $timestamp,
+				'username' => $this->username,
+			),
+			array(
+				$this->auth_token,
+				$timestamp,
+			),
+			$multipart = false,
+			$debug = $this->debug
+		);
+	}
 }
