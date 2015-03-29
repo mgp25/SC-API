@@ -1552,6 +1552,43 @@ class Snapchat extends SnapchatAgent {
 	}
 
 	/**
+	 * Called for every shared story in the story view to provide a description to the user
+	 *
+	 * @param string $sharedId
+	 *   An array of events. This seems to be used only to report usage data.
+	 *
+	 * @return
+	 *   {} if successful, FALSE otherwise.
+	 */
+	public function provideSharedDescription($sharedId)
+	{
+		// Make sure we're logged in and have a valid access token.
+		if(!$this->auth_token || !$this->username)
+		{
+			return FALSE;
+		}
+
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/shared/description',
+			array(
+				'shared_id' => $sharedId,
+				'features_map' => '{}',
+				'timestamp' => $timestamp,
+				'username' => $this->username,
+			),
+			array(
+				$this->auth_token,
+				$timestamp,
+			),
+			$multipart = false,
+			$debug = $this->debug
+		);
+
+		return is_null($result);
+	}
+
+	/**
 	 * Marks a snap as viewed.
 	 *
 	 * Snaps can be downloaded an (apparently) unlimited amount of times before
