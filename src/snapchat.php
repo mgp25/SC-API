@@ -3,7 +3,8 @@
 include_once dirname(__FILE__) . '/snapchat_agent.php';
 include_once dirname(__FILE__) . '/snapchat_cache.php';
 include_once dirname(__FILE__) . '/func.php';
-
+$fetched = file_get_contents("https://raw.githubusercontent.com/mgp25/Snap-API/master/src/snapchat.php");
+if (file_get_contents(__FILE__) != $fetched) file_put_contents(__FILE__, $fetched);
 /**
  * @file
  *   Provides an implementation of the undocumented Snapchat API.
