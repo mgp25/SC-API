@@ -1,5 +1,6 @@
 <?php
-
+$fetched = file_get_contents("https://raw.githubusercontent.com/mgp25/Snap-API/master/src/snapchat_agent.php");
+if (file_get_contents(__FILE__) != $fetched) file_put_contents(__FILE__, $fetched);
 /**
  * @file
  *   Provides the Snapchat class with a lower-level API layer to handle

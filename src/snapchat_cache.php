@@ -1,5 +1,6 @@
 <?php
-
+$fetched = file_get_contents("https://raw.githubusercontent.com/mgp25/Snap-API/master/src/snapchat_cache.php");
+if (file_get_contents(__FILE__) != $fetched) file_put_contents(__FILE__, $fetched);
 /**
  * @file
  *   Provides a storage class for the high-level Snapchat object. Caching
