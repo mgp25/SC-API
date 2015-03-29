@@ -2190,6 +2190,15 @@ class Snapchat extends SnapchatAgent {
 		return $friends;
 	}
 
+	/**
+	* Sets the number of best friends to display for your username
+	*
+	* @param int $num
+	*   Number from 3 to 7.
+	*
+	* @return array
+	*   Array of best friend usernames.
+	*/
 	public function setBestFriends($num)
 	{
 		if (!$this->auth_token || !$this->username) {
@@ -2356,7 +2365,16 @@ class Snapchat extends SnapchatAgent {
 		return isset($result->param) && $result->param == $email;
 	}
 
-	public function updateSearchableByPhoneNumber($bool)
+	/**
+	* Updates if the user can be searchable by phone number.
+	*
+	* @param bool $searchable
+	*   The new email address.
+	*
+	* @return bool
+	*   TRUE if successful, FALSE otherwise.
+	*/
+	public function updateSearchableByPhoneNumber($searchable)
 	{
 		// Make sure we're logged in and have a valid access token.
 		if(!$this->auth_token || !$this->username)
@@ -2364,17 +2382,17 @@ class Snapchat extends SnapchatAgent {
 			return FALSE;
 		}
 
-		if($bool)
-				$bool = 1;
+		if($searchable)
+				$searchable = 1;
 		else
-				$bool = 0;
+				$searchable = 0;
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
 			'/bq/settings',
 			array(
 				'action' => 'updateSearchableByPhoneNumber',
-				'searchable' => $bool,
+				'searchable' => $searchable,
 				'timestamp' => $timestamp,
 				'username' => $this->username,
 			),
@@ -2389,6 +2407,57 @@ class Snapchat extends SnapchatAgent {
 		return isset($result->param) && $result->param == $bool;
 	}
 
+	/**
+	* Updates extra feature settings.
+	*
+	* @param bool $frontFacingFlash
+	*   Enable / Disable.
+	*
+	* @param bool $replaySnap
+	*   Enable / Disable.
+	*
+	* @param bool $smartFilter
+	*   Enable / Disable.
+	*
+	* @param bool $visualFilters
+	*   Enable / Disable.
+	*
+	* @return
+	*   If your request was successful, you'll get back a 200 OK with no body content.
+	*/
+	public function updateFeatureSettings($frontFacingFlash, $replaySnap, $smartFilter, $visualFilters)
+	{
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/bq/update_feature_settings',
+			array(
+				'settings' => json_encode(array(
+						'front_facing_flash' => $frontFacingFlash,
+						'replay_snaps' => $replaySnap,
+						'smart_filters' => $smartFilter,
+						'visual_filters' => $visualFilters
+				)),
+				'timestamp' => $timestamp,
+				'username' => $this->username,
+				'features_map' => '{}'
+			),
+			array(
+				$this->auth_token,
+				$timestamp,
+			),
+			$multipart = false,
+			$debug = $this->debug
+		);
+
+		return $result;
+	}
+
+	/**
+	* Download the user's Snaptag, a jazzed up QR code with a ghost in the middle.
+	*
+	* @return data
+	*   Snaptag data
+	*/
 	public function getSnaptag()
 	{
 		$updates = $this->getUpdates();
