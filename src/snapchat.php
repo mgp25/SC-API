@@ -1674,6 +1674,49 @@ class Snapchat extends SnapchatAgent {
 	}
 
 	/**
+	* Whenever a story is viewed by the user the application notifies the server of the view,
+	* the time of viewing and the amount of screenshots taken.
+	*
+	* @param Array $friendStories
+	*   The snap to mark as shot.
+	*			friend_stories : Array
+	*							Array
+  *      							id : Story snap id
+  *      							screenshot-count : Integer
+  *      							timestamp : Time viewed
+	*
+	* @return
+	* 	If your request was successful, you'll get back a 200 OK with no body content.
+	*/
+	public function updateStories($friendStories)
+	{
+		// Make sure we're logged in and have a valid access token.
+		if(!$this->auth_token || !$this->username)
+		{
+			return FALSE;
+		}
+
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/bq/update_stories',
+			array(
+				'friend_stories' => json_encode($friendStories),
+				'features_map' => '{}',
+				'timestamp' => $timestamp,
+				'username' => $this->username,
+			),
+			array(
+				$this->auth_token,
+				$timestamp,
+			),
+			$multipart = false,
+			$debug = $this->debug
+		);
+
+		return is_null($result);
+	}
+
+	/**
 	 * Uploads a snap.
 	 *
 	 * @todo
