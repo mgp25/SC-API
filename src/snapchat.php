@@ -1732,6 +1732,50 @@ class Snapchat extends SnapchatAgent {
 	}
 
 	/**
+	* Accept terms and conditions of SnapCash and Square
+	*
+	* @param bool $acceptSnapCashV2Tos
+	*
+	* @param bool $acceptSnapCashTos
+	*
+	* @param bool $acceptSquareTos
+	**/
+	public function updateUser($acceptSnapCashV2Tos = true, $acceptSnapCashTos = true, $acceptSquareTos = false)
+	{
+		// Make sure we're logged in and have a valid access token.
+		if(!$this->auth_token || !$this->username)
+		{
+			return FALSE;
+		}
+
+		$acceptSnapCashV2Tos = ($acceptSnapCashV2Tos) ? 'true' : 'false';
+		$acceptSnapCashTos = ($acceptSnapCashTos) ? 'true' : 'false';
+		$acceptSquareTos = ($acceptSquareTos) ? 'true' : 'false';
+
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/loq/update_user',
+			array(
+				'client_properties' => json_encode(array(
+						'snapcash_tos_v2_accepted' => $acceptSnapCashV2Tos,
+						'snapcash_new_tos_accepted' => $acceptSnapCashTos,
+						'square_tos_accepted' => $acceptSquareTos
+				)),
+				'timestamp' => $timestamp,
+				'username' => $this->username,
+			),
+			array(
+				$this->auth_token,
+				$timestamp,
+			),
+			$multipart = false,
+			$debug = $this->debug
+		);
+
+		return is_null($result);
+	}
+
+	/**
 	 * Uploads a snap.
 	 *
 	 * @todo
