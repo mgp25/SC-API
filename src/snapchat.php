@@ -526,16 +526,9 @@ class Snapchat extends SnapchatAgent {
 	 */
 	public function sendPhoneVerification($phone_number)
 	{
-		$opts = array(
-			"http" => array(
-				"method" => "GET",
-				"header" => "X-Mashape-Key: wiwbql3AxwmshuZzEIxVNI9olPZlp1KsrBAjsnfJpLBkxzaEhq\r\n"
-			)
-		);
-
-		$context = stream_context_create($opts);
-
-		$result = file_get_contents("https://metropolis-api-phone.p.mashape.com/analysis?telephone={$phone_number}", false, $context);
+		$ch = curl_init();
+		curl_setopt_array($ch, array(CURLOPT_RETURNTRANSFER => 1, CURLOPT_HTTPHEADER => array("X-Mashape-Key: wiwbql3AxwmshuZzEIxVNI9olPZlp1KsrBAjsnfJpLBkxzaEhq"),CURLOPT_URL => "https://metropolis-api-phone.p.mashape.com/analysis?telephone={$phone_number}", CURLOPT_CAINFO => dirname(__FILE__) . '/ca_bundle.crt'));
+		$result = curl_exec($ch);
 		$result = json_decode($result, true);
 
 		if($result["valid"])
@@ -2548,7 +2541,31 @@ class Snapchat extends SnapchatAgent {
 
 		return isset($result->param) && $result->param == $bool;
 	}
-
+        public function openAppEvent(){
+        	$timestamp = parent::timestamp();
+        	$uniId = md5(uniqid());
+        	$updates = $snapchat->getUpdates(true);
+		$updates = $updates['data'];
+    		$fc = -1;
+		if ($updates != ""){
+    			$friends = $updates->friends_response;
+			foreach($friends->friends as &$friend) if (strval($friend->type) == 0) $fc++;
+		}
+        	$uuid4 = sprintf('%08s-%04s-%04x-%04x-%12s', substr($uniId, 0, 8), substr($uniId, 8, 4), substr($uniId, 12, 4), substr($uniId, 16, 4), substr($uniId, 20, 12));
+        	$data = '{"common_params":{"user_id":"' . hash("sha256",strtolower($this->username)) . '","city":"Unimplemented","sc_user_agent":"Snapchat\/9.2.0.0 (A0001; Android 4.4.4#5229c4ef56#19; gzip)","session_id":"00000000-0000-0000-0000-000000000000","region":"Unimplemented","latlon":"Unimplemented","friend_count":' . $fc . ',"country":"Unimplemented"},"events":[{"event_name":"APP_OPEN","event_timestamp":' . $timestamp . ',"event_params":{"open_state":"NORMAL","intent_action":"null"}}],"batch_id":"' . $uuid4 . '-Snapchat9200A0001Android4445229c4ef5619gzip' . $timestamp . '"}';
+        	$result = parent::posttourl('https://sc-analytics.appspot.com/post_events',$data);
+        	return $result;
+    	}
+    	public function closeAppEvent() {
+		$events = array(
+			array(
+				'eventName' => 'CLOSE',
+				'params' => array(),
+				'ts' => time()
+			),
+		);
+		return $this->sendEvents($events);
+	}
 	/**
 	* Updates extra feature settings.
 	*
