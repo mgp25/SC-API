@@ -423,6 +423,8 @@ class Snapchat extends SnapchatAgent {
 
 		// Clear out the cache in case the instance is recycled.
 		$this->cache = NULL;
+		
+		unlink(__DIR__ . '/auth.dat');
 
 		return is_null($result);
 	}
