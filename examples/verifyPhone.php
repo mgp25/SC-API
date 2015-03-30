@@ -14,7 +14,7 @@ $phone = trim(fgets(STDIN));
 
 $snapchat = new Snapchat($username, true);
 
-$snapchat->login($username, $password);
+$snapchat->login($password);
 
 $snapchat->sendPhoneVerification($phone);
 

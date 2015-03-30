@@ -15,7 +15,7 @@ $sendTo = array();
 $snapchat = new Snapchat($username, $debug);
 
 //Login to Snapchat with your username and password
-$snapchat->login($username, $password);
+$snapchat->login($password);
 
 // Get your friends in an array
 $friends = $snapchat->getFriends();
