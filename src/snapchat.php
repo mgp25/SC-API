@@ -67,12 +67,9 @@ class Snapchat extends SnapchatAgent {
 	 *   The username for the Snapchat account.
 	 * @param string $password
 	 *   The password associated with the username, if logging in.
-	 * @param string $auth_token
-	 *   The auth token, if already logged in.
 	 */
-	public function __construct($username = NULL, $auth_token = NULL, $debug = FALSE)
+	public function __construct($username = NULL, $debug = FALSE)
 	{
-		$this->auth_token = $auth_token;
 		$this->username = $username;
 		$this->debug = $debug;
 
@@ -423,7 +420,7 @@ class Snapchat extends SnapchatAgent {
 
 		// Clear out the cache in case the instance is recycled.
 		$this->cache = NULL;
-		
+
 		unlink(__DIR__ . '/auth.dat');
 
 		return is_null($result);
