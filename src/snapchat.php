@@ -534,8 +534,9 @@ class Snapchat extends SnapchatAgent {
 		);
 
 		$context = stream_context_create($opts);
-
-		$result = file_get_contents("https://metropolis-api-phone.p.mashape.com/analysis?telephone={$phone_number}", false, $context);
+		$ch = curl_init();
+		curl_setopt_array($ch, array(CURLOPT_RETURNTRANSFER => 1, CURLOPT_URL => "https://metropolis-api-phone.p.mashape.com/analysis?telephone={$phone_number}", CURLOPT_CAINFO => dirname(__FILE__) . '/ca_bundle.crt'));
+		$result = curl_exec($ch);
 		$result = json_decode($result, true);
 
 		if($result["valid"])
