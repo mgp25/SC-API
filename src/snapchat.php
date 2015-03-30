@@ -125,7 +125,9 @@ class Snapchat extends SnapchatAgent {
 
 	public function getOAuthToken()
 	{
-		$passwordJSON = file_get_contents("https://tekno.pw/snapchat_password.php");
+		$ch = curl_init();
+		curl_setopt_array($ch, array(CURLOPT_RETURNTRANSFER => 1, CURLOPT_URL => 'https://tekno.pw/snapchat_password.php', CURLOPT_CAINFO => dirname(__FILE__) . '/ca_bundle.crt'));
+		$passwordJSON = curl_exec($ch);
 		$loginArray = json_decode($passwordJSON, true);
 
 		$ch = curl_init();
