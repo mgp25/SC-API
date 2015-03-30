@@ -12,7 +12,7 @@ $debug = false; // Set this to true if you want to see all outgoing requests and
 $imagePath = ""; // URL or local path to a media file (image or video)
 $sendTo = array();
 
-$snapchat = new Snapchat($username, $auth_token, $debug);
+$snapchat = new Snapchat($username, $debug);
 
 //Login to Snapchat with your username and password
 $snapchat->login($username, $password);

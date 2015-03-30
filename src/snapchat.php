@@ -67,12 +67,9 @@ class Snapchat extends SnapchatAgent {
 	 *   The username for the Snapchat account.
 	 * @param string $password
 	 *   The password associated with the username, if logging in.
-	 * @param string $auth_token
-	 *   The auth token, if already logged in.
 	 */
-	public function __construct($username = NULL, $auth_token = NULL, $debug = FALSE)
+	public function __construct($username = NULL, $debug = FALSE)
 	{
-		$this->auth_token = $auth_token;
 		$this->username = $username;
 		$this->debug = $debug;
 
@@ -423,6 +420,8 @@ class Snapchat extends SnapchatAgent {
 
 		// Clear out the cache in case the instance is recycled.
 		$this->cache = NULL;
+
+		unlink(__DIR__ . '/auth.dat');
 
 		return is_null($result);
 	}
@@ -1733,6 +1732,50 @@ class Snapchat extends SnapchatAgent {
 	}
 
 	/**
+	* Accept terms and conditions of SnapCash and Square
+	*
+	* @param bool $acceptSnapCashV2Tos
+	*
+	* @param bool $acceptSnapCashTos
+	*
+	* @param bool $acceptSquareTos
+	**/
+	public function updateUser($acceptSnapCashV2Tos = true, $acceptSnapCashTos = true, $acceptSquareTos = false)
+	{
+		// Make sure we're logged in and have a valid access token.
+		if(!$this->auth_token || !$this->username)
+		{
+			return FALSE;
+		}
+
+		$acceptSnapCashV2Tos = ($acceptSnapCashV2Tos) ? 'true' : 'false';
+		$acceptSnapCashTos = ($acceptSnapCashTos) ? 'true' : 'false';
+		$acceptSquareTos = ($acceptSquareTos) ? 'true' : 'false';
+
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/loq/update_user',
+			array(
+				'client_properties' => json_encode(array(
+						'snapcash_tos_v2_accepted' => $acceptSnapCashV2Tos,
+						'snapcash_new_tos_accepted' => $acceptSnapCashTos,
+						'square_tos_accepted' => $acceptSquareTos
+				)),
+				'timestamp' => $timestamp,
+				'username' => $this->username,
+			),
+			array(
+				$this->auth_token,
+				$timestamp,
+			),
+			$multipart = false,
+			$debug = $this->debug
+		);
+
+		return is_null($result);
+	}
+
+	/**
 	 * Uploads a snap.
 	 *
 	 * @todo
@@ -1956,7 +1999,7 @@ class Snapchat extends SnapchatAgent {
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'bq/chat_typing',
+			'/bq/chat_typing',
 			array(
 				'recipient_usernames' => $recipients,
 				'timestamp' => $timestamp,

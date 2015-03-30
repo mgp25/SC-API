@@ -15,7 +15,7 @@ $email = trim(fgets(STDIN));
 echo "\nBirthday (yyyy-mm-dd): ";
 $birthday = trim(fgets(STDIN));
 
-$snapchat = new Snapchat($username, $auth_token, true);
+$snapchat = new Snapchat($username, true);
 
 
 $id = $snapchat->register($username, $password, $email, $birthday);
