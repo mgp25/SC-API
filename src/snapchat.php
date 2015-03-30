@@ -1173,8 +1173,16 @@ class Snapchat extends SnapchatAgent {
 		{
 			return FALSE;
 		}
+		
+		$friends = array();
+		$friends = $updates['data']->friends_response;
+		$friends = $friends->added_friends;
+		foreach($friends as $friend)
+		{		
+				$friendList[] = $friend->name;
+		}
 
-		return $updates->added_friends;
+		return $friendList;
 	}
 
 	/**
