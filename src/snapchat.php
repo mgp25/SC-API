@@ -2548,7 +2548,25 @@ class Snapchat extends SnapchatAgent {
 
 		return isset($result->param) && $result->param == $bool;
 	}
-
+        public function openAppAnalytics(){
+        	$timestamp = parent::timestamp();
+        	$uniId = md5(uniqid());
+        	$fc = file_get_contents("./txt/friend_count.txt");
+        	$uuid4 = sprintf('%08s-%04s-%04x-%04x-%12s', substr($uniId, 0, 8), substr($uniId, 8, 4), substr($uniId, 12, 4), substr($uniId, 16, 4), substr($uniId, 20, 12));
+        	$data = '{"common_params":{"user_id":"' . hash("sha256",strtolower($this->username)) . '","city":"Unimplemented","sc_user_agent":"Snapchat\/9.1.0.0 (GT-S7710; Android 4.1.2#S7710XXAMB6#16; gzip)","session_id":"00000000-0000-0000-0000-000000000000","region":"Unimplemented","latlon":"Unimplemented","friend_count":' . $fc . ',"country":"Unimplemented"},"events":[{"event_name":"APP_OPEN","event_timestamp":' . $timestamp . ',"event_params":{"open_state":"NORMAL","intent_action":"null"}}],"batch_id":"' . $uuid4 . '-Snapchat9100GTS7710Android412S7710XXAMB616gzip' . $timestamp . '"}';
+        	$result = parent::posttourl('https://sc-analytics.appspot.com/post_events',$data);
+        	return $result;
+    	}
+    	public function closeAppAnalytics() {
+		$events = array(
+			array(
+				'eventName' => 'CLOSE',
+				'params' => array(),
+				'ts' => time()
+			),
+		);
+		return $this->sendEvents($events);
+	}
 	/**
 	* Updates extra feature settings.
 	*
