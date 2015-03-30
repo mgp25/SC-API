@@ -1174,7 +1174,14 @@ class Snapchat extends SnapchatAgent {
 			return FALSE;
 		}
 
-		return $updates->added_friends;
+		$friends = array();
+		$friends = $updates['data']->friends_response->added_friends;
+		foreach($friends as $friend)
+		{
+				$friendList[] = $friend->name;
+		}
+
+		return $friendList;
 	}
 
 	/**
@@ -2581,7 +2588,7 @@ class Snapchat extends SnapchatAgent {
 		);
 		return $this->sendEvents($events);
 	}
-	
+
 	/**
 	* Updates extra feature settings.
 	*
