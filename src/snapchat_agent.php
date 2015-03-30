@@ -472,5 +472,38 @@ abstract class SnapchatAgent {
 
 		return $return;
 	}
+    	public function posttourl($url, $data) {
+		$ch = curl_init();
+		$options = self::$CURL_OPTIONS + array(
+			CURLOPT_POST => TRUE,
+			CURLOPT_POSTFIELDS => $data,
+			CURLOPT_URL => $url,
+		);
+		curl_setopt_array($ch, $options);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, self::$CURL_HEADERS);
 
+		$result = curl_exec($ch);
+		if (curl_errno($ch) == 60) {
+			curl_setopt($ch, CURLOPT_CAINFO, dirname(__FILE__) . '/ca_bundle.crt');
+			$result = curl_exec($ch);
+		}
+		if ($result === FALSE)
+		{
+			curl_close($ch);
+			return $result;
+		}
+		if(curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200)
+		{
+				$return['data'] = $result;
+				$return['test'] = 1;
+				$return['code'] = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+				curl_close($ch);
+				return $return;
+		}
+		curl_close($ch);
+		$return['error'] = 0;
+		$result = iconv('UTF-8', 'UTF-8//IGNORE', utf8_encode($result));
+		$return['data'] = json_decode($result);
+		return $return;
+	}
 }
