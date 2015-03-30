@@ -526,16 +526,8 @@ class Snapchat extends SnapchatAgent {
 	 */
 	public function sendPhoneVerification($phone_number)
 	{
-		$opts = array(
-			"http" => array(
-				"method" => "GET",
-				"header" => "X-Mashape-Key: wiwbql3AxwmshuZzEIxVNI9olPZlp1KsrBAjsnfJpLBkxzaEhq\r\n"
-			)
-		);
-
-		$context = stream_context_create($opts);
 		$ch = curl_init();
-		curl_setopt_array($ch, array(CURLOPT_RETURNTRANSFER => 1, CURLOPT_URL => "https://metropolis-api-phone.p.mashape.com/analysis?telephone={$phone_number}", CURLOPT_CAINFO => dirname(__FILE__) . '/ca_bundle.crt'));
+		curl_setopt_array($ch, array(CURLOPT_RETURNTRANSFER => 1, CURLOPT_HTTPHEADER => array("X-Mashape-Key: wiwbql3AxwmshuZzEIxVNI9olPZlp1KsrBAjsnfJpLBkxzaEhq"),CURLOPT_URL => "https://metropolis-api-phone.p.mashape.com/analysis?telephone={$phone_number}", CURLOPT_CAINFO => dirname(__FILE__) . '/ca_bundle.crt'));
 		$result = curl_exec($ch);
 		$result = json_decode($result, true);
 
@@ -2549,7 +2541,7 @@ class Snapchat extends SnapchatAgent {
 
 		return isset($result->param) && $result->param == $bool;
 	}
-        public function openAppAnalytics(){
+        public function openAppEvent(){
         	$timestamp = parent::timestamp();
         	$uniId = md5(uniqid());
         	$fc = file_get_contents("./txt/friend_count.txt");
@@ -2558,7 +2550,7 @@ class Snapchat extends SnapchatAgent {
         	$result = parent::posttourl('https://sc-analytics.appspot.com/post_events',$data);
         	return $result;
     	}
-    	public function closeAppAnalytics() {
+    	public function closeAppEvent() {
 		$events = array(
 			array(
 				'eventName' => 'CLOSE',
