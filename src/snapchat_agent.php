@@ -283,7 +283,9 @@ abstract class SnapchatAgent {
 	 */
 	public function get($endpoint)
 	{
-		return file_get_contents(self::URL . $endpoint);
+		$ch = curl_init();
+		curl_setopt_array($ch, array(CURLOPT_RETURNTRANSFER => 1, CURLOPT_USERAGENT => 'Snapchat/9.2.0.0 (A0001; Android 4.4.4#5229c4ef56#19; gzip)', CURLOPT_HTTPHEADER => array('Accept-Language: en', 'Accept-Locale: en_US'),CURLOPT_URL => self::$URL . $endpoint, CURLOPT_CAINFO => dirname(__FILE__) . '/ca_bundle.crt'));
+		return curl_exec($ch);
 	}
 
 	/**
