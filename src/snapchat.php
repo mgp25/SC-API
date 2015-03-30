@@ -310,8 +310,6 @@ class Snapchat extends SnapchatAgent {
 	/**
 	 * Handles login.
 	 *
-	 * @param string $username
-	 *   The username for the Snapchat account.
 	 * @param string $password
 	 *   The password associated with the username.
 	 *
@@ -319,7 +317,7 @@ class Snapchat extends SnapchatAgent {
 	 *   The data returned by the service or FALSE if the request failed.
 	 *   Generally, returns the same result as self::getUpdates().
 	 */
-	public function login($username, $password, $force = FALSE)
+	public function login($password, $force = FALSE)
 	{
 		$do = ($force && file_exists(__DIR__ . "/auth.dat")) ? 1 : 0;
 
@@ -335,7 +333,7 @@ class Snapchat extends SnapchatAgent {
 
 				$timestamp = parent::timestamp();
 				$req_token = parent::hash(parent::STATIC_TOKEN, $timestamp);
-				$string = $username . "|" . $password . "|" . $timestamp . "|" . $req_token;
+				$string = $this->username . "|" . $password . "|" . $timestamp . "|" . $req_token;
 
 				$auth = $this->getAuthToken();
 
@@ -347,7 +345,7 @@ class Snapchat extends SnapchatAgent {
 				$result = parent::post(
 					'/loq/login',
 					array(
-						'username' => $username,
+						'username' => $this->username,
 						'password' => $password,
 						'height' => 1280,
 						'width' => 720,
@@ -377,7 +375,6 @@ class Snapchat extends SnapchatAgent {
 				if(isset($result['data']->updates_response->logged) && $result['data']->updates_response->logged)
 				{
 					$this->auth_token = $result['data']->updates_response->auth_token;
-					$this->username = $result['data']->updates_response->username;
 					$this->device();
 
 					$authFile = fopen(__DIR__ . "/auth.dat", "w");
@@ -1031,48 +1028,60 @@ class Snapchat extends SnapchatAgent {
 	 * @param array $numbers
 	 *   An array of phone numbers.
 	 *   FORMATTING: array("name" => "number") !! VERY IMPORTANT !!
-	 * @param string $country
-	 *   The country code. Defaults to US.
 	 *
 	 * @return mixed
 	 *   An array of user objects or FALSE on failure.
 	 */
-	public function findFriends($numbers, $country = 'US')
+	public function findFriends($numbers)
 	{
-		$batches = array_chunk(array_flip($numbers), 30, TRUE);
+		$updates = $this->getUpdates();
 
-		// Make sure we're logged in and have a valid access token.
-		if(!$this->auth_token || !$this->username)
+		if(empty($updates))
 		{
 			return FALSE;
 		}
 
-		$results = array();
-		foreach($batches as $batch)
+		$itsVerified = $updates['data']->updates_response->should_send_text_to_verify_number;
+		if (!$itsVerified)
 		{
-			$timestamp = parent::timestamp();
-			$result = parent::post(
-				'/ph/find_friends',
-				array(
-					'countryCode' => $country,
-					'numbers' => json_encode($batch, JSON_FORCE_OBJECT),
-					'timestamp' => $timestamp,
-					'username' => $this->username,
-				),
-				array(
-					$this->auth_token,
-					$timestamp,
-				),
-				$multipart = false,
-				$debug = $this->debug
-			);
+			$batches = array_chunk(array_flip($numbers), 30, TRUE);
+			$country = $updates['data']->updates_response->country_code;
 
-			if (isset($result->results)) {
-					$results = $results + $result->results;
+			// Make sure we're logged in and have a valid access token.
+			if(!$this->auth_token || !$this->username)
+			{
+				return FALSE;
 			}
-		}
 
-		return $results;
+			$results = array();
+			foreach($batches as $batch)
+			{
+				$timestamp = parent::timestamp();
+				$result = parent::post(
+					'/ph/find_friends',
+					array(
+						'countryCode' => $country,
+						'numbers' => json_encode($batch, JSON_FORCE_OBJECT),
+						'timestamp' => $timestamp,
+						'username' => $this->username,
+					),
+					array(
+						$this->auth_token,
+						$timestamp,
+					),
+					$multipart = false,
+					$debug = $this->debug
+				);
+
+				if (isset($result->results)) {
+						$results = $results + $result->results;
+					}
+				}
+
+				return $results;
+		}
+		else if ($this->debug)
+				echo 'DEBUG: You need to verify your phone number';
 	}
 
 	public function searchFriend($friend)
