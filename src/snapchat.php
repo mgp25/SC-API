@@ -1958,7 +1958,7 @@ class Snapchat extends SnapchatAgent {
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'bq/chat_typing',
+			'/bq/chat_typing',
 			array(
 				'recipient_usernames' => $recipients,
 				'timestamp' => $timestamp,
