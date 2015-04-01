@@ -383,7 +383,8 @@ abstract class SnapchatAgent {
 		{
 			$info = curl_getinfo($ch);
 			echo "\nREQUEST TO: " .self::URL . $endpoint . "\n";
-			echo "\nSent Request info: " .print_r($info['request_header'], true). "\n";
+			if(isset($info['request_header']))
+					echo "\nSent Request info: " .print_r($info['request_header'], true). "\n";
 			if(is_array($data))
 			{
 				echo 'DATA: ' . print_r($data) . "\n";
@@ -406,7 +407,7 @@ abstract class SnapchatAgent {
 			if($endpoint == '/loq/register_username' || $endpoint == '/loq/register')
 			{
 				$jsonResult = json_decode($result);
-				if(isset($jsonResult->logged) && $jsonResult->logged == false) 
+				if(isset($jsonResult->logged) && $jsonResult->logged == false)
 				{
 					echo "\n" . 'ERROR: There was an error registering your account: ' . $jsonResult->message . "\n";
 					exit();
