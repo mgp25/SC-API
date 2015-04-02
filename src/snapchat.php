@@ -1185,6 +1185,35 @@ class Snapchat extends SnapchatAgent {
 	}
 
 	/**
+	* Gets unconfirmed friends.
+	*
+	* @return mixed
+	*   An array of friends or FALSE on failure.
+	*/
+	public function getUnconfirmedFriends()
+	{
+		$updates = $this->getUpdates();
+
+		if(empty($updates))
+		{
+			return FALSE;
+		}
+
+		$friends = array();
+		$friends = $updates['data']->friends_response->friends;
+		foreach($friends as $friend)
+		{
+				if ($friend->type == 1)
+				{
+					if ($friend->name != 'array')
+							$unconfirmedList[] = $friend->name;
+				}
+		}
+
+		return $unconfirmedList;
+	}
+
+	/**
 	 * Adds a friend.
 	 *
 	 * @param string $username
