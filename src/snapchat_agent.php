@@ -53,13 +53,13 @@ abstract class SnapchatAgent {
 		CURLOPT_CONNECTTIMEOUT => 5,
 		CURLOPT_RETURNTRANSFER => TRUE,
 		CURLOPT_TIMEOUT => 10,
-		CURLOPT_USERAGENT => 'Snapchat/9.2.0.0 (A0001; Android 4.4.4#5229c4ef56#19; gzip)',
+		CURLOPT_USERAGENT => 'Snapchat/9.3.1.0 (HTC One; Android 4.4.2#302626.7#19; gzip',
 		CURLOPT_HTTPHEADER => array('Accept-Language: en', 'Accept-Locale: en_US'),
 	);
 
 	public static $CURL_HEADERS = array(
-		'Accept-Language: en;q=1',
-		'Accept-Locale: en'
+		'Accept-Language: en',
+		'Accept-Locale: en_US'
 	);
 
 	/**
@@ -347,7 +347,9 @@ abstract class SnapchatAgent {
 
 		if($endpoint == "/loq/login")
 		{
-				$headers = array_merge(self::$CURL_HEADERS, array("Authorization: Bearer {$params[2]}"));
+			$headers = array_merge(self::$CURL_HEADERS, array(
+				"X-Snapchat-Client-Auth-Token: Bearer {$params[2]}",
+				"Accept-Encoding: gzip"));
 		}
 		else
 		{
@@ -356,7 +358,7 @@ abstract class SnapchatAgent {
 
 		if($multipart)
 		{
-            $headers = array_merge($headers, array("X-Timestamp: 0","Content-Type: multipart/form-data; boundary=$boundary"));
+			$headers = array_merge($headers, array("X-Timestamp: 0","Content-Type: multipart/form-data; boundary=$boundary"));
 		}
 
 		if($endpoint == '/ph/blob' || $endpoint == '/bq/blob' || $endpoint == '/bq/chat_media')
@@ -396,6 +398,7 @@ abstract class SnapchatAgent {
 
 			if($endpoint == "/loq/login" || $endpoint == "/all_updates")
 			{
+				$result = gzdecode($result);
 				$jsonResult = json_decode($result);
 				echo 'RESULT: ' . print_r($jsonResult) . "\n";
 			}
