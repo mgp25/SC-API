@@ -8,3 +8,5 @@
 *.png
 
 src/auth.dat
+
+*.dat
