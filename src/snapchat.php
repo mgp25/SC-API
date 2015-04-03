@@ -73,9 +73,9 @@ class Snapchat extends SnapchatAgent {
 		$this->username = $username;
 		$this->debug = $debug;
 
-		if (file_exists(__DIR__ . "/auth.dat"))
+		if (file_exists(__DIR__ . "/auth-$this->username.dat"))
 		{
-			$this->auth_token = file_get_contents(__DIR__ . '/auth.dat');
+			$this->auth_token = file_get_contents(__DIR__ . "/auth-$this->username.dat");
 		}
 	}
 
@@ -319,9 +319,9 @@ class Snapchat extends SnapchatAgent {
 	 */
 	public function login($password, $force = FALSE)
 	{
-		$do = ($force && file_exists(__DIR__ . "/auth.dat")) ? 1 : 0;
+		$do = ($force && file_exists(__DIR__ . "/auth-$this->username.dat")) ? 1 : 0;
 
-		if(($do == 1) || (!(file_exists(__DIR__ . "/auth.dat"))))
+		if(($do == 1) || (!(file_exists(__DIR__ . "/auth-$this->username.dat"))))
 		{
 				$dtoken = $this->getDeviceToken();
 
@@ -377,7 +377,7 @@ class Snapchat extends SnapchatAgent {
 					$this->auth_token = $result['data']->updates_response->auth_token;
 					$this->device();
 
-					$authFile = fopen(__DIR__ . "/auth.dat", "w");
+					$authFile = fopen(__DIR__ . "/auth-$this->username.dat", "w");
 					fwrite($authFile, $this->auth_token);
 					fclose($authFile);
 				}
@@ -420,7 +420,7 @@ class Snapchat extends SnapchatAgent {
 		// Clear out the cache in case the instance is recycled.
 		$this->cache = NULL;
 
-		unlink(__DIR__ . '/auth.dat');
+		unlink(__DIR__ . "/auth-$this->username.dat");
 
 		return is_null($result);
 	}
