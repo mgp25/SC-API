@@ -381,6 +381,9 @@ abstract class SnapchatAgent {
 		$headerBuff = tmpfile();
 		curl_setopt($ch, CURLOPT_WRITEHEADER, $headerBuff);
 		$result = curl_exec($ch);
+
+		if($endpoint == "/loq/login") $result = gzdecode($result);
+
 		if($debug)
 		{
 			$info = curl_getinfo($ch);
@@ -398,7 +401,6 @@ abstract class SnapchatAgent {
 
 			if($endpoint == "/loq/login" || $endpoint == "/all_updates")
 			{
-				$result = gzdecode($result);
 				$jsonResult = json_decode($result);
 				echo 'RESULT: ' . print_r($jsonResult) . "\n";
 			}
