@@ -2077,7 +2077,16 @@ class Snapchat extends SnapchatAgent {
 			return FALSE;
 		}
 
-		$mime = mime_content_type($media);
+		try
+		{
+			$imageData = @getimagesize($filepath);
+			if (!empty($imageData['mime'])) {
+  			$mime = $imageData['mime'];
+			}
+		} catch(Exception $e) {
+				$mime = "video/";
+		}
+
 		if(strstr($mime, "video/"))
 		{
 			$type = Snapchat::MEDIA_VIDEO;
