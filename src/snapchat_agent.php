@@ -45,6 +45,8 @@ abstract class SnapchatAgent {
 	 */
 	const HASH_PATTERN = '0001110111101110001111010101111011010001001110011000110001000110'; // Hash pattern
 
+	protected $proxyServer;
+
 	/**
 	 * Default cURL options. It doesn't appear that the UA matters, but
 	 * authenticity, right?
@@ -380,6 +382,7 @@ abstract class SnapchatAgent {
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 		$headerBuff = tmpfile();
 		curl_setopt($ch, CURLOPT_WRITEHEADER, $headerBuff);
+		curl_setopt($ch, CURLOPT_PROXY, $this->proxyServer);
 		$result = curl_exec($ch);
 
 		if($endpoint == "/loq/login") $result = gzdecode($result);
@@ -480,7 +483,8 @@ abstract class SnapchatAgent {
 
 		return $return;
 	}
-    	public function posttourl($url, $data) {
+
+	public function posttourl($url, $data) {
 		$ch = curl_init();
 		$options = self::$CURL_OPTIONS + array(
 			CURLOPT_POST => TRUE,
@@ -513,5 +517,10 @@ abstract class SnapchatAgent {
 		$result = iconv('UTF-8', 'UTF-8//IGNORE', utf8_encode($result));
 		$return['data'] = json_decode($result);
 		return $return;
+	}
+
+	public function setProxyServer ($proxyServer)
+	{
+			$this->proxyServer = $proxyServer;
 	}
 }
