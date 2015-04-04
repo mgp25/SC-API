@@ -2078,7 +2078,7 @@ class Snapchat extends SnapchatAgent {
 		}
 
 
-		$imageData = @getimagesize($filepath);
+		$imageData = @getimagesize($media);
 		if (!empty($imageData['mime'])) {
   		$mime = $imageData['mime'];
 		} else {
