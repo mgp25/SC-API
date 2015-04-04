@@ -2077,13 +2077,11 @@ class Snapchat extends SnapchatAgent {
 			return FALSE;
 		}
 
-		try
-		{
-			$imageData = @getimagesize($filepath);
-			if (!empty($imageData['mime'])) {
-  			$mime = $imageData['mime'];
-			}
-		} catch(Exception $e) {
+
+		$imageData = @getimagesize($filepath);
+		if (!empty($imageData['mime'])) {
+  		$mime = $imageData['mime'];
+		} else {
 				$mime = "video/";
 		}
 
