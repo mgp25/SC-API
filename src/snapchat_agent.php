@@ -261,12 +261,13 @@ abstract class SnapchatAgent {
 				else
 				{
 				    unlink("./temp");
-					return FALSE;
+						return FALSE;
 				}
 			}
 			zip_close($resource);
 		}
-        unlink("./temp");
+    unlink("./temp");
+
 		return $result;
 	}
 
@@ -366,9 +367,9 @@ abstract class SnapchatAgent {
 		if($endpoint == '/ph/blob' || $endpoint == '/bq/blob' || $endpoint == '/bq/chat_media')
 		{
 		    $headers = array_merge($headers, array("X-Timestamp: " . $params[1]));
-			$options += array(
-				CURLOPT_URL => self::URL . $endpoint . "?{$data}"
-			);
+				$options += array(
+					CURLOPT_URL => self::URL . $endpoint . "?{$data}"
+				);
 		}
 		else
 		{

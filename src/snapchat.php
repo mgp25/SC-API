@@ -1837,7 +1837,9 @@ class Snapchat extends SnapchatAgent {
 			return FALSE;
 		}
 
-		$mime = mime_content_type($media);
+		$finfo = finfo_open(FILEINFO_MIME_TYPE);
+		$mime = finfo_file($finfo, $media);
+
 		if(strstr($mime, "video/"))
 		{
 			$type = Snapchat::MEDIA_VIDEO;
@@ -2078,12 +2080,8 @@ class Snapchat extends SnapchatAgent {
 		}
 
 
-		$imageData = @getimagesize($media);
-		if (!empty($imageData['mime'])) {
-  		$mime = $imageData['mime'];
-		} else {
-				$mime = "video/";
-		}
+		$finfo = finfo_open(FILEINFO_MIME_TYPE);
+		$mime = finfo_file($finfo, $media);
 
 		if(strstr($mime, "video/"))
 		{
