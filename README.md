@@ -16,5 +16,7 @@ Interface to Snapchat
 
 Based on [JorgenPhi](https://github.com/JorgenPhi/php-snapchat) code.
 
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mgp25/Snap-API?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
 ## License
 MIT
