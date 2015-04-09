@@ -11,7 +11,7 @@ abstract class SnapchatAgent {
 	 * Before updating this value, confirm
 	 * that the library requests everything in the same way as the app.
 	 */
-	const VERSION = 'Snapchat/9.0.2.0';
+	const VERSION = 'Snapchat/9.3.1.0';
 
 	/*
 	 * The API URL. We're using the /bq endpoint, the one that the iPhone
@@ -287,7 +287,7 @@ abstract class SnapchatAgent {
 	public function get($endpoint)
 	{
 		$ch = curl_init();
-		curl_setopt_array($ch, array(CURLOPT_RETURNTRANSFER => 1, CURLOPT_USERAGENT => 'Snapchat/9.2.0.0 (A0001; Android 4.4.4#5229c4ef56#19; gzip)', CURLOPT_HTTPHEADER => array('Accept-Language: en', 'Accept-Locale: en_US'),CURLOPT_URL => self::$URL . $endpoint, CURLOPT_CAINFO => dirname(__FILE__) . '/ca_bundle.crt'));
+		curl_setopt_array($ch, array(CURLOPT_RETURNTRANSFER => 1, CURLOPT_USERAGENT => 'Snapchat/9.3.1.0 (HTC One; Android 4.4.2#302626.7#19; gzip)', CURLOPT_HTTPHEADER => array('Accept-Language: en', 'Accept-Locale: en_US'),CURLOPT_URL => self::$URL . $endpoint, CURLOPT_CAINFO => dirname(__FILE__) . '/ca_bundle.crt'));
 		return curl_exec($ch);
 	}
 
