@@ -856,11 +856,15 @@ class Snapchat extends SnapchatAgent {
 					$this->auth_token,
 					$timestamp,
 				),
-				$multipart = false,
-				$debug = $this->debug
+				$multipart = false
 			);
-			$convos += $result['data']->conversations_response;
-			$offset = end($result['data']->conversations_response)->iter_token;
+			$convos = array_merge($convos, $result['data']->conversations_response);
+			$last = json_decode(json_encode(end($result['data']->conversations_response)), true);
+			if(array_key_exists("iter_token", $last)){
+			    $offset = $last['iter_token'];
+			}else{
+			    $offset = "";
+			}
 		}
 		return $convos;
 	}
