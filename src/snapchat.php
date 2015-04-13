@@ -836,27 +836,33 @@ class Snapchat extends SnapchatAgent {
 		return $result;
 	}
 
-	public function getConversations($to)
+	public function getConversations()
 	{
-		$timestamp = parent::timestamp();
-		$result = parent::post(
-			'/loq/conversations',
-			array(
-				'username' => $this->username,
-				'timestamp' => $timestamp,
-				'checksum' => md5($this->username),
-				'offset' => implode('~', array($timestamp, $to, $this->username)),
-				'features_map' => '{}'
-			),
-			array(
-				$this->auth_token,
-				$timestamp,
-			),
-			$multipart = false,
-			$debug = $this->debug
-		);
-
-		return $result;
+		$updates = $this->getUpdates();
+		$offset = end($updates['data']->conversations_response)->iter_token;
+		$convos = $updates['data']->conversations_response;
+		while(strlen($offset) > 0){
+			$timestamp = parent::timestamp();
+			$result = parent::post(
+				'/loq/conversations',
+				array(
+					'username' => $this->username,
+					'timestamp' => $timestamp,
+					'checksum' => md5($this->username),
+					'offset' => $offset,
+					'features_map' => '{}'
+				),
+				array(
+					$this->auth_token,
+					$timestamp,
+				),
+				$multipart = false
+			);
+			$convos = array_merge($convos, $result['data']->conversations_response);
+			$last = json_decode(json_encode(end($result['data']->conversations_response)), true);
+			$offset = (array_key_exists("iter_token", $last)) ? $last['iter_token'] : "";
+		}
+		return $convos;
 	}
 
 	/**
