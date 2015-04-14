@@ -902,7 +902,9 @@ class Snapchat extends SnapchatAgent {
 			array(
 				$this->auth_token,
 				$timestamp,
-			)
+			),
+			$multipart = false,
+			$debug = $this->debug
 		);
 
 		if(!empty($result->updates_response))
