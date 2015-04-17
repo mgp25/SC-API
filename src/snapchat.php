@@ -2204,59 +2204,31 @@ class Snapchat extends SnapchatAgent {
 		if(!empty($blob))
 		{
 
-				$result = parent::decryptCBC($blob, $key, $iv);
+			$result = parent::decryptCBC($blob, $key, $iv);
 
-				if(parent::isCompressed(substr($result, 0, 2)))
+			if(parent::isCompressed(substr($result, 0, 2)))
+			{
+				$result = parent::unCompress($result);
+			}
+
+			if($save)
+			{
+				$path = "/var/www/html/content/" . $from;
+
+				if(!file_exists($path))
 				{
-					$result = parent::unCompress($result);
+					mkdir($path);
 				}
 
-				if($save)
+				if(is_array($result))
 				{
-					$path = "/var/www/html/content/" . $from;
-
-					if(!file_exists($path))
+					foreach ($result as &$value) 
 					{
-						mkdir($path);
-					}
-
-					if(is_array($result))
-					{
-						foreach ($result as &$value) 
-						{
-					    $file = $path . DIRECTORY_SEPARATOR . "story-" . $media_id;
-					    
-							if(!file_exists($file))
-							{
-								file_put_contents($file, $value);
-								$finfo = finfo_open(FILEINFO_MIME_TYPE);
-								$finfo = finfo_file($finfo, $file);
-								switch($finfo)
-								{
-									case "image/jpeg":
-											$ext = ".jpg";
-											break;
-									case "image/png":
-											$ext = ".png";
-											break;
-									case "video/mp4";
-											$ext = ".mp4";
-											break;
-									default:
-											$ext = null;
-								}
-
-								if($ext != null)
-								{
-									rename($file, $file . $ext);
-								}
-							}
-						}
-					}else{
-						$file = $path . DIRECTORY_SEPARATOR . "story-" . $media_id;
+				    $file = $path . DIRECTORY_SEPARATOR . "story-" . $media_id;
+				    
 						if(!file_exists($file))
 						{
-							file_put_contents($file, $result);
+							file_put_contents($file, $value);
 							$finfo = finfo_open(FILEINFO_MIME_TYPE);
 							$finfo = finfo_file($finfo, $file);
 							switch($finfo)
@@ -2280,9 +2252,37 @@ class Snapchat extends SnapchatAgent {
 							}
 						}
 					}
-				}
+				}else{
+					$file = $path . DIRECTORY_SEPARATOR . "story-" . $media_id;
+					if(!file_exists($file))
+					{
+						file_put_contents($file, $result);
+						$finfo = finfo_open(FILEINFO_MIME_TYPE);
+						$finfo = finfo_file($finfo, $file);
+						switch($finfo)
+						{
+							case "image/jpeg":
+									$ext = ".jpg";
+									break;
+							case "image/png":
+									$ext = ".png";
+									break;
+							case "video/mp4";
+									$ext = ".mp4";
+									break;
+							default:
+									$ext = null;
+						}
 
-				return $result;
+						if($ext != null)
+						{
+							rename($file, $file . $ext);
+						}
+					}
+				}
+			}
+
+			return $result;
 		}
 
 		return FALSE;
