@@ -2213,7 +2213,7 @@ class Snapchat extends SnapchatAgent {
 
 			if($save)
 			{
-				$path = "/var/www/html/content/" . $from;
+				$path = __DIR__ . DIRECTORY_SEPARATOR . "stories" . DIRECTORY_SEPARATOR .  $from;
 
 				if(!file_exists($path))
 				{
