@@ -2201,7 +2201,6 @@ class Snapchat extends SnapchatAgent {
 		// Retrieve encrypted story and decrypt.
 		$blob = parent::get('/bq/story_blob?story_id=' . $media_id);
 
-
 		if(!empty($blob))
 		{
 
@@ -2214,19 +2213,26 @@ class Snapchat extends SnapchatAgent {
 
 				if($save)
 				{
-					$path = __DIR__ . DIRECTORY_SEPARATOR . "stories" . DIRECTORY_SEPARATOR .  $from;
+					$path = "/var/www/html/content/" . $from;
+
 					if(!file_exists($path))
 					{
 						mkdir($path);
 					}
-					$file = $path . DIRECTORY_SEPARATOR . "story-" . $media_id;
-					if(!file_exists($file))
+
+					if(is_array($result))
 					{
-							file_put_contents($file, $result);
-							$finfo = finfo_open(FILEINFO_MIME_TYPE);
-							$finfo = finfo_file($finfo, $file);
-							switch($finfo)
+						foreach ($result as &$value) 
+						{
+					    $file = $path . DIRECTORY_SEPARATOR . "story-" . $media_id;
+					    
+							if(!file_exists($file))
 							{
+								file_put_contents($file, $value);
+								$finfo = finfo_open(FILEINFO_MIME_TYPE);
+								$finfo = finfo_file($finfo, $file);
+								switch($finfo)
+								{
 									case "image/jpeg":
 											$ext = ".jpg";
 											break;
@@ -2238,12 +2244,41 @@ class Snapchat extends SnapchatAgent {
 											break;
 									default:
 											$ext = null;
+								}
+
+								if($ext != null)
+								{
+									rename($file, $file . $ext);
+								}
+							}
+						}
+					}else{
+						$file = $path . DIRECTORY_SEPARATOR . "story-" . $media_id;
+						if(!file_exists($file))
+						{
+							file_put_contents($file, $result);
+							$finfo = finfo_open(FILEINFO_MIME_TYPE);
+							$finfo = finfo_file($finfo, $file);
+							switch($finfo)
+							{
+								case "image/jpeg":
+										$ext = ".jpg";
+										break;
+								case "image/png":
+										$ext = ".png";
+										break;
+								case "video/mp4";
+										$ext = ".mp4";
+										break;
+								default:
+										$ext = null;
 							}
 
 							if($ext != null)
 							{
-									rename($file, $file . $ext);
+								rename($file, $file . $ext);
 							}
+						}
 					}
 				}
 
