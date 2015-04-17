@@ -2275,7 +2275,7 @@ class Snapchat extends SnapchatAgent {
 		}
 
 		// Retrieve encrypted story and decrypt.
-		$blob = parent::get('/story_thumbnail?story_id=' . $media_id);
+		$blob = parent::get('/bq/story_thumbnail?story_id=' . $media_id);
 
 		if(!empty($blob))
 		{
