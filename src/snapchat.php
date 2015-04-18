@@ -57,6 +57,8 @@ class Snapchat extends SnapchatAgent {
 	protected $chat_auth_token;
 	protected $username;
 	protected $debug;
+	protected $gEmail;
+	protected $gPasswd;
 
 	/**
 	 * Sets up some initial variables. If a username and password are passed in,
@@ -185,23 +187,44 @@ class Snapchat extends SnapchatAgent {
 		{
 			$password  = $oauthMatch[1];
 			$ch = curl_init();
-			$postfields = array(
-				'device_country' => 'us',
-				'operatorCountry' => 'us',
-				'lang' => 'en_US',
-				'sdk_version' => '19',
-				'google_play_services_version' => '7097038',
-				'accountType' => 'HOSTED_OR_GOOGLE',
-				'Email' => 'test@gmail.com',
-				'service' => 'audience:server:client_id:694893979329-l59f3phl42et9clpoo296d8raqoljl6p.apps.googleusercontent.com',
-				'source' => 'android',
-				'androidId' => '378c184c6070c26c',
-				'app' => 'com.snapchat.android',
-				'client_sig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
-				'callerPkg' => 'com.snapchat.android',
-				'callerSig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
-				'EncryptedPasswd' => $password
-			);
+			if ($this->gEmail == null && $this->gPasswd == null)
+			{
+				$postfields = array(
+					'device_country' => 'us',
+					'operatorCountry' => 'us',
+					'lang' => 'en_US',
+					'sdk_version' => '19',
+					'google_play_services_version' => '7097038',
+					'accountType' => 'HOSTED_OR_GOOGLE',
+					'Email' => 'test@gmail.com',
+					'service' => 'audience:server:client_id:694893979329-l59f3phl42et9clpoo296d8raqoljl6p.apps.googleusercontent.com',
+					'source' => 'android',
+					'androidId' => '378c184c6070c26c',
+					'app' => 'com.snapchat.android',
+					'client_sig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
+					'callerPkg' => 'com.snapchat.android',
+					'callerSig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
+					'EncryptedPasswd' => $password
+				);
+			} else {
+				$postfields = array(
+					'device_country' => 'us',
+					'operatorCountry' => 'us',
+					'lang' => 'en_US',
+					'sdk_version' => '19',
+					'google_play_services_version' => '7097038',
+					'accountType' => 'HOSTED_OR_GOOGLE',
+					'Email' => $this->gEmail,
+					'service' => 'audience:server:client_id:694893979329-l59f3phl42et9clpoo296d8raqoljl6p.apps.googleusercontent.com',
+					'source' => 'android',
+					'androidId' => '378c184c6070c26c',
+					'app' => 'com.snapchat.android',
+					'client_sig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
+					'callerPkg' => 'com.snapchat.android',
+					'callerSig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
+					'Passwd' => $this->gPasswd
+				);
+			}
 
 			$headers = array(
 				'device: 378c184c6070c26c',
@@ -304,6 +327,12 @@ class Snapchat extends SnapchatAgent {
 		$return['token'] = substr($result, 6);
 
 		return $return;
+	}
+
+	public function setGmailData($gEmail, $gPasswd)
+	{
+			$this->gEmail = $gEmail;
+			$this->gPasswd = $gPasswd;
 	}
 
 
