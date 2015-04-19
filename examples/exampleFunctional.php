@@ -5,6 +5,8 @@ require_once("../src/snapchat.php");
 //////////// CONFIG ////////////
 $username = ""; // Your snapchat username
 $password = ""; // Your snapchat password
+$gEmail   = ""; // Gmail account
+$gPasswd  = ""; // Gmail account password
 $debug = false; // Set this to true if you want to see all outgoing requests and responses from server
 ////////////////////////////////
 
@@ -12,7 +14,7 @@ $debug = false; // Set this to true if you want to see all outgoing requests and
 $imagePath = ""; // URL or local path to a media file (image or video)
 $sendTo = array();
 
-$snapchat = new Snapchat($username, $debug);
+$snapchat = new Snapchat($username, $gEmail, $gPasswd, $debug);
 
 //Login to Snapchat with your username and password
 $snapchat->login($password);
@@ -41,5 +43,7 @@ $snapchat->getSnaps(true);
 
 // Send chat message to "username"
 $snapchat->sendMessage("username", "hello from Snap-API!");
+
+$snapchat->closeAppEvent();
 
 ?>

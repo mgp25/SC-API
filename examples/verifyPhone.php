@@ -9,10 +9,16 @@ $username = trim(fgets(STDIN));
 echo "\nPassword: ";
 $password = trim(fgets(STDIN));
 
+echo "\nGmail account: ";
+$gEmail = trim(fgets(STDIN));
+
+echo "\nGmail password: ";
+$gPasswd = trim(fgets(STDIN));
+
 echo "\Phone number: ";
 $phone = trim(fgets(STDIN));
 
-$snapchat = new Snapchat($username, true);
+$snapchat = new Snapchat($username, $gEmail, $gPasswd, true);
 
 $snapchat->login($password);
 
