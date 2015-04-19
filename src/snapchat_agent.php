@@ -325,6 +325,7 @@ abstract class SnapchatAgent {
 		}
 		else
 		{
+
             $datas = "--".$boundary."\r\n" . 'Content-Disposition: form-data; name="req_token"' . "\r\n\r\n" . self::hash($params[0], $params[1]) . "\r\n";
             foreach($data as $key => $value)
             {
@@ -386,8 +387,12 @@ abstract class SnapchatAgent {
 		curl_setopt($ch, CURLOPT_PROXY, $this->proxyServer);
 		$result = curl_exec($ch);
 
-		if($endpoint == "/loq/login") $result = gzdecode($result);
-
+		
+		if(strlen($result) > 0) //make sure curl worked. if not, keep going
+		{
+			if($endpoint == "/loq/login") $result = gzdecode($result);
+		}
+		
 		if($debug)
 		{
 			$info = curl_getinfo($ch);
@@ -446,18 +451,26 @@ abstract class SnapchatAgent {
 			$result = curl_exec($ch);
 		}
 
+		if(strlen($result) > 0 && $endpoint == "/loq/login") //make sure curl worked. if not, keep going
+		{
+			$result = gzdecode($result);
+		}
+
 		$gi = curl_getinfo($ch);
 		// If the cURL request fails, return FALSE. Also check the status code
 		// since the API generally won't return friendly errors.
 		if($result === FALSE)
 		{
+
 			curl_close($ch);
 
 			return $result;
 		}
 
+
 		if(curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200)
 		{
+
 				$return['data'] = $result;
 				$return['test'] = 1;
 				$return['code'] = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -479,9 +492,8 @@ abstract class SnapchatAgent {
 
 		// Add support for foreign characters in the JSON response.
 		$result = iconv('UTF-8', 'UTF-8//IGNORE', utf8_encode($result));
-
+		
 		$return['data'] = json_decode($result);
-
 		return $return;
 	}
 
