@@ -70,10 +70,12 @@ class Snapchat extends SnapchatAgent {
 	 * @param string $password
 	 *   The password associated with the username, if logging in.
 	 */
-	public function __construct($username = NULL, $debug = FALSE)
+	public function __construct($username = NULL, $gEmail, $gPasswd, $debug = FALSE)
 	{
 		$this->username = $username;
 		$this->debug = $debug;
+		$this->gEmail = $gEmail;
+		$this->gPasswd = $gPasswd;
 
 		if (file_exists(__DIR__ . "/auth-$this->username.dat"))
 		{
@@ -122,91 +124,11 @@ class Snapchat extends SnapchatAgent {
 		return $result;
 	}
 
-	public function getOAuthToken()
-	{
-		$ch = curl_init();
-		curl_setopt_array($ch, array(CURLOPT_RETURNTRANSFER => 1, CURLOPT_URL => 'https://tekno.pw/snapchat_password.php', CURLOPT_CAINFO => dirname(__FILE__) . '/ca_bundle.crt'));
-		$passwordJSON = curl_exec($ch);
-		$loginArray = json_decode($passwordJSON, true);
-
-		$ch = curl_init();
-		$postfields = array(
-			'device_country' => 'us',
-			'operatorCountry' => 'us',
-			'lang' => 'en_US',
-			'sdk_version' => '19',
-			'google_play_services_version' => '7097038',
-			'accountType' => 'HOSTED_OR_GOOGLE',
-			'system_partition' => '1',
-			'has_permission' => '1',
-			'add_account' => '1',
-			'service' => 'ac2dm',
-			'source' => 'android',
-			'androidId' => '356663c3e9de45ef',
-			'get_accountid' => '1',
-			'Email' => $loginArray["email"],
-			'app' => 'com.google.android.gms',
-			'client_sig' => '38918a453d07199354f8b19af05ec6562ced5788',
-			'EncryptedPasswd' => $loginArray["encryptedPassword"]
-		);
-
-		$headers = array(
-			'device: 356663c3e9de45ef',
-			'app: com.google.android.gms',
-			'User-Agent: GoogleAuth/1.4 (m7 KOT49H)',
-			'Accept-Encoding: gzip'
-		);
-
-		curl_setopt($ch, CURLOPT_URL, "https://android.clients.google.com/auth");
-		curl_setopt($ch, CURLOPT_POST, TRUE);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postfields));
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-		curl_setopt($ch, CURLOPT_ENCODING, "gzip");
-		curl_setopt($ch, CURLINFO_HEADER_OUT, true);
-
-		$result = curl_exec($ch);
-
-		if($this->debug)
-		{
-			echo "\nREQUEST TO: https://android.clients.google.com/auth\n";
-			echo 'DATA: ' . print_r($postfields) . "\n";
-			echo 'RESULT: ' . $result . "\n";
-		}
-
-		return $result;
-	}
-
 	public function getAuthToken()
 	{
-		$passwordResult = $this->getOAuthToken();
-		preg_match("/Token=(.*)/", $passwordResult, $oauthMatch);
-
-		if(array_key_exists("1", $oauthMatch) && !is_null($oauthMatch[1]))
+		if(($this->gEmail != null) && ($this->gPasswd != null))
 		{
-			$password  = $oauthMatch[1];
-			$ch = curl_init();
-			if ($this->gEmail == null && $this->gPasswd == null)
-			{
-				$postfields = array(
-					'device_country' => 'us',
-					'operatorCountry' => 'us',
-					'lang' => 'en_US',
-					'sdk_version' => '19',
-					'google_play_services_version' => '7097038',
-					'accountType' => 'HOSTED_OR_GOOGLE',
-					'Email' => 'test@gmail.com',
-					'service' => 'audience:server:client_id:694893979329-l59f3phl42et9clpoo296d8raqoljl6p.apps.googleusercontent.com',
-					'source' => 'android',
-					'androidId' => '378c184c6070c26c',
-					'app' => 'com.snapchat.android',
-					'client_sig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
-					'callerPkg' => 'com.snapchat.android',
-					'callerSig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
-					'EncryptedPasswd' => $password
-				);
-			} else {
+				$ch = curl_init();
 				$postfields = array(
 					'device_country' => 'us',
 					'operatorCountry' => 'us',
@@ -224,7 +146,6 @@ class Snapchat extends SnapchatAgent {
 					'callerSig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
 					'Passwd' => $this->gPasswd
 				);
-			}
 
 			$headers = array(
 				'device: 378c184c6070c26c',
@@ -268,7 +189,7 @@ class Snapchat extends SnapchatAgent {
 		else
 		{
 			$return['error'] = 1;
-			$return['data'] = $passwordResult;
+			$return['data'] = "Email: $this->gEmail Passwd: $this->gPasswd";
 		}
 
 		return $return;
@@ -328,13 +249,6 @@ class Snapchat extends SnapchatAgent {
 
 		return $return;
 	}
-
-	public function setGmailData($gEmail, $gPasswd)
-	{
-			$this->gEmail = $gEmail;
-			$this->gPasswd = $gPasswd;
-	}
-
 
 	/**
 	 * Handles login.
@@ -2251,10 +2165,10 @@ class Snapchat extends SnapchatAgent {
 
 				if(is_array($result))
 				{
-					foreach ($result as &$value) 
+					foreach ($result as &$value)
 					{
 				    $file = $path . DIRECTORY_SEPARATOR . "story-" . $media_id;
-				    
+
 						if(!file_exists($file))
 						{
 							file_put_contents($file, $value);
