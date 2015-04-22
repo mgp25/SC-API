@@ -451,11 +451,6 @@ abstract class SnapchatAgent {
 			$result = curl_exec($ch);
 		}
 
-		if(strlen($result) > 0 && $endpoint == "/loq/login") //make sure curl worked. if not, keep going
-		{
-			$result = gzdecode($result);
-		}
-
 		$gi = curl_getinfo($ch);
 		// If the cURL request fails, return FALSE. Also check the status code
 		// since the API generally won't return friendly errors.
