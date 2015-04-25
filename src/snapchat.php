@@ -2045,9 +2045,7 @@ class Snapchat extends SnapchatAgent {
 
 		if (($text != null) && ($type == Snapchat::MEDIA_IMAGE))
 		{
-				text($media, $text);
-				$media = file_get_contents(__DIR__ . '/cache/image.jpg');
-				unlink(__DIR__ . '/cache/image.jpg');
+				$media = text($media, $text);
 		}
 		else
 		{
