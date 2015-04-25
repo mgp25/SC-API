@@ -2071,17 +2071,18 @@ class Snapchat extends SnapchatAgent {
 		$result = parent::post(
 			'/bq/retry_post_story',
 			array(
-				'camera_front_facing' => rand(0,1),
-				'caption_text_display' => $text,
-				'country_code' => 'US',
-				'media_id' => $media_id,
 				'client_id' => $media_id,
+				'shared_ids' => '{}',
+				'story_timestamp' => parent::timestamp(),
+				'media_id' => $media_id,
+				'zipped' => 0,
+				'camera_front_facing' => rand(0, 1),
+				'my_story' => true,
+				'caption_text_display' => $text,
 				'timestamp' => $timestamp,
-				'story_timestamp' => ($timestamp - 1234),
 				'time' => $time,
 				'type' => $type,
 				'username' => strtolower($this->username),
-				'zipped' => '0',
 				'data' => $cfile
 			),
 			array(
