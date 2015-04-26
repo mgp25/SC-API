@@ -1161,7 +1161,7 @@ class Snapchat extends SnapchatAgent {
 		}
 
 		$friends = array();
-		$friends = $updates['data']->friends_response->friends;
+		$friends = $updates['data']->friends_response->added_friends;
 		foreach($friends as $friend)
 		{
 				if ($friend->type == 1)
