@@ -1275,6 +1275,50 @@ class Snapchat extends SnapchatAgent {
 	}
 
 	/**
+	* Accept an user friend request.
+	*
+	* @param string $username
+	*   The username of the friend to add.
+	*
+	* @return bool
+	*   TRUE if successful, FALSE otherwise.
+	*/
+	public function addFriendBack($username)
+	{
+		// Make sure we're logged in and have a valid access token.
+		if(!$this->auth_token || !$this->username)
+		{
+			return FALSE;
+		}
+
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/bq/friend',
+			array(
+				'action' => 'add',
+				'friend' => $username,
+				'timestamp' => $timestamp,
+				'username' => $this->username,
+				'added_by' => 'ADDED_BY_ADDED_ME_BACK'
+			),
+			array(
+				$this->auth_token,
+				$timestamp,
+			),
+			$multipart = false,
+			$debug = $this->debug
+		);
+
+		// Sigh...
+		if(strpos($result["data"]->message, 'Sorry! Couldn\'t find') === 0)
+		{
+			return FALSE;
+		}
+
+		return !empty($result->message);
+	}
+
+	/**
 	 * Deletes a friend.
 	 *
 	 * @todo
