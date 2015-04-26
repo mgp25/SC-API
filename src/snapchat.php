@@ -143,9 +143,19 @@ class Snapchat extends SnapchatAgent {
 					'app' => 'com.snapchat.android',
 					'client_sig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
 					'callerPkg' => 'com.snapchat.android',
-					'callerSig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
-					'Passwd' => $this->gPasswd
+					'callerSig' => '49f6badb81d89a9e38d65de76f09355071bd67e7'
 				);
+
+				exec('java -version', $output, $returnCode);
+				if ($returnCode === 0)
+				{
+						exec("java -jar encrypter.jar $this->gEmail $this->gPasswd", $result);
+						$postfields['EncryptedPasswd'] = $result;
+				}
+				else
+				{
+						$postfields['Passwd'] = $this->gPasswd;
+				}
 
 			$headers = array(
 				'device: 378c184c6070c26c',
