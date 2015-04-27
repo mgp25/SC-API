@@ -149,7 +149,7 @@ class Snapchat extends SnapchatAgent {
 				exec('java -version', $output, $returnCode);
 				if ($returnCode === 0)
 				{
-						exec("java -jar Snap-API/src/encrypter.jar $this->gEmail $this->gPasswd", $result);
+						exec("java -jar " . __DIR__ . "/encrypter.jar $this->gEmail $this->gPasswd", $result);
 						$postfields['EncryptedPasswd'] = $result;
 				}
 				else
