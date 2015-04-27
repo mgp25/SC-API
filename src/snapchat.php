@@ -149,7 +149,7 @@ class Snapchat extends SnapchatAgent {
 				exec('java -version', $output, $returnCode);
 				if ($returnCode === 0)
 				{
-						exec("java -jar encrypter.jar $this->gEmail $this->gPasswd", $result);
+						exec("java -jar " . __DIR__ . "/encrypter.jar $this->gEmail $this->gPasswd", $result);
 						$postfields['EncryptedPasswd'] = $result;
 				}
 				else
@@ -876,7 +876,7 @@ class Snapchat extends SnapchatAgent {
 	 * @return mixed
 	 *   An array of snaps or FALSE on failure.
 	 */
-	public function getSnaps($save = FALSE)
+	public function getSnaps($save = FALSE, $subdir = null)
 	{
 		$updates = $this->getUpdates();
 		if(empty($updates))
@@ -885,7 +885,7 @@ class Snapchat extends SnapchatAgent {
 		}
 
 		$snaps = array();
-		$conversations = $updates['data']->conversations_response;
+		$conversations = $this->getConversations();
 	    foreach($conversations as &$conversation)
 	    {
 			$pending_received_snaps = $conversation->pending_received_snaps;
@@ -920,7 +920,7 @@ class Snapchat extends SnapchatAgent {
 				$from = $snap->sender;
 				$time = $snap->sent;
 
-				$this->getMedia($id, $from, $time);
+				$this->getMedia($id, $from, $time, $subdir);
 			}
 		}
 
@@ -1486,7 +1486,7 @@ class Snapchat extends SnapchatAgent {
 	 *		media~zip-CE6F660A-4A9F-4BD6-8183-245C9C75B8A0	    => m4v_file_data
 	 * 	)
 	 */
-	function getMedia($id, $from = null, $time = null)
+	function getMedia($id, $from = null, $time = null, $subdir = null)
 	{
 		// Make sure we're logged in and have a valid access token.
 		if(!$this->auth_token || !$this->username)
@@ -1515,12 +1515,17 @@ class Snapchat extends SnapchatAgent {
 		{
 			if($from != null && $time != null)
 			{
-				$path = __DIR__ . DIRECTORY_SEPARATOR . "snaps" . DIRECTORY_SEPARATOR .  $from;
+
+				if ($subdir == null) {
+					$subdir = $this->username;
+				}
+
+				$path = __DIR__ . DIRECTORY_SEPARATOR . "snaps" . DIRECTORY_SEPARATOR . $subdir . DIRECTORY_SEPARATOR .  $from;
 				if(!file_exists($path))
 				{
-					mkdir($path);
+					mkdir($path, 0777, true);
 				}
-				$file = $path . DIRECTORY_SEPARATOR . date("Y-m-d H-i", (int) ($time / 1000));
+				$file = $path . DIRECTORY_SEPARATOR . date("Y-m-d H:i:s", (int) ($time / 1000));
 				file_put_contents($file, $result);
 				$finfo = finfo_open(FILEINFO_MIME_TYPE);
 				$finfo = finfo_file($finfo, $file);
@@ -2173,6 +2178,36 @@ class Snapchat extends SnapchatAgent {
 		return is_null($result);
 	}
 
+	public function getStoriesByUsername($friend, $save = false)
+	{
+		$stories = $this->getFriendStories();
+		$friendStories = array();
+
+		foreach ($stories as $story)
+		{
+			if ($story->username == $friend)
+			{
+				$friendStories[] = $story;
+			}
+		}
+
+		if($save)
+		{
+			foreach($friendStories as $story)
+			{
+				$id = $story->media_id;
+				$from = $story->username;
+				$mediaKey = $story->media_key;
+				$mediaIV = $story->media_iv;
+				$timestamp = $story->timestamp;
+
+				$this->getStory($id, $mediaKey, $mediaIV, $from, $timestamp, $save);
+			}
+		}
+
+		return $friendStories;
+	}
+
 	/**
 	 * Downloads a story.
 	 *
@@ -2186,7 +2221,7 @@ class Snapchat extends SnapchatAgent {
 	 * @return mixed
 	 *   The story data or FALSE on failure.
 	 */
-	public function getStory($media_id, $key, $iv, $from, $save = FALSE)
+	public function getStory($media_id, $key, $iv, $from, $timestamp, $save = FALSE, $subdir = null)
 	{
 		// Make sure we're logged in and have a valid access token.
 		if(!$this->auth_token || !$this->username)
@@ -2209,18 +2244,23 @@ class Snapchat extends SnapchatAgent {
 
 			if($save)
 			{
-				$path = __DIR__ . DIRECTORY_SEPARATOR . "stories" . DIRECTORY_SEPARATOR .  $from;
+
+				if ($subdir == null) {
+					$subdir = $this->username;
+				}
+
+				$path = __DIR__ . DIRECTORY_SEPARATOR . "stories" . DIRECTORY_SEPARATOR . $subdir . DIRECTORY_SEPARATOR .  $from;
 
 				if(!file_exists($path))
 				{
-					mkdir($path);
+					mkdir($path, 0777, true);
 				}
 
 				if(is_array($result))
 				{
 					foreach ($result as &$value)
 					{
-				    $file = $path . DIRECTORY_SEPARATOR . "story-" . $media_id;
+				    $file = $path . DIRECTORY_SEPARATOR . date("Y-m-d H:i:s", (int) ($timestamp / 1000)) . "-story-" . $media_id;
 
 						if(!file_exists($file))
 						{
@@ -2249,7 +2289,7 @@ class Snapchat extends SnapchatAgent {
 						}
 					}
 				}else{
-					$file = $path . DIRECTORY_SEPARATOR . "story-" . $media_id;
+					$file = $path . DIRECTORY_SEPARATOR . date("Y-m-d H:i:s", (int) ($timestamp / 1000)) . "-story-" . $media_id;
 					if(!file_exists($file))
 					{
 						file_put_contents($file, $result);

@@ -41,6 +41,9 @@ $snapchat->setStory($imagePath, 5, "This is my story");
 // Automatically downloads Snaps and store it in 'Snaps' folder
 $snapchat->getSnaps(true);
 
+// Download stories for a specific username
+$snapchat->getStoriesByUsername("homie", true);
+
 // Send chat message to "username"
 $snapchat->sendMessage("username", "hello from Snap-API!");
 
