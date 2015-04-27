@@ -885,7 +885,7 @@ class Snapchat extends SnapchatAgent {
 		}
 
 		$snaps = array();
-		$conversations = $updates['data']->conversations_response;
+		$conversations = $this->getConversations();
 	    foreach($conversations as &$conversation)
 	    {
 			$pending_received_snaps = $conversation->pending_received_snaps;
