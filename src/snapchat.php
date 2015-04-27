@@ -1378,7 +1378,7 @@ class Snapchat extends SnapchatAgent {
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'/friend',
+			'/bq/friend',
 			array(
 				'action' => 'display',
 				'display' => $display,
@@ -1416,7 +1416,7 @@ class Snapchat extends SnapchatAgent {
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'/friend',
+			'/bq/friend',
 			array(
 				'action' => 'block',
 				'friend' => $username,
@@ -1453,7 +1453,7 @@ class Snapchat extends SnapchatAgent {
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'/friend',
+			'/bq/friend',
 			array(
 				'action' => 'unblock',
 				'friend' => $username,
