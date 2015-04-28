@@ -2678,7 +2678,7 @@ class Snapchat extends SnapchatAgent {
 			}
 
 			$uuid4 = sprintf('%08s-%04s-%04x-%04x-%12s', substr($uniId, 0, 8), substr($uniId, 8, 4), substr($uniId, 12, 4), substr($uniId, 16, 4), substr($uniId, 20, 12));
-    	$data = '{"common_params":{"user_id":"' . hash("sha256",strtolower($this->username)) . '","city":"Unimplemented","sc_user_agent":"Snapchat\/9.2.0.0 (A0001; Android 4.4.4#5229c4ef56#19; gzip)","session_id":"00000000-0000-0000-0000-000000000000","region":"Unimplemented","latlon":"Unimplemented","friend_count":' . $fc . ',"country":"Unimplemented"},"events":[{"event_name":"APP_OPEN","event_timestamp":' . $timestamp . ',"event_params":{"open_state":"NORMAL","intent_action":"null"}}],"batch_id":"' . $uuid4 . '-Snapchat9200A0001Android4445229c4ef5619gzip' . $timestamp . '"}';
+    	$data = '{"common_params":{"user_id":"' . hash("sha256",strtolower($this->username)) . '","city":"Unimplemented","sc_user_agent":"' . str_replace("/", "\/", parent::USER_AGENT) . '","session_id":"00000000-0000-0000-0000-000000000000","region":"Unimplemented","latlon":"Unimplemented","friend_count":' . $fc . ',"country":"Unimplemented"},"events":[{"event_name":"APP_OPEN","event_timestamp":' . $timestamp . ',"event_params":{"open_state":"NORMAL","intent_action":"null"}}],"batch_id":"' . $uuid4 . '-' . preg_replace("/[^a-zA-Z0-9]+/", "", parent::USER_AGENT) . $timestamp . '"}';
       $result = parent::posttourl('https://sc-analytics.appspot.com/post_events',$data);
 
 			if ($this->debug)
