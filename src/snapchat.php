@@ -150,7 +150,7 @@ class Snapchat extends SnapchatAgent {
 				if ($returnCode === 0)
 				{
 						exec("java -jar " . __DIR__ . "/encrypter.jar $this->gEmail $this->gPasswd", $result);
-						$postfields['EncryptedPasswd'] = $result;
+						$postfields['EncryptedPasswd'] = array_shift(array_slice($result, 0, 1));
 				}
 				else
 				{
