@@ -2238,12 +2238,36 @@ class Snapchat extends SnapchatAgent {
 			return FALSE;
 		}
 
+		// Build path
+		if($save)
+		{
+			if ($subdir == null) {
+				$subdir = $this->username;
+			}
+
+			$path = __DIR__ . DIRECTORY_SEPARATOR . "stories" . DIRECTORY_SEPARATOR . $subdir . DIRECTORY_SEPARATOR .  $from;
+
+			if(!file_exists($path))
+			{
+				mkdir($path, 0777, true);
+			}
+			$file = $path . DIRECTORY_SEPARATOR . date("Y-m-d H-i-s", (int) ($timestamp / 1000)) . "-story-" . $media_id;
+			$extensions = array(".jpg", ".png", ".mp4", "");
+			foreach ($extensions as $ext)
+			{
+				if(file_exists($file . $ext))
+				{
+					if ($this->cli) echo "  skipping...\n";
+					return false;
+				}
+			}
+		}
+
 		// Retrieve encrypted story and decrypt.
 		$blob = parent::get('/bq/story_blob?story_id=' . $media_id);
 
 		if(!empty($blob))
 		{
-
 			$result = parent::decryptCBC($blob, $key, $iv);
 
 			if(parent::isCompressed(substr($result, 0, 2)))
@@ -2253,27 +2277,6 @@ class Snapchat extends SnapchatAgent {
 
 			if($save)
 			{
-
-				if ($subdir == null) {
-					$subdir = $this->username;
-				}
-
-				$path = __DIR__ . DIRECTORY_SEPARATOR . "stories" . DIRECTORY_SEPARATOR . $subdir . DIRECTORY_SEPARATOR .  $from;
-
-				if(!file_exists($path))
-				{
-					mkdir($path, 0777, true);
-				}
-				$file = $path . DIRECTORY_SEPARATOR . date("Y-m-d H-i-s", (int) ($timestamp / 1000)) . "-story-" . $media_id;
-				$extensions = array(".jpg", ".png", ".mp4", "");
-				foreach ($extensions as $ext)
-				{
-					if(file_exists($file . $ext))
-					{
-						return false;
-					}
-				}
-				
 				if(is_array($result))
 				{
 					foreach ($result as &$value)
@@ -2283,7 +2286,9 @@ class Snapchat extends SnapchatAgent {
 							$this->writeToFile($file, $value);
 						}
 					}
-				}else{
+				}
+				else
+				{
 					if(!file_exists($file))
 					{
 						$this->writeToFile($file, $result);
