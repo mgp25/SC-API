@@ -705,69 +705,60 @@ class Snapchat extends SnapchatAgent {
 		return $result;
 	}
 
-	public function sendMessage($to, $text)
-	{
-		$authInfo = $this->getConversationInfo($to);
-		if(!array_key_exists("0", $authInfo["data"]->conversations))
-		{
-			$authInfo = $this->getConversationAuth($to);
-			if(!property_exists($authInfo["data"], "messaging_auth"))
-			{
-				echo "\nYou must add {$to} to your friends list first!\n";
-				return null;
-			}
-			else
-			{
-				//new conversation
-				$payload = $authInfo["data"]->messaging_auth->payload;
-				$mac = $authInfo["data"]->messaging_auth->mac;
-				$seq_num = 0;
-				$conv_id = implode('~', array($to, $this->username));
-			}
-		}
-		else
-		{
-			//conversation already exists
-			$payload = $authInfo["data"]->conversations[0]->conversation_messages->messaging_auth->payload;
-			$mac = $authInfo["data"]->conversations[0]->conversation_messages->messaging_auth->mac;
-			$name = $this->username;
-			$seq_num = $authInfo["data"]->conversations[0]->conversation_state->user_sequences->$name;
-			$conv_id = $authInfo["data"]->conversations[0]->id;
-		}
-
-		$genID = md5(uniqid());
-		$chatID = strtoupper(sprintf('%08s-%04s-%04x-%04x-%12s', substr($genID, 0, 8), substr($genID, 8, 4), substr($genID, 12, 4), substr($genID, 16, 4), substr($genID, 20, 12)));
-		$genID = md5(uniqid());
-		$id = strtoupper(sprintf('%08s-%04s-%04x-%04x-%12s', substr($genID, 0, 8), substr($genID, 8, 4), substr($genID, 12, 4), substr($genID, 16, 4), substr($genID, 20, 12)));
-
-		$timestamp = parent::timestamp();
-		$messagesArray = array(
-			array(
-				'body' => array(
-					'text' => $text,
-					'type' => 'text'
-				),
-				'chat_message_id' => $chatID,
-				'seq_num' => $seq_num + 1,
-				'timestamp' => $timestamp,
-				'header' => array(
-					'auth' => array(
-						'mac' => $mac,
-						'payload' => $payload
-					),
-					'to' => array(
-						$to
-					),
-					'conv_id' => $conv_id,
-					'from' => $this->username,
-					'conn_seq_num' => 1
-				),
-				'retried' => false,
-				'id' => $id,
-				'type' => 'chat_message'
-			)
-		);
-
+	public function sendMessage($tos, $text){
+	    if(!is_array($tos)) $tos = array($tos);
+	    $messagesArray = array();
+	    foreach($tos as $to){
+		    $authInfo = $this->getConversationInfo($to);
+		    if(!array_key_exists("0", $authInfo["data"]->conversations)){
+			    $authInfo = $this->getConversationAuth($to);
+			    if(!property_exists($authInfo["data"], "messaging_auth")){
+				    echo "\nYou must add {$to} to your friends list first!\n";
+				    return null;
+			    }else{
+				    //new conversation
+				    $payload = $authInfo["data"]->messaging_auth->payload;
+				    $mac = $authInfo["data"]->messaging_auth->mac;
+				    $seq_num = 0;
+				    $conv_id = implode('~', array($to, $this->username));
+			    }
+		    }else{
+			    //conversation already exists
+			    $payload = $authInfo["data"]->conversations[0]->conversation_messages->messaging_auth->payload;
+			    $mac = $authInfo["data"]->conversations[0]->conversation_messages->messaging_auth->mac;
+			    $name = $this->username;
+			    $seq_num = $authInfo["data"]->conversations[0]->conversation_state->user_sequences->$name;
+			    $conv_id = $authInfo["data"]->conversations[0]->id;
+		    }
+		    $genID = md5(uniqid());
+		    $chatID = strtoupper(sprintf('%08s-%04s-%04x-%04x-%12s', substr($genID, 0, 8), substr($genID, 8, 4), substr($genID, 12, 4), substr($genID, 16, 4), substr($genID, 20, 12)));
+		    $genID = md5(uniqid());
+		    $id = strtoupper(sprintf('%08s-%04s-%04x-%04x-%12s', substr($genID, 0, 8), substr($genID, 8, 4), substr($genID, 12, 4), substr($genID, 16, 4), substr($genID, 20, 12)));
+		    $timestamp = parent::timestamp();
+		    $messagesArray[] =
+			    array(
+				    'body' => array(
+					    'text' => $text,
+					    'type' => 'text'
+				    ),
+				    'chat_message_id' => $chatID,
+				    'seq_num' => $seq_num + 1,
+				    'timestamp' => $timestamp,
+				    'header' => array(
+					    'auth' => array(
+						    'mac' => $mac,
+						    'payload' => $payload
+					    ),
+					    'to' => array($to),
+					    'conv_id' => $conv_id,
+					    'from' => $this->username,
+					    'conn_seq_num' => 1
+				    ),
+				    'retried' => false,
+				    'id' => $id,
+				    'type' => 'chat_message'
+			    );
+	    }
 		$messages = json_encode($messagesArray);
 		$timestamp = parent::timestamp();
 		$result = parent::post(
@@ -785,7 +776,6 @@ class Snapchat extends SnapchatAgent {
 			$multipart = false,
 			$debug = $this->debug
 		);
-
 		return $result;
 	}
 
