@@ -1494,6 +1494,26 @@ class Snapchat extends SnapchatAgent {
 			return FALSE;
 		}
 
+		if ($subdir == null)
+		{
+			$subdir = $this->username;
+		}
+		$path = __DIR__ . DIRECTORY_SEPARATOR . "snaps" . DIRECTORY_SEPARATOR . $subdir . DIRECTORY_SEPARATOR .  $from;
+		if(!file_exists($path))
+		{
+			mkdir($path, 0777, true);
+		}
+		$file = $path . DIRECTORY_SEPARATOR . date("Y-m-d H-i-s", (int) ($time / 1000));
+
+		$extensions = array(".jpg", ".png", ".mp4", "");
+		foreach ($extensions as $ext)
+		{
+			if(file_exists($file . $ext))
+			{
+				return false;
+			}
+		}
+
 		$timestamp = parent::timestamp();
 
 		$result = parent::post(
@@ -1511,55 +1531,8 @@ class Snapchat extends SnapchatAgent {
 				$debug = $this->debug
 			);
 
-		if(parent::isMedia(substr($result, 0, 2)))
+		if(!parent::isMedia(substr($result, 0, 2)))
 		{
-			if($from != null && $time != null)
-			{
-
-				if ($subdir == null) {
-					$subdir = $this->username;
-				}
-
-				$path = __DIR__ . DIRECTORY_SEPARATOR . "snaps" . DIRECTORY_SEPARATOR . $subdir . DIRECTORY_SEPARATOR .  $from;
-				if(!file_exists($path))
-				{
-					mkdir($path, 0777, true);
-				}
-				$file = $path . DIRECTORY_SEPARATOR . date("Y-m-d H:i:s", (int) ($time / 1000));
-				file_put_contents($file, $result);
-				$finfo = finfo_open(FILEINFO_MIME_TYPE);
-				$finfo = finfo_file($finfo, $file);
-				switch($finfo)
-				{
-					case "image/jpeg":
-						$ext = ".jpg";
-						break;
-					case "image/png":
-						$ext = ".png";
-						break;
-					case "video/mp4";
-						$ext = ".mp4";
-						break;
-					default:
-						$ext = null;
-				}
-
-				if($ext != null)
-				{
-					rename($file, $file . $ext);
-				}
-			}
-
-			return $result;
-		}
-		else
-		{
-			$result = parent::decryptECB($result);
-			if(parent::isMedia(substr($result, 0, 2)))
-			{
-				return $result;
-			}
-
 			//When a snapchat video is sent with "text" or overlay
 			//the overlay is a transparent PNG file Zipped together
 			//with the M4V file.
@@ -1573,7 +1546,57 @@ class Snapchat extends SnapchatAgent {
 			}
 		}
 
-		return FALSE;
+		if($from != null && $time != null)
+		{
+			if (is_array($result))
+			{
+				foreach ($result as $key => $value)
+				{
+					$this->writeToFile($file, $value);
+				}
+			}
+			else
+			{
+				$this->writeToFile($file, $result);
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Writes data to a file and adds the appropriate extension.
+	 *
+	 * @param string $path
+	 *   The file to be written to
+	 *
+	 * @param string $data
+	 *   The data to write
+	 */
+	function writeToFile($path, $data)
+	{
+		file_put_contents($path, $data);
+		$finfo = finfo_open(FILEINFO_MIME_TYPE);
+		$finfo = finfo_file($finfo, $path);
+		switch($finfo)
+		{
+			case "image/jpeg":
+				$ext = ".jpg";
+				break;
+			case "image/png":
+				$ext = ".png";
+				break;
+			case "video/mp4";
+				$ext = ".mp4";
+				break;
+			default:
+				$ext = null;
+		}
+
+		if($ext != null)
+		{
+			rename($path, $path . $ext);
+		}
 	}
 
 	/**
@@ -2246,7 +2269,7 @@ class Snapchat extends SnapchatAgent {
 				{
 					foreach ($result as &$value)
 					{
-				    $file = $path . DIRECTORY_SEPARATOR . date("Y-m-d H:i:s", (int) ($timestamp / 1000)) . "-story-" . $media_id;
+				    $file = $path . DIRECTORY_SEPARATOR . date("Y-m-d H-i-s", (int) ($timestamp / 1000)) . "-story-" . $media_id;
 
 						if(!file_exists($file))
 						{
@@ -2275,7 +2298,7 @@ class Snapchat extends SnapchatAgent {
 						}
 					}
 				}else{
-					$file = $path . DIRECTORY_SEPARATOR . date("Y-m-d H:i:s", (int) ($timestamp / 1000)) . "-story-" . $media_id;
+					$file = $path . DIRECTORY_SEPARATOR . date("Y-m-d H-i-s", (int) ($timestamp / 1000)) . "-story-" . $media_id;
 					if(!file_exists($file))
 					{
 						file_put_contents($file, $result);
