@@ -1240,7 +1240,7 @@ class Snapchat extends SnapchatAgent {
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'/friend',
+			'/bq/friend',
 			array(
 				'action' => 'multiadddelete',
 				'friend' => json_encode(
@@ -1258,8 +1258,8 @@ class Snapchat extends SnapchatAgent {
 			$multipart = false,
 			$debug = $this->debug
 		);
-
-		return !empty($result->message);
+		return $result['data'];
+		//return !empty($result->message);
 	}
 
 	/**
