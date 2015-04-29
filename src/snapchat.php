@@ -1187,7 +1187,7 @@ class Snapchat extends SnapchatAgent {
 				'friend' => $username,
 				'timestamp' => $timestamp,
 				'username' => $this->username,
-				'friend_source' => 'ADDED_BY_USERNAME'
+				'added_by' => 'ADDED_BY_USERNAME'
 			),
 			array(
 				$this->auth_token,
