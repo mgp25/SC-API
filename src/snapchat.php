@@ -1305,7 +1305,26 @@ class Snapchat extends SnapchatAgent {
 
 		return !empty($result->message);
 	}
-
+	public function hideSharedStory($username){
+		if(!$this->auth_token || !$this->username) return FALSE;
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/loq/friend_hide',
+			array(
+				'friend' => $username,
+				'hide' => "true",
+				'timestamp' => $timestamp,
+				'username' => $this->username,
+			),
+			array(
+				$this->auth_token,
+				$timestamp,
+			),
+			$multipart = false,
+			$debug = $this->debug
+		);
+		return $result;
+	}
 	/**
 	 * Deletes a friend.
 	 *
