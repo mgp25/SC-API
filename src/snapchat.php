@@ -757,6 +757,7 @@ class Snapchat extends SnapchatAgent {
 				    'type' => 'chat_message'
 			    );
 	    }
+	    if(count($messagesArray) <= 0) return null;
 		$messages = json_encode($messagesArray);
 		$timestamp = parent::timestamp();
 		$result = parent::post(
