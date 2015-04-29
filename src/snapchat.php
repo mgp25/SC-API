@@ -613,10 +613,9 @@ class Snapchat extends SnapchatAgent {
 	public function getConversationInfo($to)
 	{
 		$authInfo = $this->getConversationAuth($to);
-
+		$oauthInfo = $authInfo;
 		//if user is even a friend
-		if(property_exists($authInfo["data"], "messaging_auth"))
-		{
+		if(property_exists($authInfo["data"], "messaging_auth")){
 			$payload = $authInfo["data"]->messaging_auth->payload;
 			$mac = $authInfo["data"]->messaging_auth->mac;
 
@@ -690,9 +689,7 @@ class Snapchat extends SnapchatAgent {
 					$debug = $this->debug
 				);
 			}
-		}
-		else
-		{
+		}else{
 			//simulate server response to trigger error message
 			$data = new stdClass();
 			$data->conversations = array();
@@ -702,16 +699,17 @@ class Snapchat extends SnapchatAgent {
 			);
 		}
 
-		return $result;
+		return array($result, $oauthInfo);
 	}
 
 	public function sendMessage($tos, $text){
 	    if(!is_array($tos)) $tos = array($tos);
 	    $messagesArray = array();
 	    foreach($tos as $to){
-		    $authInfo = $this->getConversationInfo($to);
+		    $allauthInfo = $this->getConversationInfo($to);
+		    $authInfo = $allauthInfo[0];
 		    if(!array_key_exists("0", $authInfo["data"]->conversations)){
-			    $authInfo = $this->getConversationAuth($to);
+			    $authInfo = $allauthInfo[1];//$this->getConversationAuth($to);
 			    if(!property_exists($authInfo["data"], "messaging_auth")){
 				    echo "\nYou must add {$to} to your friends list first!\n";
 				    return null;
