@@ -712,7 +712,7 @@ class Snapchat extends SnapchatAgent {
 			    $authInfo = $allauthInfo[1];//$this->getConversationAuth($to);
 			    if(!property_exists($authInfo["data"], "messaging_auth")){
 				    echo "\nYou must add {$to} to your friends list first!\n";
-				    return null;
+				    continue;
 			    }else{
 				    //new conversation
 				    $payload = $authInfo["data"]->messaging_auth->payload;
