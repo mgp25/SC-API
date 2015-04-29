@@ -1922,7 +1922,7 @@ class Snapchat extends SnapchatAgent {
 		}
 		$uniId = md5(uniqid());
 		$media_id = strtoupper($this->username . '~' . sprintf('%08s-%04s-%04x-%04x-%12s', substr($uniId, 0, 8), substr($uniId, 8, 4), substr($uniId, 12, 4), substr($uniId, 16, 4), substr($uniId, 20, 12)));
-
+		if(!is_array($recipients)) $recipients = array($recipients);
 		$timestamp = parent::timestamp();
 		$result = parent::post(
 			'/loq/retry',
@@ -1930,7 +1930,7 @@ class Snapchat extends SnapchatAgent {
 				'camera_front_facing' => rand(0,1),
 				'country_code' => 'US',
 				'media_id' => $media_id,
-				'recipients' => "[\"" . $recipients . "\"]",
+				'recipients' => '["' . implode('","', $recipients) . '"]',
 				'reply' => '0',
 				'time' => $time,
 				'timestamp' => $timestamp,
@@ -1969,22 +1969,8 @@ class Snapchat extends SnapchatAgent {
 		{
 			return FALSE;
 		}
-
-		$recipientsString = "[";
-		if(is_array($recipients))
-		{
-			foreach($recipients as $user)
-			{
-				$recipientsString .= "\"{$user}\",";
-			}
-			$recipientsString = rtrim($recipientsString, ',');
-			$recipientsString .=  "]";
-		}
-		else
-		{
-			$recipientsString .= "\"{$recipients}\"]";
-		}
-		$recipients = $recipientsString;
+		if(!is_array($recipients)) $recipients = array($recipients);
+		$recipients = '["' . implode('","', $recipients) . '"]';
 
 		if(!is_null($text))
 		{
