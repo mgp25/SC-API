@@ -1305,7 +1305,35 @@ class Snapchat extends SnapchatAgent {
 
 		return !empty($result->message);
 	}
-
+	/**
+	* Hide a shared story from your friend list and stories feed
+	*
+	* @param string $username
+	*   The username of the shared story to hide.
+	*
+	* @return json array
+	*   This will be a json array reiterating the hidden shared story acccount 
+	*/
+	public function hideSharedStory($username){
+		if(!$this->auth_token || !$this->username) return FALSE;
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/loq/friend_hide',
+			array(
+				'friend' => $username,
+				'hide' => "true",
+				'timestamp' => $timestamp,
+				'username' => $this->username,
+			),
+			array(
+				$this->auth_token,
+				$timestamp,
+			),
+			$multipart = false,
+			$debug = $this->debug
+		);
+		return $result;
+	}
 	/**
 	 * Deletes a friend.
 	 *
