@@ -59,6 +59,7 @@ abstract class SnapchatAgent {
 		CURLOPT_HTTPHEADER => array('Accept-Language: en', 'Accept-Locale: en_US'),
 	);
 	public $gauth = "";
+	public $gauthexpire = "";
 	public static $CURL_HEADERS = array(
 		'Accept-Language: en',
 		'Accept-Locale: en_US'
@@ -67,6 +68,7 @@ abstract class SnapchatAgent {
 		return (!empty($this->gauth) ? $this->gauth : "");
 	}
 	public function setGAuth($auth){
+		$this->gauthexpire = time() + (55*60);//55min from now, 5 min early just to be safe
 		$this->gauth = $auth['auth'];
 	}
 	/**
@@ -320,6 +322,9 @@ abstract class SnapchatAgent {
 	 */
 	public function post($endpoint, $data, $params, $multipart = FALSE, $debug = FALSE)
 	{
+		if(!isset($this->gauthexpire) || $this->gauthexpire <= time()){
+			$this->setGAuth($this->getAuthToken());
+		}
 		$ch = curl_init();
 
 		$data['req_token'] = self::hash($params[0], $params[1]);
