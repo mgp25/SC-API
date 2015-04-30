@@ -168,7 +168,8 @@ class Snapchat extends SnapchatAgent {
 				if ($returnCode === 0)
 				{
 						exec("java -jar " . __DIR__ . "/encrypter.jar $this->gEmail $this->gPasswd", $result);
-						$postfields['EncryptedPasswd'] = array_shift(array_slice($result, 0, 1));
+						$t_hold = array_slice($result, 0, 1);
+						$postfields['EncryptedPasswd'] = array_shift($t_hold);
 				}
 				else
 				{
@@ -724,7 +725,7 @@ class Snapchat extends SnapchatAgent {
 	    foreach($tos as $to){
 	    	if(!array_key_exists($to, $convoInfo[1])){ //check if user can be sent a message
 	    		 echo "\nYou have to add {$to} as a friend first!";
-	    		 continue; 
+	    		 continue;
 	    		}
 		    if(!array_key_exists($to, $convoInfo[0])){ //new convo
 				    $payload = $convoInfo[1][$to]->messaging_auth->payload;
@@ -1359,7 +1360,7 @@ class Snapchat extends SnapchatAgent {
 	*   The username of the shared story to hide.
 	*
 	* @return json array
-	*   This will be a json array reiterating the hidden shared story acccount 
+	*   This will be a json array reiterating the hidden shared story acccount
 	*/
 	public function hideSharedStory($username){
 		if(!$this->auth_token || !$this->username) return FALSE;
