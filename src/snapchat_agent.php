@@ -66,8 +66,12 @@ abstract class SnapchatAgent {
 	public function getGAuth(){
 		return (!empty($this->gauth) ? $this->gauth : "");
 	}
-	public function setGAuth($auth){
-		$this->gauth = $auth['auth'];
+	public function setGAuth($auth)
+	{
+		if (is_array($auth))
+				$this->gauth = $auth['auth'];
+		else
+				$this->gauth = $auth;
 	}
 	/**
 	 * Returns the current timestamp.
@@ -392,12 +396,12 @@ abstract class SnapchatAgent {
 		curl_setopt($ch, CURLOPT_PROXY, $this->proxyServer);
 		$result = curl_exec($ch);
 
-		
+
 		if(strlen($result) > 0) //make sure curl worked. if not, keep going
 		{
 			if($endpoint == "/loq/login") $result = gzdecode($result);
 		}
-		
+
 		if($debug)
 		{
 			$info = curl_getinfo($ch);
@@ -492,7 +496,7 @@ abstract class SnapchatAgent {
 
 		// Add support for foreign characters in the JSON response.
 		$result = iconv('UTF-8', 'UTF-8//IGNORE', utf8_encode($result));
-		
+
 		$return['data'] = json_decode($result);
 		return $return;
 	}

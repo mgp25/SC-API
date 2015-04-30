@@ -81,6 +81,11 @@ class Snapchat extends SnapchatAgent {
 		{
 			$this->auth_token = file_get_contents(__DIR__ . "/auth-$this->username.dat");
 		}
+
+		if (file_exists(__DIR__ . "/gAuth-$this->username.dat"))
+		{
+			parent::setGAuth(file_get_contents(__DIR__ . "/gAuth-$this->username.dat"));
+		}
 	}
 
 	public function getDeviceToken()
@@ -293,7 +298,7 @@ class Snapchat extends SnapchatAgent {
 	{
 		$do = ($force && file_exists(__DIR__ . "/auth-$this->username.dat")) ? 1 : 0;
 
-		if(($do == 1) || (!(file_exists(__DIR__ . "/auth-$this->username.dat"))))
+		if(($do == 1) || (!(file_exists(__DIR__ . "/auth-$this->username.dat"))) || (!(file_exists(__DIR__ . "/gAuth-$this->username.dat"))))
 		{
 				$dtoken = $this->getDeviceToken();
 
@@ -308,13 +313,16 @@ class Snapchat extends SnapchatAgent {
 				$string = $this->username . "|" . $password . "|" . $timestamp . "|" . $req_token;
 
 				$auth = $this->getAuthToken();
+				$authFile = fopen(__DIR__ . "/gAuth-$this->username.dat", "w");
+				fwrite($authFile, $auth['auth']);
+				fclose($authFile);
 
 				if($auth['error'] == 1)
 				{
 						return $auth;
 				}
 				parent::setGAuth($auth);
-        			$attestation = $this->getAttestation();
+        $attestation = $this->getAttestation();
 				$result = parent::post(
 					'/loq/login',
 					array(
