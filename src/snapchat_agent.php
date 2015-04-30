@@ -362,7 +362,7 @@ abstract class SnapchatAgent {
 		}
 		else
 		{
-			$headers = array_merge(self::$CURL_HEADERS, array("X-Snapchat-Client-Auth-Token: Bearer ". $this->gauth);
+			$headers = array_merge(self::$CURL_HEADERS, array("X-Snapchat-Client-Auth-Token: Bearer ". $this->gauth));
 		}
 
 		if($multipart)
