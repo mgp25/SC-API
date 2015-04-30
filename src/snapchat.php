@@ -705,7 +705,8 @@ class Snapchat extends SnapchatAgent {
 					$this->auth_token,
 					$timestamp,
 				),
-				$multipart = false
+				$multipart = false,
+				$debug = $this->debug
 			);
 			$resultsf = array();
 			foreach($result['data']->conversations as $convo){
@@ -780,7 +781,8 @@ class Snapchat extends SnapchatAgent {
 				$this->auth_token,
 				$timestamp,
 			),
-			$multipart = false
+			$multipart = false,
+			$debug = $this->debug
 		);
 		return $result;
 	}
