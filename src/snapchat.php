@@ -53,6 +53,8 @@ class Snapchat extends SnapchatAgent {
 	const PRIVACY_EVERYONE = 0;
 	const PRIVACY_FRIENDS = 1;
 
+	const DATA_FOLDER = 'authData';
+
 	protected $auth_token;
 	protected $chat_auth_token;
 	protected $username;
@@ -77,14 +79,14 @@ class Snapchat extends SnapchatAgent {
 		$this->gEmail = $gEmail;
 		$this->gPasswd = $gPasswd;
 
-		if (file_exists(__DIR__ . "/auth-$this->username.dat"))
+		if (file_exists(__DIR__ . DIRECTORY_SEPARATOR . self::DATA_FOLDER . "/auth-$this->username.dat"))
 		{
-			$this->auth_token = file_get_contents(__DIR__ . "/auth-$this->username.dat");
+			$this->auth_token = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . self::DATA_FOLDER . "/auth-$this->username.dat");
 		}
 
-		if (file_exists(__DIR__ . "/gAuth-$this->username.dat"))
+		if (file_exists(__DIR__ . DIRECTORY_SEPARATOR . self::DATA_FOLDER . "/gAuth-$this->username.dat"))
 		{
-			parent::setGAuth(file_get_contents(__DIR__ . "/gAuth-$this->username.dat"));
+			parent::setGAuth(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . self::DATA_FOLDER . "/gAuth-$this->username.dat"));
 		}
 	}
 
@@ -296,9 +298,9 @@ class Snapchat extends SnapchatAgent {
 	 */
 	public function login($password, $force = FALSE)
 	{
-		$do = ($force && file_exists(__DIR__ . "/auth-$this->username.dat")) ? 1 : 0;
+		$do = ($force && file_exists(__DIR__ . DIRECTORY_SEPARATOR . self::DATA_FOLDER . "/auth-$this->username.dat")) ? 1 : 0;
 
-		if(($do == 1) || (!(file_exists(__DIR__ . "/auth-$this->username.dat"))) || (!(file_exists(__DIR__ . "/gAuth-$this->username.dat"))))
+		if(($do == 1) || (!(file_exists(__DIR__ . DIRECTORY_SEPARATOR . self::DATA_FOLDER . "/auth-$this->username.dat"))) || (!(file_exists(__DIR__ . DIRECTORY_SEPARATOR . self::DATA_FOLDER . "/gAuth-$this->username.dat"))))
 		{
 				$dtoken = $this->getDeviceToken();
 
@@ -313,7 +315,7 @@ class Snapchat extends SnapchatAgent {
 				$string = $this->username . "|" . $password . "|" . $timestamp . "|" . $req_token;
 
 				$auth = $this->getAuthToken();
-				$authFile = fopen(__DIR__ . "/gAuth-$this->username.dat", "w");
+				$authFile = fopen(__DIR__ . DIRECTORY_SEPARATOR . self::DATA_FOLDER . "/gAuth-$this->username.dat", "w");
 				fwrite($authFile, $auth['auth']);
 				fclose($authFile);
 
@@ -360,7 +362,7 @@ class Snapchat extends SnapchatAgent {
 					$this->auth_token = $result['data']->updates_response->auth_token;
 					$this->device();
 
-					$authFile = fopen(__DIR__ . "/auth-$this->username.dat", "w");
+					$authFile = fopen(__DIR__ . DIRECTORY_SEPARATOR . self::DATA_FOLDER . "/auth-$this->username.dat", "w");
 					fwrite($authFile, $this->auth_token);
 					fclose($authFile);
 				}
@@ -403,7 +405,8 @@ class Snapchat extends SnapchatAgent {
 		// Clear out the cache in case the instance is recycled.
 		$this->cache = NULL;
 
-		unlink(__DIR__ . "/auth-$this->username.dat");
+		unlink(__DIR__ . DIRECTORY_SEPARATOR . self::DATA_FOLDER . "/auth-$this->username.dat");
+		unlink(__DIR__ . DIRECTORY_SEPARATOR . self::DATA_FOLDER . "/gAuth-$this->username.dat");
 
 		return is_null($result);
 	}
