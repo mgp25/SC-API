@@ -123,7 +123,25 @@ class Snapchat extends SnapchatAgent {
 
 		return $result;
 	}
-
+	private function getAttestation(){
+        	$binaryRequest = base64_decode("ClMKABIUY29tLnNuYXBjaGF0LmFuZHJvaWQaIC8cqvyh7TDQtOOIY+76vqDoFXEfpM95uCJRmoJZ2VpYIgAojKq/AzIECgASADoECAEQAUD4kP+pBRIA");
+        	$ch = curl_init("https://www.googleapis.com/androidcheck/v1/attestations/attest?alt=JSON&key=AIzaSyDqVnJBjE5ymo--oBJt3On7HQx9xNm1RHA");
+        	curl_setopt($ch, CURLOPT_HEADER, false);
+        	curl_setopt($ch, CURLOPT_POST, true);
+        	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        	curl_setopt($ch, CURLOPT_POSTFIELDS, $binaryRequest);
+        	curl_setopt($ch, CURLOPT_USERAGENT, "SafetyNet/7329000 (A116 _Quad KOT49H); gzip");
+        	curl_setopt($ch, CURLOPT_ENCODING, "gzip");
+        	curl_setopt($ch, CURLOPT_HTTPHEADER, array("content-type: application/x-protobuf", "Accept:", "Expect:"));
+        	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        	$data = curl_exec($ch);
+        	if(curl_getinfo($ch, CURLINFO_HTTP_CODE) == 200) {
+            		$d = json_decode($data,true);
+            		return $d['signedAttestation'];//the json response, json_decode and grab the signedAttestation value.
+        	} else {
+            		return curl_error($ch);
+        	}
+    	}
 	public function getAuthToken()
 	{
 		if(($this->gEmail != null) && ($this->gPasswd != null))
@@ -294,7 +312,8 @@ class Snapchat extends SnapchatAgent {
 				{
 						return $auth;
 				}
-
+				parent::setGAuth($auth);
+        			$attestation = $this->getAttestation();
 				$result = parent::post(
 					'/loq/login',
 					array(
@@ -308,6 +327,8 @@ class Snapchat extends SnapchatAgent {
 						'dtoken1i' => $dtoken['data']->dtoken1i,
 						'ptoken' => "ie",
 						'timestamp' => $timestamp,
+						'attestation' => $attestation,
+						'application_id' => 'com.snapchat.android',
 						'req_token' => $req_token,
 					),
 					array(
@@ -833,13 +854,17 @@ class Snapchat extends SnapchatAgent {
 		{
 			return FALSE;
 		}
-
+		if(strlen(parent::getGAuth()) <= 0) parent::setGAuth($this->getAuthToken());
 		$timestamp = parent::timestamp();
 		$result = parent::post(
 			'/loq/all_updates',
 			array(
 				'timestamp' => $timestamp,
 				'username' => $this->username,
+				'height' => 1280,
+				'width' => 720,
+				'max_video_height' => 640,
+				'max_video_width' => 480,
 			),
 			array(
 				$this->auth_token,
