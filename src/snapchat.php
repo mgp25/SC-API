@@ -53,6 +53,8 @@ class Snapchat extends SnapchatAgent {
 	const PRIVACY_EVERYONE = 0;
 	const PRIVACY_FRIENDS = 1;
 
+	const DATA_FOLDER = 'authData';
+
 	protected $auth_token;
 	protected $chat_auth_token;
 	protected $username;
@@ -71,14 +73,15 @@ class Snapchat extends SnapchatAgent {
 	 * @param string $password
 	 *   The password associated with the username, if logging in.
 	 */
-	public function __construct($username = NULL, $gEmail, $gPasswd, $debug = FALSE)
+	public function __construct($username, $gEmail, $gPasswd, $debug = FALSE)
 	{
 		$this->username = $username;
 		$this->debug = $debug;
 		$this->gEmail = $gEmail;
 		$this->gPasswd = $gPasswd;
-		if(file_exists(__DIR__ . DIRECTORY_SEPARATOR . "auths.dat")){
-			$this->totArray = unserialize(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . "auths.dat"));
+
+		if(file_exists(__DIR__ . DIRECTORY_SEPARATOR . self::DATA_FOLDER . DIRECTORY_SEPARATOR . "auth-$this->username.dat")){
+			$this->totArray = unserialize(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . self::DATA_FOLDER . DIRECTORY_SEPARATOR . "auth-$this->username.dat"));
 		}
 		if(array_key_exists($this->username, $this->totArray[0])){
 			$this->auth_token = $this->totArray[0][$this->username];
@@ -298,7 +301,7 @@ class Snapchat extends SnapchatAgent {
 	{
 		$do = ($force && array_key_exists($this->username,$this->totArray[0])) ? 1 : 0;
 
-		if(($do == 1) || (!(array_key_exists($this->username,$this->totArray[0])) || (!(array_key_exists($this->username,$this->totArray[1]))))
+		if(($do == 1) || (!(array_key_exists($this->username,$this->totArray[0]))) || (!(array_key_exists($this->username,$this->totArray[1]))))
 		{
 				$dtoken = $this->getDeviceToken();
 
@@ -314,7 +317,7 @@ class Snapchat extends SnapchatAgent {
 
 				$auth = $this->getAuthToken();
 				$this->totArray[1][$this->username] = array($auth, time()+(55*60));
-				file_put_contents(__DIR__ . DIRECTORY_SEPARATOR . "auths.dat",serialize($this->totArray));
+				file_put_contents(__DIR__ . DIRECTORY_SEPARATOR . self::DATA_FOLDER . DIRECTORY_SEPARATOR . "auth-$this->username.dat", serialize($this->totArray));
 				if($auth['error'] == 1)
 				{
 						return $auth;
