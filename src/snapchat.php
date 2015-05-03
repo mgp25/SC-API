@@ -361,7 +361,7 @@ class Snapchat extends SnapchatAgent {
 					$this->auth_token = $result['data']->updates_response->auth_token;
 					$this->device();
 					$this->totArray[0][$this->username] = $this->auth_token;
-					file_put_contents(__DIR__ . DIRECTORY_SEPARATOR . "auths.dat", serialize($this->totArray));
+					file_put_contents(__DIR__ . DIRECTORY_SEPARATOR . self::DATA_FOLDER . DIRECTORY_SEPARATOR . "auth-$this->username.dat", serialize($this->totArray));
 				}
 
 				return $result;
@@ -403,7 +403,7 @@ class Snapchat extends SnapchatAgent {
 		$this->cache = NULL;
 		unset($this->totArray[0][$this->username]);
 		unset($this->totArray[1][$this->username]);
-		file_put_contents(__DIR__ . DIRECTORY_SEPARATOR . "auths.dat",serialize($this->totArray));
+		file_put_contents(__DIR__ . DIRECTORY_SEPARATOR . self::DATA_FOLDER . DIRECTORY_SEPARATOR . "auth-$this->username.dat",serialize($this->totArray));
 		return is_null($result);
 	}
 
@@ -855,7 +855,7 @@ class Snapchat extends SnapchatAgent {
 			$a = $this->getAuthToken();
 			parent::setGAuth($a);
 			$this->totArray[1][$this->username] = array($a, time()+(55*60));
-			file_put_contents(__DIR__ . DIRECTORY_SEPARATOR . "auths.dat",serialize($this->totArray));
+			file_put_contents(__DIR__ . DIRECTORY_SEPARATOR . self::DATA_FOLDER . DIRECTORY_SEPARATOR . "auth-$this->username.dat",serialize($this->totArray));
 		}
 		$timestamp = parent::timestamp();
 		$result = parent::post(
