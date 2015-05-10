@@ -15,6 +15,12 @@ $email = trim(fgets(STDIN));
 echo "\nBirthday (yyyy-mm-dd): ";
 $birthday = trim(fgets(STDIN));
 
+echo "\nGmail address: ";
+$gMail = trim(fgets(STDIN));
+
+echo "\nGmail password: ";
+$gPasswd = trim(fgets(STDIN));
+
 $snapchat = new Snapchat($username, $gMail, $gPasswd, true);
 
 
