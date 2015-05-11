@@ -410,11 +410,17 @@ abstract class SnapchatAgent {
 					echo "\nSent Request info: " .print_r($info['request_header'], true). "\n";
 			if(is_array($data))
 			{
-				echo 'DATA: ' . print_r($data) . "\n";
+					if ($multipart)
+				  		echo 'DATA: ' . strlen($data) . " byte data\n";
+					else
+							echo 'DATA: ' . print_r($data) . "\n";
 			}
 			else
 			{
-				echo 'DATA: ' . $data . "\n";
+				if ($multipart)
+						echo 'DATA: ' . strlen($data) . " byte data\n";
+				else
+						echo 'DATA: ' . $data . "\n";
 			}
 
 			if($endpoint == "/loq/login" || $endpoint == "/all_updates")
