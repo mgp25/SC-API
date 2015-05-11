@@ -1187,7 +1187,7 @@ class Snapchat extends SnapchatAgent {
 				}
 		}
 
-		return $unconfirmedList;
+		return isset($unconfirmedList) ? $unconfirmedList : null;
 	}
 
 	/**
