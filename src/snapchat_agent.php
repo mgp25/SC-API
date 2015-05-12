@@ -465,6 +465,8 @@ abstract class SnapchatAgent {
 			curl_setopt($ch, CURLOPT_CAINFO, dirname(__FILE__) . '/ca_bundle.crt');
 			$result = curl_exec($ch);
 		}
+		//Decode the data 
+		if($endpoint == "/loq/login") $result = gzdecode($result);
 
 		$gi = curl_getinfo($ch);
 		// If the cURL request fails, return FALSE. Also check the status code
