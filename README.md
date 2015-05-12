@@ -24,3 +24,7 @@ Based on [JorgenPhi](https://github.com/JorgenPhi/php-snapchat) code.
 
 ## License
 MIT
+
+## Legal
+
+This code is in no way affiliated with, authorized, maintained, sponsored or endorsed by Snapchat or any of its affiliates or subsidiaries. This is an independent and unofficial API. Use at your own risk.
