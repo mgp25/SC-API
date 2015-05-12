@@ -1,7 +1,5 @@
 # SnAPI Chat
 
-Interface to Snapchat
-
 **Read the [wiki](https://github.com/mgp25/SnAPI-Chat/wiki)** and previous issues before opening a new one! Maybe your issue is already answered.
 
 ----------
