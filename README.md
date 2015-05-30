@@ -1,6 +1,6 @@
 # SnAPI Chat
 
-**Read the [wiki](https://github.com/mgp25/SnAPI-Chat/wiki)** and previous issues before opening a new one! Maybe your issue is already answered.
+**Read the [wiki](https://github.com/mgp25/SC-API/wiki)** and previous issues before opening a new one! Maybe your issue is already answered.
 
 ----------
 
@@ -14,7 +14,7 @@
 
 Based on [JorgenPhi](https://github.com/JorgenPhi/php-snapchat) code.
 
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mgp25/SnAPI-Chat)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mgp25/SC-API)
 
 [![Paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QZY4JX3P7278Y)
 
