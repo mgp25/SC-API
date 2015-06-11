@@ -221,7 +221,15 @@ class Snapchat extends SnapchatAgent {
 
 			$return['error'] = 0;
 			$exploded = explode("\n", $result);
-			$return['auth'] = substr($exploded[1], 5);
+			$return['auth'] = "";
+			foreach($exploded as $line)
+			{
+				if(substr($line, 0, 5) == "Auth=")
+				{
+					$return["auth"] = substr($line, 5);
+					break;
+				}
+			}
 		}
 		else
 		{
@@ -323,7 +331,7 @@ class Snapchat extends SnapchatAgent {
 						return $auth;
 				}
 				parent::setGAuth($auth);
-        			$attestation = $this->getAttestation();
+        		$attestation = $this->getAttestation();
 				$result = parent::post(
 					'/loq/login',
 					array(
