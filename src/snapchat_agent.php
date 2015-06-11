@@ -358,7 +358,7 @@ abstract class SnapchatAgent {
 			curl_setopt($ch, CURLINFO_HEADER_OUT, true);
 		}
 
-		if($endpoint == "/loq/login")
+		if($endpoint == "/loq/login" || $endpoint == "/loq/register_username")
 		{
 			$headers = array_merge(self::$CURL_HEADERS, array(
 				"X-Snapchat-Client-Auth-Token: Bearer {$params[2]}",
