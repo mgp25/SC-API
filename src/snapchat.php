@@ -1000,8 +1000,9 @@ class Snapchat extends SnapchatAgent {
 				$from = $story->username;
 				$mediaKey = $story->media_key;
 				$mediaIV = $story->media_iv;
+				$timestamp = $story->timestamp;
 
-				$this->getStory($id, $mediaKey, $mediaIV, $from, $save);
+				$this->getStory($id, $mediaKey, $mediaIV, $from,$timestamp, $save);
 			}
 		}
 
