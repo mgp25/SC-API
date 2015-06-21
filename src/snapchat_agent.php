@@ -395,8 +395,6 @@ abstract class SnapchatAgent {
 		curl_setopt($ch, CURLOPT_WRITEHEADER, $headerBuff);
 		curl_setopt($ch, CURLOPT_PROXY, $this->proxyServer);
 		$result = curl_exec($ch);
-
-
 		if(strlen($result) > 0) //make sure curl worked. if not, keep going
 		{
 			if($endpoint == "/loq/login") $result = gzdecode($result);
@@ -427,7 +425,7 @@ abstract class SnapchatAgent {
 			{
 				$jsonResult = json_decode($result);
 				echo 'RESULT: ' . print_r($jsonResult) . "\n";
-				if ($jsonResult->status == '-103')
+				if (property_exists($jsonResult, "status") && $jsonResult->status == '-103')
 						exit();
 			}
 			else

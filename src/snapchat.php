@@ -133,7 +133,8 @@ class Snapchat extends SnapchatAgent {
 	}
 	private function getAttestation($password, $timestamp)
 	{
-		$nonce          = base64_encode(hash('sha256', "$this->username|$password|$timestamp|loq/login", true));
+		$hashString     = $this->username."|{$password}|{$timestamp}|/loq/login";
+		$nonce          = base64_encode(hash('sha256', $hashString, true));
 		$authentication = 'cp4craTcEr82Pdf5j8mwFKyb8FNZbcel';
 		$apkDigest      = 'JJShKOLH4YYjWZlJQ71A2dPTcmxbaMboyfo0nsKYayE';
 
@@ -340,7 +341,7 @@ class Snapchat extends SnapchatAgent {
 						return $auth;
 				}
 				parent::setGAuth($auth);
-        $attestation = $this->getAttestation($password, $timestamp);
+                $attestation = $this->getAttestation($password, $timestamp);
 
 				$result = parent::post(
 					'/loq/login',
@@ -356,7 +357,7 @@ class Snapchat extends SnapchatAgent {
 						'ptoken' => "ie",
 						'timestamp' => $timestamp,
 						'attestation' => $attestation,
-						'sflag' => '1',
+						'sflag' => 1,
 						'application_id' => 'com.snapchat.android',
 						'req_token' => $req_token,
 					),
