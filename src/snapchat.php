@@ -76,9 +76,9 @@ class Snapchat extends SnapchatAgent {
 	public function __construct($username, $gEmail, $gPasswd, $debug = FALSE)
 	{
 		$this->username = $username;
-		$this->debug = $debug;
-		$this->gEmail = $gEmail;
-		$this->gPasswd = $gPasswd;
+		$this->debug 		= $debug;
+		$this->gEmail 	= $gEmail;
+		$this->gPasswd 	= $gPasswd;
 
 		if(file_exists(__DIR__ . DIRECTORY_SEPARATOR . self::DATA_FOLDER . DIRECTORY_SEPARATOR . "auth-$this->username.dat")){
 			$this->totArray = unserialize(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . self::DATA_FOLDER . DIRECTORY_SEPARATOR . "auth-$this->username.dat"));
@@ -131,25 +131,34 @@ class Snapchat extends SnapchatAgent {
 
 		return $result;
 	}
-	private function getAttestation(){
-        	$binaryRequest = base64_decode("ClMKABIUY29tLnNuYXBjaGF0LmFuZHJvaWQaIC8cqvyh7TDQtOOIY+76vqDoFXEfpM95uCJRmoJZ2VpYIgAojKq/AzIECgASADoECAEQAUD4kP+pBRIA");
-        	$ch = curl_init("https://www.googleapis.com/androidcheck/v1/attestations/attest?alt=JSON&key=AIzaSyDqVnJBjE5ymo--oBJt3On7HQx9xNm1RHA");
-        	curl_setopt($ch, CURLOPT_HEADER, false);
-        	curl_setopt($ch, CURLOPT_POST, true);
-        	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        	curl_setopt($ch, CURLOPT_POSTFIELDS, $binaryRequest);
-        	curl_setopt($ch, CURLOPT_USERAGENT, "SafetyNet/7329000 (A116 _Quad KOT49H); gzip");
-        	curl_setopt($ch, CURLOPT_ENCODING, "gzip");
-        	curl_setopt($ch, CURLOPT_HTTPHEADER, array("content-type: application/x-protobuf", "Accept:", "Expect:"));
-        	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        	$data = curl_exec($ch);
-        	if(curl_getinfo($ch, CURLINFO_HTTP_CODE) == 200) {
-            		$d = json_decode($data,true);
-            		return $d['signedAttestation'];//the json response, json_decode and grab the signedAttestation value.
-        	} else {
-            		return curl_error($ch);
-        	}
-    	}
+	private function getAttestation($password, $timestamp)
+	{
+		$nonce          = base64_encode(hash('sha256', "$this->username|$password|$timestamp|loq/login", true));
+		$authentication = 'cp4craTcEr82Pdf5j8mwFKyb8FNZbcel';
+		$apkDigest      = 'JJShKOLH4YYjWZlJQ71A2dPTcmxbaMboyfo0nsKYayE';
+
+		$url = 'http://attest.casper.io/attestation';
+		$data = array(
+			'nonce'           => $nonce,
+			'authentication'  => $authentication,
+			'apk_digest'      => $apkDigest,
+			'timestamp'       => $timestamp
+		);
+
+		$options = array(
+			'http' => array(
+				'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+				'method'  => 'POST',
+				'content' => http_build_query($data),
+			),
+		);
+
+		$context  = stream_context_create($options);
+		$result = json_decode(file_get_contents($url, false, $context));
+
+		return $result->signedAttestation;
+  }
+
 	public function getAuthToken()
 	{
 		if(($this->gEmail != null) && ($this->gPasswd != null))
@@ -331,7 +340,8 @@ class Snapchat extends SnapchatAgent {
 						return $auth;
 				}
 				parent::setGAuth($auth);
-        		$attestation = $this->getAttestation();
+        $attestation = $this->getAttestation($password, $timestamp);
+
 				$result = parent::post(
 					'/loq/login',
 					array(
@@ -346,6 +356,7 @@ class Snapchat extends SnapchatAgent {
 						'ptoken' => "ie",
 						'timestamp' => $timestamp,
 						'attestation' => $attestation,
+						'sflag' => '1',
 						'application_id' => 'com.snapchat.android',
 						'req_token' => $req_token,
 					),
