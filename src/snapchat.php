@@ -2,6 +2,7 @@
 
 include_once dirname(__FILE__) . '/snapchat_agent.php';
 include_once dirname(__FILE__) . '/snapchat_cache.php';
+include_once dirname(__FILE__) . '/googleCrypto.php';
 include_once dirname(__FILE__) . '/func.php';
 
 /**
@@ -182,17 +183,10 @@ class Snapchat extends SnapchatAgent {
 					'callerSig' => '49f6badb81d89a9e38d65de76f09355071bd67e7'
 				);
 
-				exec('java -version', $output, $returnCode);
-				if ($returnCode === 0)
-				{
-						exec("java -jar " . __DIR__ . "/encrypter.jar $this->gEmail $this->gPasswd", $result);
-						$t_hold = array_slice($result, 0, 1);
-						$postfields['EncryptedPasswd'] = array_shift($t_hold);
-				}
-				else
-				{
-						$postfields['Passwd'] = $this->gPasswd;
-				}
+
+
+			$gcrypto = new Encrypt($this->gmail, $this->gpasswd);
+			$postfields['EncryptedPasswd']= $gcrypto->encrypt();
 
 			$headers = array(
 				'device: 378c184c6070c26c',
