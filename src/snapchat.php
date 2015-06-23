@@ -1,5 +1,8 @@
 <?php
 
+require_once "phpseclib/Crypt/RSA.php";
+require_once "phpseclib/Math/BigInteger.php";
+
 include_once dirname(__FILE__) . '/snapchat_agent.php';
 include_once dirname(__FILE__) . '/snapchat_cache.php';
 include_once dirname(__FILE__) . '/func.php';
@@ -131,6 +134,7 @@ class Snapchat extends SnapchatAgent {
 
 		return $result;
 	}
+
 	private function getAttestation($password, $timestamp)
 	{
 		$hashString     = $this->username."|{$password}|{$timestamp}|/loq/login";
@@ -158,41 +162,61 @@ class Snapchat extends SnapchatAgent {
 		$result = json_decode(file_get_contents($url, false, $context));
 
 		return $result->signedAttestation;
-  }
+	}
+
+	public function encryptPassword($email, $password)
+	{
+		$googleDefaultPublicKey = "AAAAgMom/1a/v0lblO2Ubrt60J2gcuXSljGFQXgcyZWveWLEwo6prwgi3iJIZdodyhKZQrNWp5nKJ3srRXcUW+F1BD3baEVGcmEgqaLZUNBjm057pKRI16kB0YppeGx5qIQ5QjKzsR8ETQbKLNWgRY0QRNVz34kMJR3P/LgHax/6rmf5AAAAAwEAAQ==";
+		$binaryKey = bin2hex(base64_decode($googleDefaultPublicKey));
+
+		$half = substr($binaryKey, 8, 256);
+		$modulus  = new Math_BigInteger(hex2bin($half), 256);
+
+		$half = substr($binaryKey, 272, 6);
+		$exponent = new Math_BigInteger(hex2bin($half), 256);
+
+		$sha1  = sha1(base64_decode($googleDefaultPublicKey), true);
+		$signature = "00" . bin2hex(substr($sha1, 0, 4));
+
+		$rsa = new Crypt_RSA();
+
+		$rsa->setPublicKeyFormat(CRYPT_RSA_PUBLIC_FORMAT_RAW);
+		$rsa->loadKey(array("n" => $modulus, "e" => $exponent));
+		$rsa->setPublicKey();
+
+		$plain = "{$email}\x00{$password}";
+		$rsa->setEncryptionMode("CRYPT_RSA_ENCRYPTION_OAEP");
+		$encrypted = bin2hex($rsa->encrypt($plain));
+
+		$output = hex2bin($signature . $encrypted);
+		$b64EncryptedPasswd = str_replace(array("+", "/"), array("-", "_"), mb_convert_encoding(base64_encode($output), "US-ASCII"));
+		return $b64EncryptedPasswd;
+	}
 
 	public function getAuthToken()
 	{
 		if(($this->gEmail != null) && ($this->gPasswd != null))
 		{
-				$ch = curl_init();
-				$postfields = array(
-					'device_country' => 'us',
-					'operatorCountry' => 'us',
-					'lang' => 'en_US',
-					'sdk_version' => '19',
-					'google_play_services_version' => '7097038',
-					'accountType' => 'HOSTED_OR_GOOGLE',
-					'Email' => $this->gEmail,
-					'service' => 'audience:server:client_id:694893979329-l59f3phl42et9clpoo296d8raqoljl6p.apps.googleusercontent.com',
-					'source' => 'android',
-					'androidId' => '378c184c6070c26c',
-					'app' => 'com.snapchat.android',
-					'client_sig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
-					'callerPkg' => 'com.snapchat.android',
-					'callerSig' => '49f6badb81d89a9e38d65de76f09355071bd67e7'
-				);
+			$encryptedPasswd = $this->encryptPassword($this->gEmail, $this->gPasswd);
 
-				exec('java -version', $output, $returnCode);
-				if ($returnCode === 0)
-				{
-						exec("java -jar " . __DIR__ . "/encrypter.jar $this->gEmail $this->gPasswd", $result);
-						$t_hold = array_slice($result, 0, 1);
-						$postfields['EncryptedPasswd'] = array_shift($t_hold);
-				}
-				else
-				{
-						$postfields['Passwd'] = $this->gPasswd;
-				}
+			$ch = curl_init();
+			$postfields = array(
+				'device_country' => 'us',
+				'operatorCountry' => 'us',
+				'lang' => 'en_US',
+				'sdk_version' => '19',
+				'google_play_services_version' => '7097038',
+				'accountType' => 'HOSTED_OR_GOOGLE',
+				'Email' => $this->gEmail,
+				'service' => 'audience:server:client_id:694893979329-l59f3phl42et9clpoo296d8raqoljl6p.apps.googleusercontent.com',
+				'source' => 'android',
+				'androidId' => '378c184c6070c26c',
+				'app' => 'com.snapchat.android',
+				'client_sig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
+				'callerPkg' => 'com.snapchat.android',
+				'callerSig' => '49f6badb81d89a9e38d65de76f09355071bd67e7',
+				'EncryptedPasswd' => $encryptedPasswd
+			);
 
 			$headers = array(
 				'device: 378c184c6070c26c',
