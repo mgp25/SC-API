@@ -1,8 +1,14 @@
-# SnAPI Chat
+# SnAPI Chat [![Latest Stable Version](https://poser.pugx.org/mgp25/snapapi/v/stable)](https://packagist.org/packages/mgp25/snapapi) [![Total Downloads](https://poser.pugx.org/mgp25/snapapi/downloads)](https://packagist.org/packages/mgp25/snapapi) [![License](https://poser.pugx.org/mgp25/snapapi/license)](https://packagist.org/packages/mgp25/snapapi)
 
 **Read the [wiki](https://github.com/mgp25/SC-API/wiki)** and previous issues before opening a new one! Maybe your issue is already answered.
 
 ----------
+
+### Installation
+
+```sh
+composer require mgp25/snapapi
+```
 
 ### Special thanks
 
