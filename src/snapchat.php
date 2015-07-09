@@ -2209,6 +2209,45 @@ class Snapchat extends SnapchatAgent {
 	}
 
 	/**
+	 * Find nearby snapchatters
+	 *
+	 * @param string $action: update or delete
+	 * @param string $latitude
+	 * @param string $longitude
+	 *
+	 * RETURN json object with nearby snapchatters
+	 */
+	public function findNearbyFriends($action, $latitude, $longitude)
+	{
+		if(!$this->auth_token || !$this->username)
+		{
+			return FALSE;
+		}
+
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/bq/find_nearby_friends',
+			array(
+				'accuracyMeters' => '65.000000',
+				'action' => $update,
+				'timestamp' => $timestamp,
+				'username' => $this->username,
+				'lat' => $latitude,
+				'long' => $longitude,
+				'totalPollingDurationMillis' => '20000'
+			),
+			array(
+				$this->auth_token,
+				$timestamp
+			),
+			$multipart = false,
+			$debug = $this->debug
+		);
+
+		return $result;
+	}
+
+	/**
 	 * Sets a story.
 	 *
 	 * @param string $media_id
