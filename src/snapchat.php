@@ -365,7 +365,7 @@ class Snapchat extends SnapchatAgent {
 						return $auth;
 				}
 				parent::setGAuth($auth);
-                $attestation = $this->getAttestation($password, $timestamp);
+        $attestation = $this->getAttestation($password, $timestamp);
 
 				$result = parent::post(
 					'/loq/login',
@@ -477,13 +477,30 @@ class Snapchat extends SnapchatAgent {
 	public function register($username, $password, $email, $birthday, $phone_verification = FALSE, $phone_number = NULL)
 	{
 		$timestamp = parent::timestamp();
+
+		$dtoken = $this->getDeviceToken();
+
+		if($dtoken['error'] == 1)
+		{
+				$return['message'] = "Failed to get new Device token set.";
+				return $return;
+		}
+
+		$attestation = $this->getAttestation($password, $timestamp);
+
+		$birthDate = explode("-", $birthday);
+		$age = (date("md", date("U", mktime(0, 0, 0, $birthDate[0], $birthDate[1], $birthDate[2]))) > date("md") ? ((date("Y") - $birthDate[2]) - 1) : (date("Y") - $birthDate[2]));
 		$result = parent::post(
 			'/loq/register',
 			array(
+				'age'	=>	$age,
+				'dsig' => substr(hash_hmac('sha256', $string, $dtoken['data']->dtoken1v), 0, 20),
+				'dtoken1i' => $dtoken['data']->dtoken1i,
 				'birthday' => $birthday,
 				'password' => $password,
 				'email' => $email,
 				'timestamp' => $timestamp,
+				'attestation'	=> $attestation
 			),
 			array(
 				parent::STATIC_TOKEN,
