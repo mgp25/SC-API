@@ -73,8 +73,10 @@ class Snapchat extends SnapchatAgent {
 	 *
 	 * @param string $username
 	 *   The username for the Snapchat account.
-	 * @param string $password
-	 *   The password associated with the username, if logging in.
+	 * @param string $gEmail
+	 *   The Google e-mail used for this device.
+	 * @param string $gPasswd
+	 *   The Google password used for this gEmail.
 	 */
 	public function __construct($username, $gEmail, $gPasswd, $debug = FALSE)
 	{
