@@ -874,7 +874,9 @@ class Snapchat extends SnapchatAgent {
 	public function getConversations()
 	{
 		$updates = $this->getUpdates();
-		$offset = end($updates['data']->conversations_response)->iter_token;
+		$last = end($updates['data']->conversations_response);
+		if (isset($last->iter_token))
+			$offset = $last->iter_token;
 		$convos = $updates['data']->conversations_response;
 		while(strlen($offset) > 0){
 			$timestamp = parent::timestamp();
