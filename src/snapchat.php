@@ -479,6 +479,8 @@ class Snapchat extends SnapchatAgent {
 	public function register($username, $password, $email, $birthday, $phone_verification = FALSE, $phone_number = NULL)
 	{
 		$timestamp = parent::timestamp();
+		$req_token = parent::hash(parent::STATIC_TOKEN, $timestamp);
+		$string = $this->username . "|" . $password . "|" . $timestamp . "|" . $req_token;
 
 		$dtoken = $this->getDeviceToken();
 
