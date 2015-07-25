@@ -873,6 +873,7 @@ class Snapchat extends SnapchatAgent {
 
 	public function getConversations()
 	{
+		$offset = null;
 		$updates = $this->getUpdates();
 		$last = end($updates['data']->conversations_response);
 		if (isset($last->iter_token))
