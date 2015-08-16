@@ -2017,7 +2017,7 @@ class Snapchat extends SnapchatAgent {
 	 * @return mixed
 	 *   The ID of the uploaded media or FALSE on failure.
 	 */
-	public function upload($data, $media)
+	public function upload($data)
 	{
 		// Make sure we're logged in and have a valid access token.
 		if(!$this->auth_token || !$this->username)
@@ -2026,7 +2026,7 @@ class Snapchat extends SnapchatAgent {
 		}
 
 		$finfo = finfo_open(FILEINFO_MIME_TYPE);
-		$mime = finfo_file($finfo, $media);
+		$mime = finfo_buffer($finfo, $data);
 
 		if(strstr($mime, "video/"))
 		{
@@ -2038,6 +2038,7 @@ class Snapchat extends SnapchatAgent {
 		}
 		else
 		{
+			echo "\nBad file type, must be a photo or video.\n";
 			return false;
 		}
 
@@ -2159,29 +2160,33 @@ class Snapchat extends SnapchatAgent {
 			$mediaData = file_get_contents($media);
 		}
 
-		$media_id = $this->upload($mediaData, $media);
+		$media_id = $this->upload($mediaData);
 
-		$timestamp = parent::timestamp();
-		$result = parent::post(
-			'/loq/send',
-			array(
-				'media_id' => $media_id,
-				'zipped' => '0',
-				'recipients' => $recipients,
-				'username' => $this->username,
-				'time' => $time,
-				'timestamp' => $timestamp,
-				'features_map' => '{}'
-			),
-			array(
-				$this->auth_token,
-				$timestamp
-			),
-			$multipart = false,
-			$debug = $this->debug
-		);
+		if($media_id)
+		{
+			$timestamp = parent::timestamp();
+			$result = parent::post(
+				'/loq/send',
+				array(
+					'media_id' => $media_id,
+					'zipped' => '0',
+					'recipients' => $recipients,
+					'username' => $this->username,
+					'time' => $time,
+					'timestamp' => $timestamp,
+					'features_map' => '{}'
+				),
+				array(
+					$this->auth_token,
+					$timestamp
+				),
+				$multipart = false,
+				$debug = $this->debug
+			);
+			return $result;
+		}
 
-		return $result;
+		return $media_id;
 	}
 
 	/**
