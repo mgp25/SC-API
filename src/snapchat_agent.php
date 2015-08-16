@@ -395,6 +395,14 @@ abstract class SnapchatAgent {
 		curl_setopt($ch, CURLOPT_WRITEHEADER, $headerBuff);
 		curl_setopt($ch, CURLOPT_PROXY, $this->proxyServer);
 		$result = curl_exec($ch);
+
+		// If cURL doesn't have a bundle of root certificates handy, we provide
+		// ours (see http://curl.haxx.se/docs/sslcerts.html).
+		if (curl_errno($ch) == 60) {
+			curl_setopt($ch, CURLOPT_CAINFO, dirname(__FILE__) . '/ca_bundle.crt');
+			$result = curl_exec($ch);
+		}
+
 		if(strlen($result) > 0) //make sure curl worked. if not, keep going
 		{
 			if($endpoint == "/loq/login") $result = gzdecode($result);
@@ -457,13 +465,6 @@ abstract class SnapchatAgent {
 				fclose($headerBuff);
 				return "captcha.zip";
 			}
-		}
-
-		// If cURL doesn't have a bundle of root certificates handy, we provide
-		// ours (see http://curl.haxx.se/docs/sslcerts.html).
-		if (curl_errno($ch) == 60) {
-			curl_setopt($ch, CURLOPT_CAINFO, dirname(__FILE__) . '/ca_bundle.crt');
-			$result = curl_exec($ch);
 		}
 
 		$gi = curl_getinfo($ch);
