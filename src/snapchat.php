@@ -411,8 +411,11 @@ class Snapchat extends SnapchatAgent {
 				}
 
 				return $result;
-		} else {
-				$this->openAppEvent();
+		}
+		else
+		{
+			$this->openAppEvent();
+			return $this->device();
 		}
 	}
 
