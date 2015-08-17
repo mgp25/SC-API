@@ -1262,9 +1262,9 @@ class Snapchat extends SnapchatAgent {
 		$friends = $updates['data']->friends_response->added_friends;
 		foreach($friends as $friend)
 		{
-				if ($friend->type == 1)
+				if ($friend->type == 0)
 				{
-					if (($friend->name != 'array') && ($friend->is_shared_story != 1))
+					if ((!is_array($friend->name)) && ($friend->is_shared_story != 0))
 							$unconfirmedList[] = $friend->name;
 				}
 		}
