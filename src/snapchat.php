@@ -276,6 +276,42 @@ class Snapchat extends SnapchatAgent {
 		return $return;
 	}
 
+	public function getClientAuthToken($username, $password, $timestamp)
+	{
+		$data = array(
+			"username" => $username,
+			"password" => $password,
+			"timestamp" => $timestamp
+		);
+
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, "http://client-auth.casper.io/");
+		curl_setopt($ch, CURLINFO_HEADER_OUT, TRUE);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+		curl_setopt($ch, CURLOPT_HEADER, FALSE);
+		curl_setopt($ch, CURLOPT_ENCODING, "gzip");
+		curl_setopt($ch, CURLOPT_POST, TRUE);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+		$return = curl_exec($ch);
+
+		if(curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200)
+		{
+			$return["error"] = 1;
+			$return["data"] = "HTTP Status Code != 200";
+
+			return $return;
+		}
+		curl_close($ch);
+		$return = json_decode($return, true);
+		if(!$return || $return["status"] != 200 || !isset($return["signature"]))
+		{
+			$return["error"] = 1;
+			$return["data"] = "Invalid JSON / Incorrect status / No signature returned.";
+		}
+
+		return $return;
+	}
+
 	private function getGCMToken()
 	{
 		$ch = curl_init();
@@ -347,70 +383,72 @@ class Snapchat extends SnapchatAgent {
 
 		if(($do == 1) || (!(array_key_exists($this->username,$this->totArray[0]))) || (!(array_key_exists($this->username,$this->totArray[1]))))
 		{
-				$dtoken = $this->getDeviceToken();
+			$dtoken = $this->getDeviceToken();
 
-				if($dtoken['error'] == 1)
-				{
-						$return['message'] = "Failed to get new Device token set.";
-						return $return;
-				}
+			if($dtoken['error'] == 1)
+			{
+					$return['message'] = "Failed to get new Device token set.";
+					return $return;
+			}
 
-				$timestamp = parent::timestamp();
-				$req_token = parent::hash(parent::STATIC_TOKEN, $timestamp);
-				$string = $this->username . "|" . $password . "|" . $timestamp . "|" . $req_token;
+			$timestamp = parent::timestamp();
+			$req_token = parent::hash(parent::STATIC_TOKEN, $timestamp);
+			$string = $this->username . "|" . $password . "|" . $timestamp . "|" . $req_token;
 
-				$auth = $this->getAuthToken();
-				$this->totArray[1][$this->username] = array($auth, time()+(55*60));
-				file_put_contents(__DIR__ . DIRECTORY_SEPARATOR . self::DATA_FOLDER . DIRECTORY_SEPARATOR . "auth-$this->username.dat", serialize($this->totArray));
-				if($auth['error'] == 1)
-				{
-						return $auth;
-				}
-				parent::setGAuth($auth);
-        $attestation = $this->getAttestation($password, $timestamp);
+			$auth = $this->getAuthToken();
+			$this->totArray[1][$this->username] = array($auth, time()+(55*60));
+			file_put_contents(__DIR__ . DIRECTORY_SEPARATOR . self::DATA_FOLDER . DIRECTORY_SEPARATOR . "auth-$this->username.dat", serialize($this->totArray));
+			if($auth['error'] == 1)
+			{
+					return $auth;
+			}
+			parent::setGAuth($auth);
+            $attestation = $this->getAttestation($password, $timestamp);
+			$clientAuthToken = $this->getClientAuthToken($this->username, $password, $timestamp);
 
-				$result = parent::post(
-					'/loq/login',
-					array(
-						'username' => $this->username,
-						'password' => $password,
-						'height' => 1280,
-						'width' => 720,
-						'max_video_height' => 640,
-						'max_video_width' => 480,
-						'dsig' => substr(hash_hmac('sha256', $string, $dtoken['data']->dtoken1v), 0, 20),
-						'dtoken1i' => $dtoken['data']->dtoken1i,
-						'ptoken' => "ie",
-						'timestamp' => $timestamp,
-						'attestation' => $attestation,
-						'sflag' => 1,
-						'application_id' => 'com.snapchat.android',
-						'req_token' => $req_token,
-					),
-					array(
-						parent::STATIC_TOKEN,
-						$timestamp,
-						$auth['auth']
-					),
-					$multipart = false,
-					$debug = $this->debug
-				);
+			$result = parent::post(
+				'/loq/login',
+				array(
+					'username' => $this->username,
+					'password' => $password,
+					'height' => 1280,
+					'width' => 720,
+					'max_video_height' => 640,
+					'max_video_width' => 480,
+					'dsig' => substr(hash_hmac('sha256', $string, $dtoken['data']->dtoken1v), 0, 20),
+					'dtoken1i' => $dtoken['data']->dtoken1i,
+					'ptoken' => "ie",
+					'timestamp' => $timestamp,
+					'attestation' => $attestation,
+					'sflag' => 1,
+					'application_id' => 'com.snapchat.android',
+					'req_token' => $req_token,
+				),
+				array(
+					parent::STATIC_TOKEN,
+					$timestamp,
+					$auth['auth'],
+					$clientAuthToken["signature"]
+				),
+				$multipart = false,
+				$debug = $this->debug
+			);
 
 
-				if($result['error'] == 1)
-				{
-					return $result;
-				}
-
-				if(isset($result['data']->updates_response->logged) && $result['data']->updates_response->logged)
-				{
-					$this->auth_token = $result['data']->updates_response->auth_token;
-					$this->device();
-					$this->totArray[0][$this->username] = $this->auth_token;
-					file_put_contents(__DIR__ . DIRECTORY_SEPARATOR . self::DATA_FOLDER . DIRECTORY_SEPARATOR . "auth-$this->username.dat", serialize($this->totArray));
-				}
-
+			if($result['error'] == 1)
+			{
 				return $result;
+			}
+
+			if(isset($result['data']->updates_response->logged) && $result['data']->updates_response->logged)
+			{
+				$this->auth_token = $result['data']->updates_response->auth_token;
+				$this->device();
+				$this->totArray[0][$this->username] = $this->auth_token;
+				file_put_contents(__DIR__ . DIRECTORY_SEPARATOR . self::DATA_FOLDER . DIRECTORY_SEPARATOR . "auth-$this->username.dat", serialize($this->totArray));
+			}
+
+			return $result;
 		}
 		else
 		{
