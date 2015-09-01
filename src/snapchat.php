@@ -285,7 +285,7 @@ class Snapchat extends SnapchatAgent {
 		);
 
 		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, "http://client-auth.casper.io/");
+		curl_setopt($ch, CURLOPT_URL, "https://api.casper.io/security/login/signrequest/");
 		curl_setopt($ch, CURLINFO_HEADER_OUT, TRUE);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($ch, CURLOPT_HEADER, FALSE);
@@ -303,7 +303,7 @@ class Snapchat extends SnapchatAgent {
 		}
 		curl_close($ch);
 		$return = json_decode($return, true);
-		if(!$return || $return["status"] != 200 || !isset($return["signature"]))
+		if(!$return || $return["code"] != 200 || !isset($return["signature"]))
 		{
 			$return["error"] = 1;
 			$return["data"] = "Invalid JSON / Incorrect status / No signature returned.";
