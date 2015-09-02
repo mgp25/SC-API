@@ -458,6 +458,34 @@ class Snapchat extends SnapchatAgent {
 	}
 
 	/**
+	 * IP Routing
+	 */
+	public function ipRouting()
+	{
+		// Make sure we're logged in and have a valid access token.
+		if(!$this->auth_token || !$this->username)
+		{
+			return FALSE;
+		}
+
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/bq/ip_routing',
+			array(
+				'ip_routing_key' => '{"https:\/\/feelinsonice-hrd.appspot.com":"https:\/\/feelinsonice-hrd.appspot.com"}',
+				'timestamp' => $timestamp,
+				'username' => $this->username
+			),
+			array(
+				$this->auth_token,
+				$timestamp,
+			),
+			$multipart = false,
+			$debug = $this->debug
+		);
+	}
+
+	/**
 	 * Logs out the current user.
 	 *
 	 * @return bool
