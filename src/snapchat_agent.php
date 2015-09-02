@@ -432,6 +432,12 @@ abstract class SnapchatAgent {
 
 			if($endpoint == "/loq/login" || $endpoint == "/all_updates")
 			{
+				if (strpos($result,'401 UNAUTHORIZED') !== false)
+				{
+					echo "\nRESULT: 401 UNAUTHORIZED\n";
+					exit();
+				}
+
 				$jsonResult = json_decode($result);
 				echo 'RESULT: ' . print_r($jsonResult) . "\n";
 				if (property_exists($jsonResult, "status") && $jsonResult->status == '-103')
