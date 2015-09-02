@@ -2412,7 +2412,7 @@ class Snapchat extends SnapchatAgent {
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'/delete_story',
+			'/bq/delete_story',
 			array(
 				'story_id' => $storyId,
 			),
