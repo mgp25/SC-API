@@ -1819,8 +1819,11 @@ class Snapchat extends SnapchatAgent {
 
 		if($ext != null)
 		{
-			rename($path, $path . $ext);
+			$newFile = $path . $ext;
+			rename($path, $newFile);
 		}
+
+		return $newFile;
 	}
 
 	/**
@@ -2519,7 +2522,7 @@ class Snapchat extends SnapchatAgent {
 			{
 				mkdir($path, 0777, true);
 			}
-			$file = $path . DIRECTORY_SEPARATOR . date("Y-m-d H-i-s", (int) ($timestamp / 1000)) . "-story-" . $media_id;
+			$file = $path . DIRECTORY_SEPARATOR . date("Y-m-d-H-i-s", (int) ($timestamp / 1000)) . "-story-" . $media_id;
 			$extensions = array(".jpg", ".png", ".mp4", "");
 			foreach ($extensions as $ext)
 			{
@@ -2546,12 +2549,26 @@ class Snapchat extends SnapchatAgent {
 			{
 				if(is_array($result))
 				{
+					$files = array();
 					foreach ($result as &$value)
 					{
 						if(!file_exists($file))
 						{
-							$this->writeToFile($file, $value);
+							$newFile = $this->writeToFile($file, $value);
+							$files[] = $newFile;
 						}
+					}
+					$output = array();
+					$returnvalue = false;
+					exec('ffmpeg -version', $output, $returnvalue);
+					if ($returnvalue === 0)
+					{
+						$videoSize = shell_exec("ffprobe -v error -select_streams v:0 -show_entries stream=width,height \-of default=nokey=1:noprint_wrappers=1 $files[0]");
+						$videoSize = array_filter(explode("\n", $videoSize));
+
+						shell_exec("ffmpeg -y -i $files[1] -vf scale=$videoSize[0]:$videoSize[1] $files[1]");
+						shell_exec("ffmpeg -y -i $files[0] -i $files[1] -strict -2 -filter_complex overlay -c:a copy -flags global_header $files[0]");
+						unlink($files[1]);
 					}
 				}
 				else
