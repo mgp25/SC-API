@@ -1034,6 +1034,36 @@ class Snapchat extends SnapchatAgent {
 	}
 
 	/**
+	 * Download profile data
+	 *
+	 */
+	 public function downloadProfileData()
+	 {
+	 	// Make sure we're logged in and have a valid access token.
+	 	if(!$this->auth_token || !$this->username)
+	 	{
+			return FALSE;
+	 	}
+
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/bq/download_profile_data',
+			array(
+				'size' => 'MEDIUM',
+				'username' => $this->username,
+				'username_image' => $this->username
+			),
+			array(
+				$this->auth_token,
+				$timestamp,
+			),
+			$multipart = false,
+			$debug = $this->debug
+		);
+
+		return $result;
+	}
+	/**
 	 * Gets the user's snaps.
 	 *
 	 * @return mixed
