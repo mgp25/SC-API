@@ -2694,6 +2694,24 @@ class Snapchat extends SnapchatAgent {
 	}
 
 	/**
+	 * Gets the Discover's channel list
+	 *
+	 * @return array
+	 *   An array of channels with all it's information
+	 */
+	 public function getDiscoversChannelList()
+	 {
+		 // Make sure we're logged in and have a valid access token.
+		 if(!$this->auth_token || !$this->username)
+		 {
+			 return FALSE;
+		 }
+		 $result = parent::get('/discover/channel_list?region=INTERNATIONAL');
+
+		 return $result;
+	 }
+
+	/**
 	 * Gets the best friends and scores of the specified users.
 	 *
 	 * @param array $friends
