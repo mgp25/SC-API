@@ -1330,7 +1330,7 @@ class Snapchat extends SnapchatAgent {
 		{
 				if ($friend->type == 0)
 				{
-					if ((!is_array($friend->name)) && ($friend->is_shared_story != 0))
+					if ((!is_array($friend->name)) && (isset($friend->is_shared_story) && ($friend->is_shared_story != 0)))
 							$unconfirmedList[] = $friend->name;
 				}
 		}
