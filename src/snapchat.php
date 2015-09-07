@@ -1914,7 +1914,7 @@ class Snapchat extends SnapchatAgent {
 			$newFile = $path . $ext;
 			rename($path, $newFile);
 
-			return $newFile
+			return $newFile;
 		}
 		else
 			return false;
