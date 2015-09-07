@@ -1913,9 +1913,11 @@ class Snapchat extends SnapchatAgent {
 		{
 			$newFile = $path . $ext;
 			rename($path, $newFile);
-		}
 
-		return $newFile;
+			return $newFile
+		}
+		else
+			return false;
 	}
 
 	/**
@@ -2647,7 +2649,8 @@ class Snapchat extends SnapchatAgent {
 						if(!file_exists($file))
 						{
 							$newFile = $this->writeToFile($file, $value);
-							$files[] = $newFile;
+							if($newFile)
+								$files[] = $newFile;
 						}
 					}
 					$output = array();
