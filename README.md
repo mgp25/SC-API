@@ -13,6 +13,7 @@ composer require mgp25/snapapi
 ### Special thanks
 
 - [teknogeek](https://github.com/teknogeek)
+- [liamcottle](https://github.com/liamcottle) (creator of [Casper](https://casper.io/))
 - [JorgenPhi](https://github.com/JorgenPhi)
 - [hako](https://github.com/hako)
 - [0xTryCatch](https://github.com/0xTryCatch)
