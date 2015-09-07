@@ -137,33 +137,95 @@ class Snapchat extends SnapchatAgent {
 		return $result;
 	}
 
-	private function getAttestation($password, $timestamp)
+	public function getAttestation($password, $timestamp)
 	{
-		$hashString     = $this->username."|{$password}|{$timestamp}|/loq/login";
-		$nonce          = base64_encode(hash('sha256', $hashString, true));
-		$authentication = 'cp4craTcEr82Pdf5j8mwFKyb8FNZbcel';
-		$apkDigest      = 'JJShKOLH4YYjWZlJQ71A2dPTcmxbaMboyfo0nsKYayE';
+		$binary = file_get_contents("https://api.casper.io/droidguard/create/binary");
+		$binaryJSON = json_decode($binary);
 
-		$url = 'http://attest.casper.io/attestation';
-		$data = array(
-			'nonce'           => $nonce,
-			'authentication'  => $authentication,
-			'apk_digest'      => $apkDigest,
-			'timestamp'       => $timestamp
-		);
 
-		$options = array(
-			'http' => array(
-				'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-				'method'  => 'POST',
-				'content' => http_build_query($data),
-			),
-		);
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, "https://www.googleapis.com/androidantiabuse/v1/x/create?alt=PROTO&key=AIzaSyBofcZsgLSS7BOnBjZPEkk4rYwzOIz-lTI");
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+		curl_setopt($ch, CURLOPT_ENCODING, "gzip");
+		curl_setopt($ch, CURLOPT_USERAGENT, "DroidGuard/7329000 (A116 _Quad KOT49H); gzip");
+		curl_setopt($ch, CURLOPT_POST, TRUE);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, base64_decode($binaryJSON->binary));
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array("Accept:", "Expect:", "content-type: application/x-protobuf"));
 
-		$context  = stream_context_create($options);
-		$result = json_decode(file_get_contents($url, false, $context));
+		$return = curl_exec($ch);
 
-		return $result->signedAttestation;
+		if(curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200)
+		{
+			throw new Exception("attestationCreate Exception: HTTP Status Code != 200");
+		}
+
+		curl_close($ch);
+
+		$ch = curl_init();
+
+		curl_setopt($ch, CURLOPT_URL, "https://api.casper.io/droidguard/attest/binary");
+		curl_setopt($ch, CURLOPT_POST, TRUE);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, array(
+			"bytecode_proto" => base64_encode($return),
+			"nonce" => base64_encode(hash("sha256", $this->username."|{$password}|{$timestamp}|/loq/login", true)),
+			"apk_digest" => "5O40Rllov9V8PpwD5zPmmp+GQi7UMIWz2A0LWZA7UX0="
+		));
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+
+		$return = curl_exec($ch);
+
+		if(curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200)
+		{
+			throw new Exception("getAttestation Exception: HTTP Status Code != 200");
+		}
+
+		curl_close($ch);
+
+		$return = json_decode($return);
+
+		if(!$return || !isset($return->binary))
+		{
+			throw new Exception("getAttestation Exception: Invalid JSON / No signedAttestation returned");
+		}
+
+		$postData = base64_decode($return->binary);
+
+		$ch = curl_init();
+
+		curl_setopt($ch, CURLOPT_URL, "https://www.googleapis.com/androidcheck/v1/attestations/attest?alt=JSON&key=AIzaSyDqVnJBjE5ymo--oBJt3On7HQx9xNm1RHA");
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+		curl_setopt($ch, CURLOPT_HEADER, FALSE);
+		curl_setopt($ch, CURLOPT_POST, TRUE);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+			'Accept:',
+			'Expect:',
+			'User-Agent: SafetyNet/7899000 (WIKO JZO54K); gzip',
+			'Content-Type: application/x-protobuf',
+			'Content-Length: ' . strlen($postData),
+			'Connection: Keep-Alive'
+		));
+		curl_setopt($ch, CURLOPT_ENCODING, "gzip");
+
+		$return = curl_exec($ch);
+
+		if(curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200)
+		{
+			throw new Exception("getAttestation Exception: HTTP Status Code != 200");
+		}
+
+		curl_close($ch);
+
+		$return = json_decode($return);
+
+		if(!$return || !isset($return->signedAttestation))
+		{
+			throw new Exception("getAttestation Exception: Invalid JSON / No signedAttestation returned");
+		}
+
+		return $return->signedAttestation;
 	}
 
 	public function encryptPassword($email, $password)
