@@ -2773,6 +2773,97 @@ class Snapchat extends SnapchatAgent {
 		 return $result;
 	 }
 
+	 /**
+ 	 * Gets Discover's videos by edition
+	 * Use getDiscoversChannelList() in order to get the edition
+	 *
+	 * @param string $edition
+	 * @param string $platform
+ 	 *
+ 	 * @return array
+ 	 *   An array of channels with all it's information
+ 	 */
+	 public function getDiscoversVideosByEdition($edition, $platform = 'android')
+	 {
+		 // Make sure we're logged in and have a valid access token.
+		 if(!$this->auth_token || !$this->username)
+		 {
+			 return FALSE;
+		 }
+		 $result = parent::get("/discover/video_catalog_v2?region=INTERNATIONAL&edition=$edition&platform=$platform");
+
+		 $channels = json_decode($this->getDiscoversChannelList(), true);
+
+		 foreach ($channels['channels'] as $channel)
+		 {
+			 if ($channel['edition_id'] == $edition)
+			 {
+				 $path = __DIR__ . DIRECTORY_SEPARATOR . "Discover" . DIRECTORY_SEPARATOR . $channel['publisher_formal_name'];
+				 if(!file_exists($path))
+				 {
+					 mkdir($path, 0777, true);
+				 }
+
+				 foreach ($channel['dsnaps_data'] as $snaps)
+				 {
+					 parse_str($snaps['url']);
+					 $zipFile = $path . DIRECTORY_SEPARATOR . $dsnap_id . '.zip';
+					 file_put_contents($zipFile , parent::get($snaps['url']));
+					 $zip = new ZipArchive;
+					 $res = $zip->open($zipFile);
+					 if ($res === TRUE) {
+						$i = 0;
+						for ($i; $i < 3; $i++)
+						{
+							$name = $zip->statIndex($i)['name'];
+							if (!strpos($name,'thumbnail') !== false)
+								break;
+						}
+  				 	$zip->extractTo($path);
+  					$zip->close();
+						unlink($zipFile);
+					} else {
+						if ($this->debug)
+  						echo "Oops! Error extracting discover snap!\n";
+							unlink($zipFile);
+					}
+				 }
+
+				 $dir = opendir($path);
+				 while (false !== ($file = readdir($dir)))
+				 {
+					 $file = $path . DIRECTORY_SEPARATOR . $file;
+					 $finfo = finfo_open(FILEINFO_MIME_TYPE);
+					 $finfo = finfo_file($finfo, $file);
+					 switch($finfo)
+					 {
+						 case "image/jpeg":
+							 $ext = ".jpg";
+							 break;
+						 case "image/png":
+							 $ext = ".png";
+							 break;
+						 case "video/mp4";
+							 $ext = ".mp4";
+							 break;
+						 default:
+							 $ext = null;
+					 }
+
+					 if($ext != null)
+					 {
+						 $newFile = $file . $ext;
+						 rename($file, $newFile);
+					 }
+					 else {
+					 	unlink($file);
+					 }
+				 }
+			 }
+		 }
+		 return $result;
+	 }
+
 	/**
 	 * Gets the best friends and scores of the specified users.
 	 *
