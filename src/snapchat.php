@@ -2759,7 +2759,7 @@ class Snapchat extends SnapchatAgent {
 	 * Gets the Discover's channel list
 	 *
 	 * @return array
-	 *   An array of channels with all it's information
+	 *   An array of channels with its edition_id
 	 */
 	 public function getDiscoversChannelList()
 	 {
@@ -2768,9 +2768,18 @@ class Snapchat extends SnapchatAgent {
 		 {
 			 return FALSE;
 		 }
-		 $result = parent::get('/discover/channel_list?region=INTERNATIONAL');
+		 $result = json_decode(parent::get('/discover/channel_list?region=INTERNATIONAL'), true);
 
-		 return $result;
+		 $channels = array();
+		 foreach ($result['channels'] as $channel)
+		 {
+			 $channels[] = array(
+				 'name' => $channel['publisher_formal_name'],
+				 'edition' => $channel['edition_id']
+			 );
+		 }
+
+		 return $channels;
 	 }
 
 	 /**
