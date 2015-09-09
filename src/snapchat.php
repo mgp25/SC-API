@@ -165,6 +165,7 @@ class Snapchat extends SnapchatAgent {
 		$ch = curl_init();
 
 		curl_setopt($ch, CURLOPT_URL, "https://api.casper.io/droidguard/attest/binary");
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 		curl_setopt($ch, CURLOPT_POST, TRUE);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, array(
 			"bytecode_proto" => base64_encode($return),
@@ -348,6 +349,7 @@ class Snapchat extends SnapchatAgent {
 
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, "https://api.casper.io/security/login/signrequest/");
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 		curl_setopt($ch, CURLINFO_HEADER_OUT, TRUE);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($ch, CURLOPT_HEADER, FALSE);
