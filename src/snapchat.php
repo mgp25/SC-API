@@ -3259,4 +3259,32 @@ class Snapchat extends SnapchatAgent {
 
 		return $result;
 	}
+	public function getMessageChats();
+	$friends = $snapchat->getFriends();
+	$conversationInfo= $snapchat->getConversationInfo($friends);
+	$conversation ="";
+	foreach ($conversationInfo as $A) {
+ 		foreach ($A as $B) {
+ 			if(!isset($B->conversation_messages->messages))
+  			{
+   				break;
+  			} 
+  			$C=$B->conversation_messages->messages; 
+ 			foreach($C as $D) {
+ 				if(!isset($D->chat_message->header->from))
+  				{
+   					break;
+  				} 
+ 				$conversation .= "From: ";
+ 				$conversation .= ($D->chat_message->header->from)."\n";
+ 				$conversation .= "To: ";
+ 					foreach ($D->chat_message->header->to as $E) {
+ 						$conversation .=$E."\n";
+ 					}
+ 				$conversation .="Message: ";
+ 				$conversation .= ($D->chat_message->body->text)."\n"."\n";
+     	}
+	}
+}
+return $conversation;
 }
