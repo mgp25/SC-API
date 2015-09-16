@@ -1870,8 +1870,28 @@ class Snapchat extends SnapchatAgent {
 			{
 				foreach ($result as $key => $value)
 				{
-					$this->writeToFile($file, $value);
+					$newfile=$this->writeToFile($file, $value);
+					$files=$newfile;
 				}
+				// sometimes the array is createed with blanck values.
+			$files=array_values(array_diff($files,array( "" )));
+
+			$path_parts = pathinfo($video);
+			$orignial= $path_parts['filename'].'.' . $path_parts['extension'];
+			$orignial=$path_parts['dirname']."/".$orignial;
+			
+			$name=$path_parts['filename'] . "-" . '.' . $path_parts['extension'];
+			$out= $path_parts['dirname']."/".$name;
+			
+			$videoSize = shell_exec("ffprobe -v error -select_streams v:0 -show_entries stream=width,height \-of default=nokey=1:noprint_wrappers=1 $files[0]");
+			$videoSize = array_filter(explode("\n", $videoSize));
+			
+			shell_exec("ffmpeg -loglevel panic -y -i $files[1] -vf scale=$videoSize[0]:$videoSize[1] $files[1]");
+			shell_exec("ffmpeg -loglevel panic -y -i $files[0] -i $files[1] -strict -2 -filter_complex overlay -c:a copy -flags global_header $out");
+			unlink($files[1]);
+			
+			rename($out,$orignial);
+
 			}
 			else
 			{
