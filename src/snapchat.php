@@ -36,25 +36,25 @@ class Snapchat extends SnapchatAgent {
 	/**
 	 * Snap statuses.
 	 */
-	const STATUS_NONE = -1;
-	const STATUS_SENT = 0;
-	const STATUS_DELIVERED = 1;
-	const STATUS_OPENED = 2;
+	const STATUS_NONE 			= -1;
+	const STATUS_SENT 			= 0;
+	const STATUS_DELIVERED 	= 1;
+	const STATUS_OPENED 		= 2;
 	const STATUS_SCREENSHOT = 3;
 
 	/**
 	 * Friend statuses.
 	 */
-	const FRIEND_CONFIRMED = 0;
-	const FRIEND_UNCONFIRMED = 1;
-	const FRIEND_BLOCKED = 2;
-	const FRIEND_DELETED = 3;
+	const FRIEND_CONFIRMED		= 0;
+	const FRIEND_UNCONFIRMED	= 1;
+	const FRIEND_BLOCKED			= 2;
+	const FRIEND_DELETED			= 3;
 
 	/**
 	 * Privacy settings.
 	 */
-	const PRIVACY_EVERYONE = 0;
-	const PRIVACY_FRIENDS = 1;
+	const PRIVACY_EVERYONE	= 0;
+	const PRIVACY_FRIENDS		= 1;
 
 	const DATA_FOLDER = 'authData';
 
@@ -467,7 +467,7 @@ class Snapchat extends SnapchatAgent {
 					return $auth;
 			}
 			parent::setGAuth($auth);
-            $attestation = $this->getAttestation($password, $timestamp);
+      $attestation = $this->getAttestation($password, $timestamp);
 			$clientAuthToken = $this->getClientAuthToken($this->username, $password, $timestamp);
 
 			$result = parent::post(
@@ -846,21 +846,21 @@ class Snapchat extends SnapchatAgent {
 		return $result;
 	}
 
-
-	public function getConversationInfo($tos){
-	    if(!is_array($tos)) $tos = array($tos);
+	public function getConversationInfo($tos)
+	{
+	  if(!is_array($tos)) $tos = array($tos);
 		$messagesArray = array();
 		$authArray = array();
-	    foreach($tos as $to){
-		    $authInfo = $this->getConversationAuth($to);
-		    //if user is even a friend
-		    if(!property_exists($authInfo["data"], "messaging_auth")) continue;
-		      $authArray[$to] = $authInfo['data'];
-			    $payload = $authInfo["data"]->messaging_auth->payload;
-			    $mac = $authInfo["data"]->messaging_auth->mac;
-			    $genID = md5(uniqid());
-			    $id = strtoupper(sprintf('%08s-%04s-%04x-%04x-%12s', substr($genID, 0, 8), substr($genID, 8, 4), substr($genID, 12, 4), substr($genID, 16, 4), substr($genID, 20, 12)));
-			    $messagesArray[] = array(
+	  foreach($tos as $to){
+		  $authInfo = $this->getConversationAuth($to);
+		  //if user is even a friend
+		  if(!property_exists($authInfo["data"], "messaging_auth")) continue;
+		    $authArray[$to] = $authInfo['data'];
+			  $payload = $authInfo["data"]->messaging_auth->payload;
+			  $mac = $authInfo["data"]->messaging_auth->mac;
+			  $genID = md5(uniqid());
+			  $id = strtoupper(sprintf('%08s-%04s-%04x-%04x-%12s', substr($genID, 0, 8), substr($genID, 8, 4), substr($genID, 12, 4), substr($genID, 16, 4), substr($genID, 20, 12)));
+			  $messagesArray[] = array(
 					"presences" => array(
 						$this->username => true,
 						$to => false
@@ -907,83 +907,84 @@ class Snapchat extends SnapchatAgent {
 					"type" => "presence"
 				);
 		}
-			$messages = json_encode($messagesArray);
-			$timestamp = parent::timestamp();
-			$result = parent::post(
-				'/loq/conversation_post_messages',
-				array(
-					'auth_token' => $this->auth_token,
-					'messages' => $messages,
-					'timestamp' => $timestamp,
-					'username' => $this->username,
-				),
-				array(
-					$this->auth_token,
-					$timestamp,
-				),
-				$multipart = false,
-				$debug = $this->debug
-			);
-			$resultsf = array();
-			foreach($result['data']->conversations as $convo){
-				$split = explode("~", $convo->id);
-				$un = (strtolower($split[0]) != strtolower($this->username)) ? $split[0] : $split[1];
-				$resultsf[$un] = $convo;
-			}
+		$messages = json_encode($messagesArray);
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/loq/conversation_post_messages',
+			array(
+				'auth_token' => $this->auth_token,
+				'messages' => $messages,
+				'timestamp' => $timestamp,
+				'username' => $this->username,
+			),
+			array(
+				$this->auth_token,
+				$timestamp,
+			),
+			$multipart = false,
+			$debug = $this->debug
+		);
+		$resultsf = array();
+		foreach($result['data']->conversations as $convo){
+			$split = explode("~", $convo->id);
+			$un = (strtolower($split[0]) != strtolower($this->username)) ? $split[0] : $split[1];
+			$resultsf[$un] = $convo;
+		}
 		return array($resultsf,$authArray);
 	}
 
-	public function sendMessage($tos, $text){
-	    if(!is_array($tos)) $tos = array($tos);
-	    $convoInfo = $this->getConversationInfo($tos);
-	    $messagesArray = array();
-	    foreach($tos as $to){
-	    	if(!array_key_exists($to, $convoInfo[1])){ //check if user can be sent a message
-	    		 echo "\nYou have to add {$to} as a friend first!";
-	    		 continue;
-	    		}
-		    if(!array_key_exists($to, $convoInfo[0])){ //new convo
-				    $payload = $convoInfo[1][$to]->messaging_auth->payload;
-				    $mac = $convoInfo[1][$to]->messaging_auth->mac;
-				    $seq_num = 0;
-				    $conv_id = implode('~', array($to, $this->username));
-		    }else{ //conversation already exists
-			    $payload = $convoInfo[0][$to]->conversation_messages->messaging_auth->payload;
-			    $mac = $convoInfo[0][$to]->conversation_messages->messaging_auth->mac;
-			    $name = $this->username;
-			    $seq_num = $convoInfo[0][$to]->conversation_state->user_sequences->$name;
-			    $conv_id = $convoInfo[0][$to]->id;
-		    }
-		    $genID = md5(uniqid());
-		    $chatID = strtoupper(sprintf('%08s-%04s-%04x-%04x-%12s', substr($genID, 0, 8), substr($genID, 8, 4), substr($genID, 12, 4), substr($genID, 16, 4), substr($genID, 20, 12)));
-		    $genID = md5(uniqid());
-		    $id = strtoupper(sprintf('%08s-%04s-%04x-%04x-%12s', substr($genID, 0, 8), substr($genID, 8, 4), substr($genID, 12, 4), substr($genID, 16, 4), substr($genID, 20, 12)));
-		    $timestamp = parent::timestamp();
-		    $messagesArray[] =
-			    array(
-				    'body' => array(
-					    'text' => $text,
-					    'type' => 'text'
+	public function sendMessage($tos, $text)
+	{
+	  if(!is_array($tos)) $tos = array($tos);
+	  $convoInfo = $this->getConversationInfo($tos);
+	  $messagesArray = array();
+	  foreach($tos as $to){
+	  	if(!array_key_exists($to, $convoInfo[1])){ //check if user can be sent a message
+	  		echo "\nYou have to add {$to} as a friend first!";
+	  		continue;
+	  	}
+		  if(!array_key_exists($to, $convoInfo[0])){ //new convo
+		    $payload = $convoInfo[1][$to]->messaging_auth->payload;
+			  $mac = $convoInfo[1][$to]->messaging_auth->mac;
+			  $seq_num = 0;
+		    $conv_id = implode('~', array($to, $this->username));
+		  }else{ //conversation already exists
+			  $payload = $convoInfo[0][$to]->conversation_messages->messaging_auth->payload;
+			  $mac = $convoInfo[0][$to]->conversation_messages->messaging_auth->mac;
+			  $name = $this->username;
+			  $seq_num = $convoInfo[0][$to]->conversation_state->user_sequences->$name;
+			  $conv_id = $convoInfo[0][$to]->id;
+		  }
+		  $genID = md5(uniqid());
+		  $chatID = strtoupper(sprintf('%08s-%04s-%04x-%04x-%12s', substr($genID, 0, 8), substr($genID, 8, 4), substr($genID, 12, 4), substr($genID, 16, 4), substr($genID, 20, 12)));
+		  $genID = md5(uniqid());
+		  $id = strtoupper(sprintf('%08s-%04s-%04x-%04x-%12s', substr($genID, 0, 8), substr($genID, 8, 4), substr($genID, 12, 4), substr($genID, 16, 4), substr($genID, 20, 12)));
+		  $timestamp = parent::timestamp();
+		  $messagesArray[] =
+			  array(
+			    'body' => array(
+				    'text' => $text,
+				    'type' => 'text'
+			    ),
+			    'chat_message_id' => $chatID,
+			    'seq_num' => $seq_num + 1,
+			    'timestamp' => $timestamp,
+			    'header' => array(
+				    'auth' => array(
+					    'mac' => $mac,
+					    'payload' => $payload
 				    ),
-				    'chat_message_id' => $chatID,
-				    'seq_num' => $seq_num + 1,
-				    'timestamp' => $timestamp,
-				    'header' => array(
-					    'auth' => array(
-						    'mac' => $mac,
-						    'payload' => $payload
-					    ),
-					    'to' => array($to),
-					    'conv_id' => $conv_id,
-					    'from' => $this->username,
-					    'conn_seq_num' => 1
-				    ),
-				    'retried' => false,
-				    'id' => $id,
-				    'type' => 'chat_message'
-			    );
-	    }
-	    	if(count($messagesArray) <= 0) return null;
+				    'to' => array($to),
+				    'conv_id' => $conv_id,
+				    'from' => $this->username,
+				    'conn_seq_num' => 1
+			    ),
+			    'retried' => false,
+			    'id' => $id,
+			    'type' => 'chat_message'
+		    );
+	  }
+	  if(count($messagesArray) <= 0) return null;
 		$messages = json_encode($messagesArray);
 		$timestamp = parent::timestamp();
 		$result = parent::post(
@@ -1243,10 +1244,13 @@ class Snapchat extends SnapchatAgent {
 	 *   An array of phone numbers.
 	 *   FORMATTING: array("name" => "number") !! VERY IMPORTANT !!
 	 *
+	 * @param string $country
+	 *		Country, i.e: US, ES, GE...
+	 *
 	 * @return mixed
 	 *   An array of user objects or FALSE on failure.
 	 */
-	public function findFriends($numbers)
+	public function findFriends($numbers, $country)
 	{
 		$updates = $this->getUpdates();
 
@@ -1259,8 +1263,6 @@ class Snapchat extends SnapchatAgent {
 		if (!$itsVerified)
 		{
 			$batches = array_chunk(array_flip($numbers), 30, TRUE);
-			$country = $updates['data']->updates_response->country_code;
-
 			// Make sure we're logged in and have a valid access token.
 			if(!$this->auth_token || !$this->username)
 			{
@@ -1295,7 +1297,7 @@ class Snapchat extends SnapchatAgent {
 				return $results;
 		}
 		else if ($this->debug)
-				echo 'DEBUG: You need to verify your phone number';
+			echo 'DEBUG: You need to verify your phone number';
 	}
 
 	public function searchFriend($friend)
@@ -1506,7 +1508,8 @@ class Snapchat extends SnapchatAgent {
 			),
 			$multipart = false,
 			$debug = $this->debug);
-        	return $result;
+
+		return $result;
 	}
 	/**
 	 * Adds multiple friends.

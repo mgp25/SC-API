@@ -441,11 +441,14 @@ abstract class SnapchatAgent {
 				$jsonResult = json_decode($result);
 				echo 'RESULT: ' . print_r($jsonResult) . "\n";
 				if (property_exists($jsonResult, "status") && $jsonResult->status == '-103')
-						exit();
+					exit();
 			}
 			else
 			{
-				echo 'RESULT: ' . $result . "\n";
+				if (strpos($result,'400 BAD_REQUEST') !== false)
+					echo "\nRESULT: 400 BAD REQUEST\n";
+				else
+					echo 'RESULT: ' . $result . "\n";
 			}
 
 			if($endpoint == '/loq/register_username' || $endpoint == '/loq/register')
