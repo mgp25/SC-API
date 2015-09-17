@@ -1821,7 +1821,7 @@ class Snapchat extends SnapchatAgent {
 		{
 			mkdir($path, 0777, true);
 		}
-		$file = $path . DIRECTORY_SEPARATOR . date("Y-m-d H-i-s", (int) ($time / 1000));
+		$file = $path . DIRECTORY_SEPARATOR . date("Y-m-d-H-i-s", (int) ($time / 1000));
 
 		$extensions = array(".jpg", ".png", ".mp4", "");
 		foreach ($extensions as $ext)
@@ -1868,10 +1868,30 @@ class Snapchat extends SnapchatAgent {
 		{
 			if (is_array($result))
 			{
+				$files[] = null;
 				foreach ($result as $key => $value)
 				{
-					$this->writeToFile($file, $value);
+					$newFile = $this->writeToFile($file, $value);
+					$files[]=$newFile;
 				}
+			// array is sometimes filled in with blanks, thus we remove them
+			$files=array_values(array_diff($files,array( "" )));
+			// Ffmpeg can´t export over the same input file path, thus we create an output path, then we rename it
+			$path_parts = pathinfo($files[0]);
+			$original= $path_parts['filename'].'.' . $path_parts['extension'];
+			$original=$path_parts['dirname']."/".$original;
+
+			$name=$path_parts['filename'] . "-" . '.' . $path_parts['extension'];
+			$out= $path_parts['dirname']."/".$name;
+
+			$videoSize = shell_exec("ffprobe -loglevel panic -v error -select_streams v:0 -show_entries stream=width,height \-of default=nokey=1:noprint_wrappers=1 $files[0]");
+			$videoSize = array_filter(explode("\n", $videoSize));
+
+			shell_exec("ffmpeg -loglevel panic -y -i $files[1] -vf scale=$videoSize[0]:$videoSize[1] $files[1]");
+			shell_exec("ffmpeg -loglevel panic -y -i $files[0] -i $files[1] -strict -2 -filter_complex overlay -c:a copy -flags global_header $out");
+			unlink($files[1]);
+
+			rename($out,$original);
 			}
 			else
 			{
