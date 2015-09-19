@@ -1399,7 +1399,7 @@ class Snapchat extends SnapchatAgent {
 		$friends = $updates['data']->friends_response->added_friends;
 		foreach($friends as $friend)
 		{
-				$friendList[$friend->name] = empty($friend->display) ? $friend->name : $friend->display;
+				$friendList[$friend->name] = empty($friend->display) ? $friend->name : utf8_encore($friend->display);
 		}
 
 		return $friendList;
