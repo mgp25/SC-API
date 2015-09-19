@@ -1374,7 +1374,7 @@ class Snapchat extends SnapchatAgent {
 
 		foreach($friends as $friend)
 		{
-				$friendList[] = $friend->name;
+				$friendList[$friend->name] = $friend->display;
 		}
 
 		return $friendList;
@@ -1399,7 +1399,7 @@ class Snapchat extends SnapchatAgent {
 		$friends = $updates['data']->friends_response->added_friends;
 		foreach($friends as $friend)
 		{
-				$friendList[] = $friend->name;
+				$friendList[$friend->name] = $friend->display;
 		}
 
 		return $friendList;
