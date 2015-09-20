@@ -2545,6 +2545,8 @@ class Snapchat extends SnapchatAgent {
 			'/bq/delete_story',
 			array(
 				'story_id' => $storyId,
+        'username' => $this->username,
+        'timestamp' => $timestamp
 			),
 			array(
 				$this->auth_token,
