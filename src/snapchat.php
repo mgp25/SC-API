@@ -137,6 +137,8 @@ class Snapchat extends SnapchatAgent {
 		return $result;
 	}
 
+
+
 	public function getAttestation($password, $timestamp)
 	{
 		$binary = file_get_contents("https://api.casper.io/droidguard/create/binary");
@@ -3054,12 +3056,41 @@ class Snapchat extends SnapchatAgent {
 
 		$timestamp = parent::timestamp();
 		$result = parent::post(
-			'/bq/settings',
+			'/ph/settings',
 			array(
 				'action' => 'updatePrivacy',
 				'privacySetting' => $setting,
 				'timestamp' => $timestamp,
 				'username' => $this->username,
+			),
+			array(
+				$this->auth_token,
+				$timestamp,
+			),
+			$multipart = false,
+			$debug = $this->debug
+		);
+
+		return isset($result->param) && $result->param == $setting;
+	}
+
+	public function updateStoryPrivacy($setting = "EVERYONE")
+	{
+		if(!$this->auth_token || !$this->username)
+		{
+			return FALSE;
+		}
+
+		$setting = strcasecmp($setting, "everyone") ? "EVERYONE" : strcasecmp($setting, "friends") ? "FRIENDS" : "EVERYONE";
+
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			"/ph/settings",
+			array(
+				"action" => "updateStoryPrivacy",
+				"privacySetting" => $setting,
+				"timestamp" => $timestamp,
+				"username" => $this->username
 			),
 			array(
 				$this->auth_token,
