@@ -988,7 +988,6 @@ class Snapchat extends SnapchatAgent {
 	  }
 	  if(count($messagesArray) <= 0) return null;
 		$messages = json_encode($messagesArray);
-		$timestamp = parent::timestamp();
 		$result = parent::post(
 			'/loq/conversation_post_messages',
 			array(
@@ -2547,8 +2546,8 @@ class Snapchat extends SnapchatAgent {
 			'/bq/delete_story',
 			array(
 				'story_id' => $storyId,
-        'username' => $this->username,
-        'timestamp' => $timestamp
+				'username' => $this->username,
+				'timestamp' => $timestamp
 			),
 			array(
 				$this->auth_token,
