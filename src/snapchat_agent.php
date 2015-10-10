@@ -11,7 +11,7 @@ abstract class SnapchatAgent {
 	 * Before updating this value, confirm
 	 * that the library requests everything in the same way as the app.
 	 */
-	const USER_AGENT = 'Snapchat/9.14.2.0 (HTC One; Android 4.4.2#302626.7#19; gzip)';
+	const USER_AGENT = 'Snapchat/9.16.2.0 (HTC One; Android 5.0.2#482424.2#21; gzip)';
 
 	/*
 	 * The API URL. We're using the /bq endpoint, the one that the iPhone

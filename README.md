@@ -10,6 +10,22 @@
 composer require mgp25/snapapi
 ```
 
+## Getting a Casper API Key
+
+This is required for the API to work.
+
+Go to https://clients.casper.io/login.php and create an account.
+
+Once you have created an account, go to "Projects" and create a new project.
+
+![projects](http://s2.postimg.org/r7olutpah/projects.png)
+
+Now you will have your project with your API Key and API Secret.
+
+![api](http://s2.postimg.org/vi39qeudl/api.png)
+
+You will need to set this data in the constructor, as shown in the [examples] (/examples).
+
 ### Special thanks
 
 - [teknogeek](https://github.com/teknogeek)

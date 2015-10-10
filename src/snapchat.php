@@ -6,6 +6,7 @@ require_once "phpseclib/Math/BigInteger.php";
 include_once dirname(__FILE__) . '/snapchat_agent.php';
 include_once dirname(__FILE__) . '/snapchat_cache.php';
 include_once dirname(__FILE__) . '/func.php';
+include_once dirname(__FILE__) . '/Casper-API-PHP/CasperAPI.php';
 
 /**
  * @file
@@ -38,23 +39,23 @@ class Snapchat extends SnapchatAgent {
 	 */
 	const STATUS_NONE 			= -1;
 	const STATUS_SENT 			= 0;
-	const STATUS_DELIVERED 	= 1;
+	const STATUS_DELIVERED  	= 1;
 	const STATUS_OPENED 		= 2;
-	const STATUS_SCREENSHOT = 3;
+	const STATUS_SCREENSHOT     = 3;
 
 	/**
 	 * Friend statuses.
 	 */
 	const FRIEND_CONFIRMED		= 0;
 	const FRIEND_UNCONFIRMED	= 1;
-	const FRIEND_BLOCKED			= 2;
-	const FRIEND_DELETED			= 3;
+	const FRIEND_BLOCKED		= 2;
+	const FRIEND_DELETED		= 3;
 
 	/**
 	 * Privacy settings.
 	 */
 	const PRIVACY_EVERYONE	= 0;
-	const PRIVACY_FRIENDS		= 1;
+	const PRIVACY_FRIENDS	= 1;
 
 	const DATA_FOLDER = 'authData';
 
@@ -64,6 +65,7 @@ class Snapchat extends SnapchatAgent {
 	protected $debug;
 	protected $gEmail;
 	protected $gPasswd;
+	protected $casper;
 	protected $totArray = array(array(),array());
 
 	/**
@@ -78,20 +80,26 @@ class Snapchat extends SnapchatAgent {
 	 * @param string $gPasswd
 	 *   The Google password used for this gEmail.
 	 */
-	public function __construct($username, $gEmail, $gPasswd, $debug = FALSE)
+	public function __construct($username, $gEmail, $gPasswd, $casperKey = "", $casperSecret = "", $debug = FALSE)
 	{
-		$this->username = $username;
-		$this->debug 		= $debug;
-		$this->gEmail 	= $gEmail;
-		$this->gPasswd 	= $gPasswd;
+		$this->username     = $username;
+		$this->debug 	    = $debug;
+		$this->gEmail 	    = $gEmail;
+		$this->gPasswd  	= $gPasswd;
+		$this->casper       = new CasperAPI($casperKey, $casperSecret);
 
-		if(file_exists(__DIR__ . DIRECTORY_SEPARATOR . self::DATA_FOLDER . DIRECTORY_SEPARATOR . "auth-$this->username.dat")){
+		if(file_exists(__DIR__ . DIRECTORY_SEPARATOR . self::DATA_FOLDER . DIRECTORY_SEPARATOR . "auth-$this->username.dat"))
+		{
 			$this->totArray = unserialize(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . self::DATA_FOLDER . DIRECTORY_SEPARATOR . "auth-$this->username.dat"));
 		}
-		if(array_key_exists($this->username, $this->totArray[0])){
+
+		if(array_key_exists($this->username, $this->totArray[0]))
+		{
 			$this->auth_token = $this->totArray[0][$this->username];
 		}
-		if(array_key_exists($this->username, $this->totArray[1])){
+
+		if(array_key_exists($this->username, $this->totArray[1]))
+		{
 			if($this->totArray[1][$this->username][1] > time()) parent::setGAuth($this->totArray[1][$this->username][0]);
 		}
 	}
@@ -137,98 +145,11 @@ class Snapchat extends SnapchatAgent {
 		return $result;
 	}
 
-
-
-	public function getAttestation($password, $timestamp)
+	public function getAttestation($username, $password, $timestamp)
 	{
-		$binary = file_get_contents("https://api.casper.io/droidguard/create/binary");
-		$binaryJSON = json_decode($binary);
-
-
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, "https://www.googleapis.com/androidantiabuse/v1/x/create?alt=PROTO&key=AIzaSyBofcZsgLSS7BOnBjZPEkk4rYwzOIz-lTI");
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-		curl_setopt($ch, CURLOPT_ENCODING, "gzip");
-		curl_setopt($ch, CURLOPT_USERAGENT, "DroidGuard/7329000 (A116 _Quad KOT49H); gzip");
-		curl_setopt($ch, CURLOPT_POST, TRUE);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, base64_decode($binaryJSON->binary));
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array("Accept:", "Expect:", "content-type: application/x-protobuf"));
-
-		$return = curl_exec($ch);
-
-		if(curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200)
-		{
-			throw new Exception("attestationCreate Exception: HTTP Status Code != 200");
-		}
-
-		curl_close($ch);
-
-		$ch = curl_init();
-
-		curl_setopt($ch, CURLOPT_URL, "https://api.casper.io/droidguard/attest/binary");
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-		curl_setopt($ch, CURLOPT_POST, TRUE);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, array(
-			"bytecode_proto" => base64_encode($return),
-			"nonce" => base64_encode(hash("sha256", $this->username."|{$password}|{$timestamp}|/loq/login", true)),
-			"apk_digest" => "5O40Rllov9V8PpwD5zPmmp+GQi7UMIWz2A0LWZA7UX0="
-		));
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-
-		$return = curl_exec($ch);
-
-		if(curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200)
-		{
-			throw new Exception("getAttestation Exception: HTTP Status Code != 200");
-		}
-
-		curl_close($ch);
-
-		$return = json_decode($return);
-
-		if(!$return || !isset($return->binary))
-		{
-			throw new Exception("getAttestation Exception: Invalid JSON / No signedAttestation returned");
-		}
-
-		$postData = base64_decode($return->binary);
-
-		$ch = curl_init();
-
-		curl_setopt($ch, CURLOPT_URL, "https://www.googleapis.com/androidcheck/v1/attestations/attest?alt=JSON&key=AIzaSyDqVnJBjE5ymo--oBJt3On7HQx9xNm1RHA");
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-		curl_setopt($ch, CURLOPT_HEADER, FALSE);
-		curl_setopt($ch, CURLOPT_POST, TRUE);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-			'Accept:',
-			'Expect:',
-			'User-Agent: SafetyNet/7899000 (WIKO JZO54K); gzip',
-			'Content-Type: application/x-protobuf',
-			'Content-Length: ' . strlen($postData),
-			'Connection: Keep-Alive'
-		));
-		curl_setopt($ch, CURLOPT_ENCODING, "gzip");
-
-		$return = curl_exec($ch);
-
-		if(curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200)
-		{
-			throw new Exception("getAttestation Exception: HTTP Status Code != 200");
-		}
-
-		curl_close($ch);
-
-		$return = json_decode($return);
-
-		if(!$return || !isset($return->signedAttestation))
-		{
-			throw new Exception("getAttestation Exception: Invalid JSON / No signedAttestation returned");
-		}
-
-		return $return->signedAttestation;
+		$nonce = $this->casper->generateSnapchatNonce($username, $password, $timestamp);
+		$attestation = $this->casper->getSnapchatAttestation($nonce);
+		return $attestation;
 	}
 
 	public function encryptPassword($email, $password)
@@ -343,39 +264,8 @@ class Snapchat extends SnapchatAgent {
 
 	public function getClientAuthToken($username, $password, $timestamp)
 	{
-		$data = array(
-			"username" => $username,
-			"password" => $password,
-			"timestamp" => $timestamp
-		);
-
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, "https://api.casper.io/security/login/signrequest/");
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-		curl_setopt($ch, CURLINFO_HEADER_OUT, TRUE);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-		curl_setopt($ch, CURLOPT_HEADER, FALSE);
-		curl_setopt($ch, CURLOPT_ENCODING, "gzip");
-		curl_setopt($ch, CURLOPT_POST, TRUE);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-		$return = curl_exec($ch);
-
-		if(curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200)
-		{
-			$return["error"] = 1;
-			$return["data"] = "HTTP Status Code != 200";
-
-			return $return;
-		}
-		curl_close($ch);
-		$return = json_decode($return, true);
-		if(!$return || $return["code"] != 200 || !isset($return["signature"]))
-		{
-			$return["error"] = 1;
-			$return["data"] = "Invalid JSON / Incorrect status / No signature returned.";
-		}
-
-		return $return;
+		$clientAuthToken = $this->casper->getSnapchatClientAuth($username, $password, $timestamp);
+		return $clientAuthToken;
 	}
 
 	private function getGCMToken()
@@ -469,7 +359,7 @@ class Snapchat extends SnapchatAgent {
 					return $auth;
 			}
 			parent::setGAuth($auth);
-      $attestation = $this->getAttestation($password, $timestamp);
+            $attestation = $this->getAttestation($this->username, $password, $timestamp);
 			$clientAuthToken = $this->getClientAuthToken($this->username, $password, $timestamp);
 
 			$result = parent::post(
@@ -494,7 +384,7 @@ class Snapchat extends SnapchatAgent {
 					parent::STATIC_TOKEN,
 					$timestamp,
 					$auth['auth'],
-					$clientAuthToken["signature"]
+					$clientAuthToken
 				),
 				$multipart = false,
 				$debug = $this->debug
@@ -625,7 +515,7 @@ class Snapchat extends SnapchatAgent {
 				return $return;
 		}
 
-		$attestation = $this->getAttestation($password, $timestamp);
+		$attestation = $this->getAttestation($this->username, $password, $timestamp);
 
 		$birthDate = explode("-", $birthday);
 		$age = (date("md", date("U", mktime(0, 0, 0, $birthDate[0], $birthDate[1], $birthDate[2]))) > date("md") ? ((date("Y") - $birthDate[2]) - 1) : (date("Y") - $birthDate[2]));
@@ -656,7 +546,7 @@ class Snapchat extends SnapchatAgent {
 		$this->auth_token = $result['data']->auth_token;
 
 		$auth = $this->getAuthToken();
-		$this->totArray[1][$this->username] = array($auth, time()+(55*60));
+		$this->totArray[1][$this->username] = array($auth, time() + (55 * 60));
 		file_put_contents(__DIR__ . DIRECTORY_SEPARATOR . self::DATA_FOLDER . DIRECTORY_SEPARATOR . "auth-$this->username.dat", serialize($this->totArray));
 		if($auth['error'] == 1)
 		{
@@ -1067,7 +957,7 @@ class Snapchat extends SnapchatAgent {
 		if(strlen(parent::getGAuth()) <= 0){
 			$a = $this->getAuthToken();
 			parent::setGAuth($a);
-			$this->totArray[1][$this->username] = array($a, time()+(55*60));
+			$this->totArray[1][$this->username] = array($a, time() + (55 * 60));
 			file_put_contents(__DIR__ . DIRECTORY_SEPARATOR . self::DATA_FOLDER . DIRECTORY_SEPARATOR . "auth-$this->username.dat",serialize($this->totArray));
 		}
 		$timestamp = parent::timestamp();

@@ -21,7 +21,13 @@ $gMail = trim(fgets(STDIN));
 echo "\nGmail password: ";
 $gPasswd = trim(fgets(STDIN));
 
-$snapchat = new Snapchat($username, $gMail, $gPasswd, true);
+echo "\nCasper key: ";
+$casperKey = trim(fgets(STDIN));
+
+echo "\nCasper secret: ";
+$casperSecret = trim(fgets(STDIN));
+
+$snapchat = new Snapchat($username, $gMail, $gPasswd, $casperKey, $casperSecret, true);
 
 
 $id = $snapchat->register($username, $password, $email, $birthday);
@@ -35,15 +41,16 @@ echo "\nResult: ";
 $result = trim(fgets(STDIN));
 
 $result = $snapchat->sendCaptcha($result, $id);
-unlink(__DIR__."{$id}");
-if ($result == null)
+unlink(__DIR__.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."src".DIRECTORY_SEPARATOR.$id);
+if(property_exists($result, "error") && $result->error === 0 && property_exists($result->data, "find_friends_enabled"))
 {
     echo "Account successfully created\n";
     echo "\nUsername: $username\n";
     echo "Password: $password\n";
     echo "Email: $email\n";
 }
-else {
+else
+{
     echo "There was an error registering your account\n";
     echo "Error code: " . $result['code'];
 }

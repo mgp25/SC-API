@@ -15,16 +15,22 @@ $gEmail = trim(fgets(STDIN));
 echo "\nGmail password: ";
 $gPasswd = trim(fgets(STDIN));
 
-echo "\Phone number: ";
+echo "\nCasper key: ";
+$casperKey = trim(fgets(STDIN));
+
+echo "\nCasper secret: ";
+$casperSecret = trim(fgets(STDIN));
+
+echo "\nPhone number: ";
 $phone = trim(fgets(STDIN));
 
-$snapchat = new Snapchat($username, $gEmail, $gPasswd, true);
+$snapchat = new Snapchat($username, $gEmail, $gPasswd, $casperKey, $casperSecret, true);
 
 $snapchat->login($password);
 
 $snapchat->sendPhoneVerification($phone);
 
-echo "\Code: ";
+echo "\nCode: ";
 $code = trim(fgets(STDIN));
 
 $snapchat->verifyPhoneNumber($code);

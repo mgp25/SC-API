@@ -3,15 +3,17 @@
 include_once("../../src/snapchat.php");
 
 /////////// DATA /////////////
-$username = '';
-$password = '';
-$gEmail   = '';
-$gPasswd  = '';
-$debug    = false;
+$username     = '';
+$password     = '';
+$gEmail       = '';
+$gPasswd      = '';
+$casperKey    = '';
+$casperSecret = '';
+$debug        = false;
 //////////////////////////////
 
 // Login
-$snapchat = new Snapchat($username, $gEmail, $gPasswd, $debug);
+$snapchat = new Snapchat($username, $gEmail, $gPasswd, $casperKey, $casperSecret, $debug);
 $snapchat->login($password);
 
 // Get unconfirmed friends
