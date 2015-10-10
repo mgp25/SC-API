@@ -152,7 +152,7 @@ abstract class CasperAgent {
 		//If cURL doesn't have a bundle of root certificates handy,
 		//we provide ours (see http://curl.haxx.se/docs/sslcerts.html).
 		if(curl_errno($ch) == 60){
-			curl_setopt($ch, CURLOPT_CAINFO, "../ca_bundle.crt");
+			curl_setopt($ch, CURLOPT_CAINFO, __DIR__.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."ca_bundle.crt");
 			$result = curl_exec($ch);
 		}
 
@@ -238,7 +238,7 @@ abstract class CasperAgent {
 		//If cURL doesn't have a bundle of root certificates handy,
 		//we provide ours (see http://curl.haxx.se/docs/sslcerts.html).
 		if(curl_errno($ch) == 60){
-			curl_setopt($ch, CURLOPT_CAINFO, "../ca_bundle.crt");
+			curl_setopt($ch, CURLOPT_CAINFO, __DIR__.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."ca_bundle.crt");
 			$result = curl_exec($ch);
 		}
 
