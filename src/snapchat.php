@@ -3184,4 +3184,43 @@ class Snapchat extends SnapchatAgent {
 
 		return $result;
 	}
+	
+	/**
+	* Set/update your location for geofilters, weather info, and local stories.
+	*
+	* @param int $lat
+	*   Latitude.
+	*
+	* @param int $lon
+	*   Longitude.
+	*
+	* @param int $acc
+	*   Accuracy in meters.
+	*
+	* @return json array
+	*   Returns a JSON array with geofilters, local our stories, weather, and lens filters.
+	*/
+	public function setLocation($lat, $lon, $acc)
+	{
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/loq/loc_data',
+			array(
+                'timestamp' => $timestamp,
+				'lat' => $lat,
+				'long' => $lon,
+                'loc_accuracy_in_meters' => $acc,
+                'checksums_dict' => '{}',
+				'username' => $this->username
+			),
+			array(
+				$this->auth_token,
+				$timestamp,
+			),
+			$multipart = false,
+			$debug = $this->debug,
+		);
+
+		return $result;
+	}
 }
