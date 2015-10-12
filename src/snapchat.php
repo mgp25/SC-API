@@ -3218,7 +3218,7 @@ class Snapchat extends SnapchatAgent {
 				$timestamp,
 			),
 			$multipart = false,
-			$debug = $this->debug,
+			$debug = $this->debug
 		);
 
 		return $result;
