@@ -50,6 +50,7 @@ class Snapchat extends SnapchatAgent {
 	const FRIEND_UNCONFIRMED	= 1;
 	const FRIEND_BLOCKED		= 2;
 	const FRIEND_DELETED		= 3;
+	const FRIEND_FOLLOWING  	= 6;
 
 	/**
 	 * Privacy settings.
@@ -3184,7 +3185,7 @@ class Snapchat extends SnapchatAgent {
 
 		return $result;
 	}
-	
+
 	/**
 	* Set/update your location for geofilters, weather info, and local stories.
 	*
