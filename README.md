@@ -16,7 +16,7 @@ This is required for the API to work.
 
 Go to https://clients.casper.io/login.php and create an account.
 
-Once you have created an account, go to "Projects" and create a new project.
+Once you have created an account, go to `Projects` and create a new project.
 
 ![projects](http://s2.postimg.org/r7olutpah/projects.png)
 
@@ -39,9 +39,10 @@ Based on [JorgenPhi](https://github.com/JorgenPhi/php-snapchat) code.
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mgp25/SC-API)
 
-[![Paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QZY4JX3P7278Y)
+Do you like this project? Support it by donating
 
-**Bitcoin:** 15NejBDahfe1eLAPSJh4iMfYLHYuKDrwJ2
+- ![Paypal](https://raw.githubusercontent.com/reek/anti-adblock-killer/gh-pages/images/paypal.png) Paypal: [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QZY4JX3P7278Y)
+- ![btc](https://camo.githubusercontent.com/4bc31b03fc4026aa2f14e09c25c09b81e06d5e71/687474703a2f2f7777772e6d6f6e747265616c626974636f696e2e636f6d2f696d672f66617669636f6e2e69636f) Bitcoin: 15NejBDahfe1eLAPSJh4iMfYLHYuKDrwJ2
 
 ## License
 MIT
