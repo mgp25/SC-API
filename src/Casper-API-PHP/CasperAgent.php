@@ -153,6 +153,8 @@ abstract class CasperAgent {
 		//we provide ours (see http://curl.haxx.se/docs/sslcerts.html).
 		if(curl_errno($ch) == 60){
 			curl_setopt($ch, CURLOPT_CAINFO, __DIR__.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."ca_bundle.crt");
+			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT ,0);
+			curl_setopt($ch, CURLOPT_TIMEOUT, 20);
 			$result = curl_exec($ch);
 		}
 
