@@ -3186,6 +3186,52 @@ class Snapchat extends SnapchatAgent {
 		return $result;
 	}
 
+	public function getFriendSnaptag($friend)
+	{
+		$updates = $this->getUpdates();
+
+		if(empty($updates))
+		{
+			return FALSE;
+		}
+
+		$friends = array();
+		$friends = $updates['data']->friends_response;
+		$friends = $friends->friends;
+
+		$userId = null;
+		foreach($friends as $user)
+		{
+			if ($user->name == $friend)
+			{
+				$userId = $user->user_id;
+				break;
+			}
+		}
+
+		if ($userId == null)
+			return false;
+
+		$timestamp = parent::timestamp();
+		$result = parent::post(
+			'/bq/snaptag_download',
+			array(
+				'timestamp' => $timestamp,
+				'type' => 'SVG',
+				'user_id' => $userId,
+				'username' => $this->username
+			),
+			array(
+				$this->auth_token,
+				$timestamp,
+			),
+			$multipart = false,
+			$debug = $this->debug
+		);
+
+		return $result;
+	}
+
 	/**
 	* Set/update your location for geofilters, weather info, and local stories.
 	*
