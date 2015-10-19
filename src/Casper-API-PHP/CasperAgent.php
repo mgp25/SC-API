@@ -145,8 +145,6 @@ abstract class CasperAgent {
 			}
 			curl_setopt($ch, CURLOPT_POST, true);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 20);
-			curl_setopt($ch, CURLOPT_TIMEOUT, 20);
 		}
 
 		$result = curl_exec($ch);
