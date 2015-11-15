@@ -1,4 +1,4 @@
-# SC API [![Latest Stable Version](https://poser.pugx.org/mgp25/snapapi/v/stable)](https://packagist.org/packages/mgp25/snapapi) [![Total Downloads](https://poser.pugx.org/mgp25/snapapi/downloads)](https://packagist.org/packages/mgp25/snapapi) [![License](https://poser.pugx.org/mgp25/snapapi/license)](https://packagist.org/packages/mgp25/snapapi)
+# SC API [![Latest Stable Version](https://poser.pugx.org/mgp25/snapapi/v/stable)](https://packagist.org/packages/mgp25/snapapi) [![Total Downloads](https://poser.pugx.org/mgp25/snapapi/downloads)](https://packagist.org/packages/mgp25/snapapi) [![License](https://poser.pugx.org/mgp25/snapapi/license)](https://packagist.org/packages/mgp25/snapapi) ![CasperStatus](https://www.mgp25.com/cstatus/status.svg)
 
 **Read the [wiki](https://github.com/mgp25/SC-API/wiki)** and previous issues before opening a new one! Maybe your issue is already answered.
 
