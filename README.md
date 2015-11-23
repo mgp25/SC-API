@@ -6,9 +6,9 @@ Welcome to SnAPI!
 
 ## Table of Contents
 
-* [Installation](### Installation)
-* [Methods](### Methods)
-* [Examples](### Examples)
+* [Installation](Installation)
+* [Methods](Methods)
+* [Examples](Examples)
 
 ----------
 
