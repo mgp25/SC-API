@@ -9,7 +9,6 @@ Welcome to SnAPI!
 * [Installation](### Installation)
 * [Methods](### Methods)
 * [Examples](### Examples)
-
 ----------
 
 ## Installation
@@ -34,15 +33,15 @@ You'll now have your project with your API Key and API Secret.
 
 ![api](http://s2.postimg.org/vi39qeudl/api.png)
 
-You will need to set this data in the constructor, as shown in the [examples](src/examples).
+You will need to set this data in the constructor, as shown in the [examples](/examples).
 
 ## Methods
 
-See [Methods](src/methods/methods.md) for detailed information on SnAPI methods.
+See [Methods](methods/methods.md) for detailed information on SnAPI methods.
 
 ## Examples
 
-See Examples for examples of [basic user functions](src/examples/exampleFunctional.php), [account registration](src/examples/registerTool.php), and [phone verification](src/examples/verifyPhone.php).
+See Examples for examples of [basic user functions](examples/exampleFunctional.php), [account registration](registerTool.php), and [phone verification](verifyPhone.php).
 
 ### Special thanks
 
