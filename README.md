@@ -38,7 +38,10 @@ You will need to set this data in the constructor, as shown in the [examples](sr
 
 ## Methods
 
-See [Methods](src/methods/accountmethods.md) for detailed information on SnAPI methods.
+See the following Methods pages for detailed information on SnAPI methods:
+
+* [Methods](src/methods/accountmethods.md)
+
 
 ## Examples
 
