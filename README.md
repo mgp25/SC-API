@@ -6,12 +6,12 @@ Welcome to SnAPI!
 
 ## Table of Contents
 
-* [Installation]()
-* [Methods](methods/methods.md)
-* [examples](/examples)
+* [Installation](### Installation)
+* [Methods](### Methods)
+* [Examples](### Examples)
 ----------
 
-### Installation
+## Installation
 
 Use the following command for installation:
 
@@ -38,6 +38,10 @@ You will need to set this data in the constructor, as shown in the [examples](/e
 ## Methods
 
 See [Methods](methods/methods.md) for detailed information on SnAPI methods.
+
+## Examples
+
+See Examples for examples of [basic user functions](examples/exampleFunctional.php), [account registration](registerTool.php), and [phone verification](verifyPhone.php).
 
 ### Special thanks
 
