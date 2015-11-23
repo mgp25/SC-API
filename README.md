@@ -6,9 +6,9 @@ Welcome to SnAPI!
 
 ## Table of Contents
 
-* [Installation](Installation)
-* [Methods](Methods)
-* [Examples](Examples)
+* [Installation](readme##Installation)
+* [Methods](readme##Methods)
+* [Examples](readme##Examples)
 
 ----------
 
@@ -38,7 +38,7 @@ You will need to set this data in the constructor, as shown in the [examples](sr
 
 ## Methods
 
-See [Methods](src/methods/methods.md) for detailed information on SnAPI methods.
+See [Methods](src/methods/accountmethods.md) for detailed information on SnAPI methods.
 
 ## Examples
 
