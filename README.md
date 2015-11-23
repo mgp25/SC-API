@@ -40,7 +40,7 @@ You will need to set this data in the constructor, as shown in the [examples](sr
 
 See the following Methods pages for detailed information on SnAPI methods:
 
-* [Methods](src/methods/accountmethods.md)
+* [Account Methods](src/doc/methods/accountmethods.md)
 
 
 ## Examples

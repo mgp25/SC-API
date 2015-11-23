@@ -58,70 +58,122 @@ $snapchat->sendMessage($to, $msg);
 
 ## setStory()
 
-
+Sets a user story. Videos must be less than or equal to ten seconds.
 
 ### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-|  |  |  |
+| imagePath | string | URL or local path to an image or video to use. |
+| time | int | The duration of the video in seconds. |
+| text | string | The text for the story. |
 
 ### Example
+
+```php
+$snapchat->setStory($imagePath, $time, $text);
+```
+
 
 ## getFriends()
 
+Gets a user's friends list.
 
-### Parameters
+### Returns
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-|  |  |  |
+Returns a user's friends list in a format; if it was a JSON response I'd use the appropriate structure.
 
 ### Example
+
+$friends = $snapchat->getFriends();
 
 ## getSnaps()
 
+Gets a user's snaps. Can be run once or automatically if set to `true`.
 
-### Parameters
+### Returns
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-|  |  |  |
+Returns a users snaps in a format; if it was a JSON response I'd use the appropriate structure.
 
 ### Example
+
+```php
+$snapchat->getSnaps();
+```
+
+OR
+
+```php
+$snapchat->getSnaps(true);
+```
 
 ## getFriendStories()
 
+Gets the stories from a user's friends. Can be run once or automatically if set to `true`.
 
-### Parameters
+### Returns
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-|  |  |  |
+Returns a friends' stories in a format; if it was a JSON response I'd use the appropriate structure.
 
 ### Example
+
+```php
+$snapchat->getFriendStories();
+```
+
+```php
+$snapchat->getFriendStories(true);
+```
 
 ## addFriend()
 
+Adds a friend.
 
 ### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-|  |  |  |
+| username | string | Name of the friend to add. |
 
 ### Example
+
+```php
+$snapchat->addFriend($username);
+```
+
+## deleteFriend()
+
+Deletes a friend.
+
+### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| username | string | Name of the friend to delete. |
+
+### Example
+
+```php
+$snapchat->deleteFriend($username);
+```
 
 ## findFriends()
 
+Finds a user's friends based on (Email contacts? Friend list?)
 
 ### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-|  |  |  |
+| friends | string | The user's friends. |
+
+### Returns
+
+Returns the user's friends as an array. If it's a JSON response, I'd put that here in the appropriate format.
 
 ### Example
+
+$snapchat->findFriends($friends);
 
 ## openAppEvent()
 
