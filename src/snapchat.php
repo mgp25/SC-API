@@ -148,9 +148,12 @@ class Snapchat extends SnapchatAgent {
 
 	public function getAttestation($username, $password, $timestamp)
 	{
+		/*
 		$nonce = $this->casper->generateSnapchatNonce($username, $password, $timestamp);
 		$attestation = $this->casper->getSnapchatAttestation($nonce);
 		return $attestation;
+		*/
+		return 'ie';
 	}
 
 	public function encryptPassword($email, $password)
