@@ -1,30 +1,43 @@
+Welcome to SnAPI!
+
 # SC API [![Latest Stable Version](https://poser.pugx.org/mgp25/snapapi/v/stable)](https://packagist.org/packages/mgp25/snapapi) [![Total Downloads](https://poser.pugx.org/mgp25/snapapi/downloads)](https://packagist.org/packages/mgp25/snapapi) [![License](https://poser.pugx.org/mgp25/snapapi/license)](https://packagist.org/packages/mgp25/snapapi) ![CasperStatus](https://www.mgp25.com/cstatus/status.svg)
 
-**Read the [wiki](https://github.com/mgp25/SC-API/wiki)** and previous issues before opening a new one! Maybe your issue is already answered.
+**Please see the [wiki](https://github.com/mgp25/SC-API/wiki)** and previous issues before opening a new one; your issue may already be answered.
 
+## Table of Contents
+
+* [Installation]()
+* [Methods](methods/methods.md)
+* [examples](/examples)
 ----------
 
 ### Installation
+
+Use the following command for installation:
 
 ```sh
 composer require mgp25/snapapi
 ```
 
-## Getting a Casper API Key
+## Get a Casper API Key
 
-This is required for the API to work.
+You must get a Casper API key to make SnAPI work.
 
-Go to https://clients.casper.io/login.php and create an account.
+Go to the [Casper Client page](https://clients.casper.io/login.php) and create an account.
 
-Once you have created an account, go to `Projects` and create a new project.
+Once you've created an account, go to `Projects` and create a new project.
 
 ![projects](http://s2.postimg.org/r7olutpah/projects.png)
 
-Now you will have your project with your API Key and API Secret.
+You'll now have your project with your API Key and API Secret.
 
 ![api](http://s2.postimg.org/vi39qeudl/api.png)
 
-You will need to set this data in the constructor, as shown in the [examples] (/examples).
+You will need to set this data in the constructor, as shown in the [examples](/examples).
+
+## Methods
+
+See [Methods](methods/methods.md) for detailed information on SnAPI methods.
 
 ### Special thanks
 
