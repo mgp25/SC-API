@@ -1,0 +1,8 @@
+If you're receiving a "BadAuthentication" error when getting the authentication from Google's servers, follow these steps:
+
+1) When signed in to your Google account, visit this page and click "Unlock": https://accounts.google.com/b/0/DisplayUnlockCaptcha
+2) Enable 2-step verification
+3) Generate a new App Password for "other" at this page: https://security.google.com/settings/security/apppasswords
+4) Use that password for the Gmail password when setting up Snap-API.
+
+Enjoy!
